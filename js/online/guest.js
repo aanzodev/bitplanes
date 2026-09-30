@@ -2,9 +2,9 @@
 // sends key presses back.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
 
-    const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, interval: SNAPSHOT_MS, input: {}};
+    const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {}};
 
     function join(code) {
         if (O.role) return;
@@ -18,7 +18,7 @@
         status("Connecting to room " + code + "…");
         const peer = new Peer(peerOptions());
         peer.on("open", () => {
-            const conn = peer.connect(PREFIX + code, {reliable: true});
+            const conn = peer.connect(PREFIX + code, {reliable: true, serialization: "json"});
             guest.conn = conn;
             conn.on("open", () => {
                 conn.send({
@@ -109,12 +109,48 @@
         return a + d * t;
     }
 
+    // The host time the guest is currently drawing.
+    function renderTime() {
+        return performance.now() - (guest.offset || 0) - RENDER_DELAY_MS;
+    }
+
+    // Called by the render loop every frame: place every object where it was
+    // at renderTime(), blending between the two snapshots around that time.
     function guestAlpha() {
-        const t = Math.min(1, (performance.now() - guest.last) / guest.interval);
-        for (const o of guest.objects.values()) {
-            if (o.nextAngle !== undefined) o.angle = lerpAngle(o.prevAngle, o.nextAngle, t);
+        const t = renderTime();
+        for (const [id, o] of guest.objects) {
+            if (o.goneAt !== undefined && t >= o.goneAt) {
+                removeObject(guest.world, o);
+                guest.objects.delete(id);
+                continue;
+            }
+            const h = o.hist;
+            if (!h || !h.length) continue;
+            let x, y, a;
+            if (t <= h[0][0]) [, x, y, a] = h[0];
+            else if (t >= h[h.length - 1][0]) [, x, y, a] = h[h.length - 1];
+            else {
+                let i = h.length - 2;
+                while (i > 0 && h[i][0] > t) i--;
+                const [t0, x0, y0, a0] = h[i], [t1, x1, y1, a1] = h[i + 1];
+                const k = t1 > t0 ? (t - t0) / (t1 - t0) : 1;
+                x = x0 + (x1 - x0) * k;
+                y = y0 + (y1 - y0) * k;
+                a = lerpAngle(a0, a1, k);
+            }
+            o.position = {x, y};
+            o.previous = o.position;
+            o.angle = a;
         }
-        return t;
+        return 1;
+    }
+
+    // Estimate (local clock - host clock) as the smallest recent difference,
+    // i.e. the snapshot that arrived fastest.
+    function updateOffset(ts, now) {
+        guest.offsets.push(now - ts);
+        if (guest.offsets.length > 90) guest.offsets.shift();
+        guest.offset = Math.min(...guest.offsets);
     }
 
     function createObject(world, [id, cls, look, radius]) {
@@ -129,6 +165,7 @@
         });
         applyLook(o, look);
         if (!o.sprite) return;
+        o.netId = id;
         guest.objects.set(id, o);
         world.add(o);
     }
@@ -143,8 +180,9 @@
     function applySnapshot(msg) {
         const world = guest.world, e = engine();
         const now = performance.now();
-        if (guest.last) guest.interval = guest.interval * 0.8 + Math.min(200, Math.max(20, now - guest.last)) * 0.2;
         guest.last = now;
+        const ts = typeof msg.ts === "number" ? msg.ts : now;
+        updateOffset(ts, now);
 
         for (const d of msg.d || []) createObject(world, d);
         for (const [id, look] of msg.k || []) {
@@ -156,22 +194,17 @@
             const o = guest.objects.get(id);
             if (!o) continue;
             seen.add(id);
-            if (o.seen) {
-                o.previous = {x: o.position.x, y: o.position.y};
-                o.prevAngle = o.nextAngle;
-            } else {
-                o.previous = {x, y};
-                o.prevAngle = a;
-                o.seen = true;
+            if (!o.hist) {
+                o.hist = [];
+                o.position = o.previous = {x, y};
+                o.angle = a;
             }
-            o.position = {x, y};
-            o.nextAngle = a;
+            o.hist.push([ts, x, y, a]);
+            if (o.hist.length > 10) o.hist.shift();
         }
-        for (const [id, o] of guest.objects) {
-            if (!seen.has(id)) {
-                removeObject(world, o);
-                guest.objects.delete(id);
-            }
+        // Objects missing from the snapshot are removed once the drawn time catches up.
+        for (const o of guest.objects.values()) {
+            if (!seen.has(o.netId) && o.goneAt === undefined) o.goneAt = ts;
         }
 
         guest.me = msg.me || 0;
@@ -199,7 +232,8 @@
                 plane.flares, plane.maxFlares] = msg.h;
             e.cockpit(plane);
         }
-        for (const p of msg.fx || []) spawnParticle(world, p);
+        // Particles are delayed like everything else so they line up with the planes.
+        if (msg.fx && msg.fx.length) setTimeout(() => msg.fx.forEach(p => spawnParticle(world, p)), RENDER_DELAY_MS);
     }
 
     function bindGuestKeys() {

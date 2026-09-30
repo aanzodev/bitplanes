@@ -91,7 +91,7 @@
         const beat = () => {
             world.tick && world.tick();
             const now = performance.now();
-            if (now - last >= SNAPSHOT_MS) {
+            if (now - last >= SNAPSHOT_MS - 4) {
                 last = now;
                 sendSnapshots();
             }
@@ -163,6 +163,9 @@
         if (!client || !client.player) return;
         if (msg.t === "in" && msg.s) {
             client.input = {u: !!msg.s.u, d: !!msg.s.d, l: !!msg.s.l, r: !!msg.s.r, f: !!msg.s.f};
+            // Turn right away instead of waiting for the next control tick.
+            const plane = client.player.hasPlane(), i = client.input;
+            if (plane) plane.elevator = i.l && !i.r ? -1 : !i.l && i.r ? 1 : 0;
         } else if (msg.t === "act") {
             const world = host.world, player = client.player, controls = engine().controls;
             const plane = player.hasPlane();
@@ -310,7 +313,7 @@
                 ? [mine.ammo, mine.maxAmmo, mine.missiles, mine.maxMissiles, mine.thrust, mine.maxThrust || consts.k,
                     mine.flares || 0, mine.maxFlares || 0]
                 : null;
-            client.conn.send({t: "s", o: entries, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud});
+            client.conn.send({t: "s", ts: round(performance.now(), 1), o: entries, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud});
         }
     }
 
