@@ -309,13 +309,15 @@
         }
         const e = s.engine, now = s.ctx.currentTime, glide = 0.12;
         const t = Math.max(0, Math.min(1, plane.thrust / (plane.maxThrust || 17)));
+        // Overall loudness for this plane; some engines are silent at idle.
+        const level = (profile.volume || 1) * (profile.idleSilent && t === 0 ? 0 : 1);
         if (profile.kind === "jet") {
             e.roarLp.frequency.setTargetAtTime(profile.roar[0] + (profile.roar[1] - profile.roar[0]) * t, now, glide);
             e.roarGain.gain.setTargetAtTime(0.14 + 0.3 * t, now, glide);
             e.whine.frequency.setTargetAtTime(profile.whine[0] + (profile.whine[1] - profile.whine[0]) * t, now, glide);
             e.whineGain.gain.setTargetAtTime(profile.whineVol * (0.4 + 0.6 * t), now, glide);
             e.burnerGain.gain.setTargetAtTime(t > 0.8 ? profile.burner * (t - 0.8) / 0.2 : 0, now, glide);
-            e.out.gain.setTargetAtTime(0.5, now, glide);
+            e.out.gain.setTargetAtTime(0.5 * level, now, glide);
         } else {
             const f = profile.base + profile.range * t;
             e.osc1.frequency.setTargetAtTime(f, now, glide);
@@ -324,7 +326,7 @@
             e.tone.frequency.setTargetAtTime(profile.tone * (0.6 + 0.9 * t), now, glide);
             e.washGain.gain.setTargetAtTime(0.03 + 0.07 * t, now, glide);
             if (e.whistleGain) e.whistleGain.gain.setTargetAtTime(0.03 * t, now, glide);
-            let vol = 0.16 + 0.22 * t;
+            let vol = (0.16 + 0.22 * t) * level;
             if (profile.sputter && Math.random() < profile.sputter) vol *= 0.35;
             e.out.gain.setTargetAtTime(vol, now, 0.04);
         }

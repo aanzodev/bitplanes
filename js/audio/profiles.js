@@ -13,6 +13,9 @@
 //   whine        [idle, full] turbine whine pitch
 //   whineVol     how loud the turbine whine is
 //   burner       afterburner rumble volume at full throttle (0 = none)
+// Any plane:
+//   volume       overall engine loudness (1 = normal)
+//   idleSilent   engine makes no sound at zero throttle
 // gun: "mg" (machine gun), "cannon" (M61 Vulcan buzz) or "brrt" (A-10's GAU-8)
 window.BitSoundProfiles = {
     classic: {kind: "prop", base: 55, range: 45, wave: "sawtooth", pulse: 18, tone: 900, gun: "mg"},
@@ -26,5 +29,5 @@ window.BitSoundProfiles = {
     mustang: {kind: "prop", base: 48, range: 56, wave: "triangle", pulse: 36, tone: 1200, whistle: 1250, gun: "mg"},
     f16: {kind: "jet", roar: [500, 2800], whine: [2200, 5200], whineVol: 0.05, burner: 0.35, gun: "cannon"},
     a10: {kind: "jet", roar: [400, 1600], whine: [3200, 6200], whineVol: 0.11, burner: 0, gun: "brrt"},
-    f22: {kind: "jet", roar: [300, 2200], whine: [1500, 3600], whineVol: 0.035, burner: 0.5, gun: "cannon"},
+    f22: {kind: "jet", roar: [300, 2200], whine: [1500, 3600], whineVol: 0.035, burner: 0.3, volume: 0.4, idleSilent: true, gun: "cannon"},
 };
