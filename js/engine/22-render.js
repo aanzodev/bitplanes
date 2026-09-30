@@ -462,20 +462,29 @@ BitModules[22] = function (M, j, t) {
             I = 0,
             g = Object(D.g)(),
             y = 1 / 60;
+        // One simulation step (fixed 60 Hz physics, catching up on elapsed time).
+        function step() {
+            const A = Object(D.g)();
+            let n = (A - g) / 1e3;
+            for (n > 0.1 && (n = 0.1), g = A, I += n, t.remote || Object(L.c)(t, n); I >= y;)
+                (t.remote || O(t, y), (I -= y));
+            return (Object(N.g)(t, y), n);
+        }
+        // Lets the game keep running while the window is covered or hidden and
+        // animation frames stop (used by online hosts).
+        t.tick = function () {
+            Object(D.g)() - g > 50 && step();
+        };
         return (
             (function T() {
                 e = requestAnimationFrame(T);
-                const A = Object(D.g)();
-                let n = (A - g) / 1e3;
+                const n = step();
                 window.bitAdaptQuality && window.bitAdaptQuality(n);
-                for (n > 0.1 && (n = 0.1), g = A, I += n, t.remote || Object(L.c)(t, n); I >= y;)
-                    (t.remote || O(t, y), (I -= y));
-                Object(N.g)(t, y);
                 const c = t.remote ? t.remote.alpha() : I / y;
                 (i(M, c), a(j, M, t, c, u));
             })(),
             function () {
-                cancelAnimationFrame(e);
+                (cancelAnimationFrame(e), (t.tick = null));
             }
         );
     }
