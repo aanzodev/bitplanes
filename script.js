@@ -512,7 +512,7 @@
             try {
                 let M = JSON.parse(L("stats") || "{}");
                 i = Object.assign(Object.assign({}, i), M)
-            } finally {}
+            } catch (M) {}
             setInterval(() => {
                 N("stats", JSON.stringify(i))
             }, 1e3)
@@ -1366,7 +1366,7 @@
                     return M instanceof L.a ? this.bullets.has(M) : M instanceof i.b ? this.pilots.has(M) : M instanceof N.a ? this.barns.has(M) : this.bodies.has(M)
                 }
                 delete(M) {
-                    M instanceof L.a ? this.bullets.delete(M) : M instanceof i.b ? this.pilots.delete(M) : this.bodies.delete(M), M.destroy()
+                    M instanceof L.a ? this.bullets.delete(M) : M instanceof i.b ? this.pilots.delete(M) : M instanceof N.a ? this.barns.delete(M) : this.bodies.delete(M), M.destroy()
                 }
             }
         }, function(M, j, t) {
@@ -2446,3 +2446,4 @@
                 })
             }))
         }
+]);
