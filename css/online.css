@@ -55,3 +55,64 @@ main input.room-code {
     font-weight: 700;
     white-space: nowrap;
 }
+
+/* Ping meter (online games only) */
+
+.ping-meter {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: 90vw;
+}
+
+.ping-meter[hidden] {
+    display: none;
+}
+
+.ping {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.ping b {
+    font-variant-numeric: tabular-nums;
+}
+
+.ping .bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 1px;
+    height: 12px;
+}
+
+.ping .bars > i {
+    width: 3px;
+    background: #c6ccd2;
+    border-radius: 1px;
+}
+
+.ping .bars > i:nth-child(1) { height: 5px; }
+.ping .bars > i:nth-child(2) { height: 8px; }
+.ping .bars > i:nth-child(3) { height: 12px; }
+
+.ping.good { color: #117a2b; }
+.ping.good .bars > i { background: #1fae45; }
+
+.ping.ok { color: #9a6a00; }
+.ping.ok .bars > i:nth-child(-n+2) { background: #e3a008; }
+
+.ping.bad { color: #b3261e; }
+.ping.bad .bars > i:nth-child(1) { background: #e0453a; }
+
+.ping.waiting { color: #5b6b7a; }
