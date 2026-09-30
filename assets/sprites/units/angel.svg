@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="11px" viewBox="0 0 13 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>angel</title>
+    <g id="angel" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(0.611218, 3.755766)" stroke="#7F7F7F" stroke-width="0.5">
+            <path d="M0.359455625,3.24423407 C-0.402039416,1.08141136 0.0463673856,0 1.70467603,0 C2.99313828,0 4.12246425,0.85406463 5.09265396,2.56219389 C5.27831257,2.88906698 4.95169169,3.34268213 4.11279132,3.92303934 L0.359455625,3.24423407 Z" id="Path-9" fill="#FFFFFF" stroke-linejoin="round"></path>
+            <line x1="1.88878175" y1="3.4141291" x2="1.88878175" y2="2.12211703" id="Line" stroke-linecap="round" stroke-linejoin="bevel"></line>
+            <line x1="2.88878175" y1="3.4141291" x2="2.88878175" y2="2.42135605" id="Line" stroke-linecap="round" stroke-linejoin="bevel"></line>
+        </g>
+        <g id="Group" transform="translate(9.500000, 6.000000) scale(-1, 1) translate(-9.500000, -6.000000) translate(7.000000, 4.000000)" stroke="#7F7F7F" stroke-width="0.5">
+            <path d="M0.359455625,3.24423407 C-0.402039416,1.08141136 0.0463673856,0 1.70467603,0 C2.88100963,0 3.92469948,0.711882544 4.83574558,2.13564763 C5.08459873,2.52455049 4.73962577,3.10154106 3.80082669,3.86661933 L0.359455625,3.24423407 Z" id="Path-9" fill="#FFFFFF" stroke-linejoin="round"></path>
+            <line x1="1.88878175" y1="3.4141291" x2="1.88878175" y2="2.12211703" id="Line" stroke-linecap="round" stroke-linejoin="bevel"></line>
+            <line x1="2.88878175" y1="3.4141291" x2="2.88878175" y2="2.42135605" id="Line" stroke-linecap="round" stroke-linejoin="bevel"></line>
+        </g>
+        <path d="M6.5,6 C7.40204885,6 8.08185505,6.9377924 8.33259419,8.05463097 C8.49975362,8.79919002 8.72222222,9.44764636 9,10 L4,10 C4.40396339,9.11119576 4.60594508,8.46273942 4.60594508,8.05463097 C4.60594508,7.4424683 5.59795115,6 6.5,6 Z" id="Path-5" stroke="#7F7F7F" stroke-width="0.4" fill-opacity="0.8" fill="#FFFFFF"></path>
+        <circle id="Oval" stroke="#FFB300" cx="6.5" cy="2.5" r="2"></circle>
+        <circle id="Oval" stroke="#7F7F7F" stroke-width="0.5" fill-opacity="0.79" fill="#FFFFFF" cx="6.5" cy="4.5" r="2.25"></circle>
+    </g>
+</svg>
