@@ -617,7 +617,7 @@
                 for (let t = 0; t < j.length; t++) {
                     let L = 10 + 28 * t;
                     const i = j[j.length - t - 1];
-                    M.textBaseline = "top", M.font = "20px monospace", M.fillStyle = "#454545", M.drawImage(N.b.ui.targetMark.canvas, 10, L, 20, 20), M.fillText(i.kills.toString(), 33, L + 1), M.drawImage(N.b.ui.skull.canvas, 60, L, 20, 20), M.fillText(i.deaths.toString(), 83, L + 1), M.font = '24px "Cormorant Garamond"';
+                    M.textBaseline = "top", M.font = "20px monospace", M.fillStyle = "#454545", M.drawImage(N.b.ui.targetMark.canvas, 10, L, 20, 20), M.fillText(i.kills.toString(), 33, L + 1), M.drawImage(N.b.ui.skull.canvas, 60, L, 20, 20), M.fillText(i.deaths.toString(), 83, L + 1), M.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
                     let e = M.measureText(i.name);
                     M.fillStyle = "rgba(255, 255, 255, 0.3)", Object(u.d)(M, 112, L - 1, e.width + 6, 25, 5), M.fill(), M.fillStyle = "rgb(82, 161, 255)", M.fillText(i.name, 115, L + 1), M.fillStyle = i.color, M.fillText(i.name, 115, L)
                 }
@@ -633,7 +633,7 @@
                     for (let L = 0; L < j.members.length; L++) {
                         let i = t + 28 * L;
                         const e = j.members[L];
-                        M.textBaseline = "top", M.font = "20px monospace", M.fillStyle = "#454545", M.drawImage(N.b.ui.targetMark.canvas, 10, i, 20, 20), M.fillText(e.kills.toString(), 33, i + 1), M.drawImage(N.b.ui.skull.canvas, 60, i, 20, 20), M.fillText(e.deaths.toString(), 83, i + 1), M.font = '24px "Cormorant Garamond"';
+                        M.textBaseline = "top", M.font = "20px monospace", M.fillStyle = "#454545", M.drawImage(N.b.ui.targetMark.canvas, 10, i, 20, 20), M.fillText(e.kills.toString(), 33, i + 1), M.drawImage(N.b.ui.skull.canvas, 60, i, 20, 20), M.fillText(e.deaths.toString(), 83, i + 1), M.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
                         let I = M.measureText(e.name);
                         M.fillStyle = "rgba(255, 255, 255, 0.3)", Object(u.d)(M, 112, i - 1, I.width + 6, 25, 5), M.fill(), M.fillStyle = "rgb(82, 161, 255)", M.fillText(e.name, 115, i + 1), M.fillStyle = e.color, M.fillText(e.name, 115, i)
                     }
@@ -646,7 +646,7 @@
                     for (let L = 0; L < j.members.length; L++) {
                         let i = t + 28 * L;
                         const e = j.members[L];
-                        M.textBaseline = "top", M.font = "20px monospace", M.fillStyle = "#454545", M.drawImage(N.b.ui.targetMark.canvas, 10, i, 20, 20), M.fillText(e.kills.toString(), 33, i + 1), e.inGame() || M.drawImage(N.b.ui.skull.canvas, 60, i, 20, 20), M.font = '24px "Cormorant Garamond"';
+                        M.textBaseline = "top", M.font = "20px monospace", M.fillStyle = "#454545", M.drawImage(N.b.ui.targetMark.canvas, 10, i, 20, 20), M.fillText(e.kills.toString(), 33, i + 1), e.inGame() || M.drawImage(N.b.ui.skull.canvas, 60, i, 20, 20), M.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
                         let I = M.measureText(e.name);
                         M.fillStyle = "rgba(255, 255, 255, 0.3)", Object(u.d)(M, 92, i - 1, I.width + 6, 25, 5), M.fill(), M.fillStyle = "rgb(82, 161, 255)", M.fillText(e.name, 95, i + 1), M.fillStyle = e.color, M.fillText(e.name, 95, i)
                     }
