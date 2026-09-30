@@ -227,7 +227,7 @@
         client.conn.send({
             t: "welcome",
             code: host.code,
-            world: {width: world.width, height: world.height, ground: world.ground, stratosphere: world.stratosphere},
+            world: {width: world.width, height: world.height, ground: world.ground, stratosphere: world.stratosphere, map: world.map && world.map.id},
         });
         updateHostBanner();
         hostLog(`<span class="message">${player.html()} joined</span>`);

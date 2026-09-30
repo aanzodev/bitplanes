@@ -53,7 +53,8 @@ BitModules[18] = function (M, j, t) {
             ((t.position = Object(i.s)((e + M.width) * Math.random() - e / 2, u)), M.clouds.push(t));
         }
         for (let j = 0, t = 10; t < M.width;) {
-            const u = new L.d(N.b.groundObjects[j++ % N.b.groundObjects.length]);
+            const objs = (M.map && M.map.groundObjects) || N.b.groundObjects,
+                u = new L.d(objs[j++ % objs.length]);
             ((u.position = Object(i.s)(t, M.ground - u.sprite.height + 0.5)),
                 (t += u.sprite.width + 30 + 800 * Math.random()),
                 M.groundObjects.add(u));

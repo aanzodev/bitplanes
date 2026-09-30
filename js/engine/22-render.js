@@ -18,9 +18,17 @@ BitModules[22] = function (M, j, t) {
 
     function a(M, j, t, L, a) {
         var A;
+        // Map theme (sky colors, ground, forest). Falls back to the countryside look.
+        const theme = t.map || {},
+            mapSky = theme.sky || "#9be2fe",
+            mapSpace = theme.space || "#1f4752",
+            mapForest = theme.forest || I.b.forest,
+            mapForestBack = theme.forestBack || I.b.forest2,
+            mapGround = theme.ground || I.b.ground,
+            mapClouds = theme.cloudAlpha != null ? theme.cloudAlpha : 0.8;
         let n = t.stratosphere - j.offsetY;
-        (n < 0 ? (n = 0) : ((M.fillStyle = "#1f4752"), M.fillRect(0, 0, j.width, n)),
-            (M.fillStyle = "#9be2fe"),
+        (n < 0 ? (n = 0) : ((M.fillStyle = mapSpace), M.fillRect(0, 0, j.width, n)),
+            (M.fillStyle = mapSky),
             M.fillRect(0, n, j.width, j.height),
             (function (M, j, t) {
                 if (t.stratosphere > j.offsetY) {
@@ -28,15 +36,15 @@ BitModules[22] = function (M, j, t) {
                     const N = -j.offsetY - L + t.stratosphere + 4;
                     (M.save(), M.translate(0, N));
                     let i = M.createLinearGradient(0, 0, 0, L);
-                    (i.addColorStop(0, "#1f4752"),
-                        i.addColorStop(1, "#9be2fe"),
+                    (i.addColorStop(0, mapSpace),
+                        i.addColorStop(1, mapSky),
                         (M.fillStyle = i),
                         M.fillRect(0, 0, j.width, L),
                         M.restore());
                 }
             })(M, j, t),
-            y(M, j, t, I.b.forest2, 1.05, 50),
-            y(M, j, t, I.b.forest, 1.02, 100),
+            y(M, j, t, mapForestBack, 1.05, 50),
+            y(M, j, t, mapForest, 1.02, 100),
             (function (M, j, t) {
                 for (let L of t.groundObjects) {
                     const t = L.position.x - j.offsetX,
@@ -47,11 +55,11 @@ BitModules[22] = function (M, j, t) {
                 }
             })(M, j, t),
             (function (M, j, t) {
-                const L = t.height - j.offsetY - I.b.ground.height;
+                const L = t.height - j.offsetY - mapGround.height;
                 if (L < j.height) {
-                    (M.save(), M.translate(-j.offsetX % I.b.ground.width, L));
-                    let t = Math.floor((j.width * j.cameraScale) / I.b.ground.width) + 1;
-                    for (; t-- > 0;) (I.b.ground.draw(M), M.translate(I.b.ground.width - 1, 0));
+                    (M.save(), M.translate(-j.offsetX % mapGround.width, L));
+                    let t = Math.floor((j.width * j.cameraScale) / mapGround.width) + 1;
+                    for (; t-- > 0;) (mapGround.draw(M), M.translate(mapGround.width - 1, 0));
                     M.restore();
                 }
             })(M, j, t),
@@ -61,7 +69,7 @@ BitModules[22] = function (M, j, t) {
                         N = L.position.y - j.offsetY;
                     t + L.sprite.width < 0 ||
                         t - L.sprite.width > j.width ||
-                        (M.save(), M.translate(t, N), (M.globalAlpha = 0.8), L.sprite.draw(M), M.restore());
+                        (M.save(), M.translate(t, N), (M.globalAlpha = mapClouds), L.sprite.draw(M), M.restore());
                 }
             })(M, j, t));
         for (let N of t) {

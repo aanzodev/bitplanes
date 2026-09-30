@@ -79,6 +79,8 @@
         const world = new e.World({width: w.width, height: w.height, ground: 0, stratosphere: w.stratosphere});
         world.ground = w.ground;
         world.players = [];
+        // Same map as the host.
+        world.map = window.BitMaps && window.BitMaps.get(typeof w.map === "string" ? w.map : "countryside");
         e.decorate(world);
         world.remote = {alpha: guestAlpha};
         guest.world = world;
@@ -102,6 +104,7 @@
         e.minimap(world);
         bindGuestKeys();
         banner("Room " + guest.code);
+        window.BitMaps && window.BitMaps.announce(world.map);
         setInterval(() => {
             sendPing();
             if (performance.now() - guest.last > TIMEOUT_MS) hostLeft();
