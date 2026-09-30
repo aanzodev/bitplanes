@@ -320,12 +320,28 @@
             }));
             var L = t(2);
 
-            function P(M, j = !0) {
+            function J(M, j) {
+                return "data:image/svg+xml;base64," + btoa(`<svg width="36px" height="22px" viewBox="0 0 36 22" xmlns="http://www.w3.org/2000/svg">
+    <path d="M26.5 10 L30.5 1.5 L34.5 1.5 L34 10 Z" fill="${M}" stroke="#000" stroke-width="1"/>
+    <path d="M1 12.5 L7.5 9.5 L30 9 L35 10.5 L35 13.5 L30 14.5 L7.5 14.5 Z" fill="${M}" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M1 12.5 L7.5 9.5 L7.5 14.5 Z" fill="#555" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M12.5 12.5 L23.5 12.5 L29 19.5 L22 19.5 Z" fill="${M}" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M12.5 12.5 L23.5 12.5 L29 19.5 L22 19.5 Z" fill="#000" fill-opacity="0.25"/>
+    <path d="M27 12 L33 12" stroke="#000" stroke-opacity="0.35"/>
+    <path d="M8.5 9.6 C10 5.5 16 5.2 18.5 9.3 Z" fill="${j ? "#9fdcff" : "#46616e"}" stroke="#000" stroke-width="1"/>
+    ${j ? '<circle cx="13.5" cy="8" r="1.8" fill="#8B572A" stroke="#000" stroke-width="0.6"/>' : ""}
+    <rect x="34.5" y="10.8" width="1.5" height="2.4" fill="#ff9d00"/>
+</svg>`)
+            }
+
+            function P(M, j = !0, t) {
+                if ("jet" === t) return J(M, j);
                 return "data:image/svg+xml;base64," + btoa(`<?xml version="1.0" encoding="UTF-8"?>\n<svg width="36px" height="22px" viewBox="0 0 36 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n    <g id="plane" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n        <path d="M9,20 L6.5,14.837989" id="Line-5" stroke="#000000" stroke-linecap="square"></path>\n        <path d="M9,20 L12.5,15" id="Line-6" stroke="#000000" stroke-linecap="square"></path>\n        <path d="M1,10.6473106 L5.5,10.6473106" id="Line-2" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M1.5,1.5 L1.5,19.5" id="Line-3" stroke="#616161" opacity="0.897600446" stroke-linecap="square"></path>\n        ${j?'<circle id="Oval" stroke="#000000" fill="#8B572A" cx="18" cy="6" r="3"></circle>':""}\n        <circle id="Oval" stroke="#000000" fill="#D8D8D8" cx="9" cy="19" r="2"></circle>\n        <path d="M7,6 C9.64828465,6 12.1482847,6 14.5,6 C16.3325123,8.43421188 19,8.78938418 21,6 C24.1271127,9 26.9158998,8.38196373 29.3663615,4.1458912 C30.796177,0.0888319406 35,1.37620196 35,4.1458912 L35,9.52014093 C27.1897306,13.6293783 18.3448695,15.3528534 14.4693514,16 C11.9889294,16.2076026 9.49914561,15.8742692 7,15 L7,6 Z" id="Path-2" stroke="#000000" fill="${M}"></path>\n        <path d="M15.5,13.5 L11.5,2.57605962" id="Line-4" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M11.5,13.5 L7.5,2.57605962" id="Line-4" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M7,6 L4.04141777,6 C2.65286074,8.33959901 2.65286074,12.4359008 4.04141777,15 L7,15 L7,6 Z" id="Path-3" stroke="#000000" fill="#3ED53E"></path>\n        <rect id="Rectangle" stroke="#000000" fill="#F5A623" x="4.5" y="0.5" width="10" height="2" rx="1"></rect>\n        <rect id="Rectangle" stroke-opacity="0.5" stroke="#000000" fill="#F5A623" x="28.5" y="7.5" width="6" height="2" rx="1"></rect>\n        <rect id="Rectangle" stroke-opacity="0.5019941" stroke="#000000" fill="#C28219" x="8.5" y="12.5" width="10" height="2" rx="1"></rect>\n        <polygon id="Path-4" fill-opacity="0.545891608" fill="#FFFFFF" points="7 9.63371095 7 7.5 3.46379584 7.5 3 9.63371095"></polygon>\n    </g>\n</svg>`)
             }
 
-            function N(M, j = !0) {
-                return new L.a(P(M, j), 36, 22)
+            function N(M, j = !0, t) {
+                const i = new L.a(P(M, j, t), 36, 22);
+                return i.planeKey = [M, j ? 1 : 0, t || ""], i
             }
             window.bitPlaneImage = P;
             var i = t(13),
@@ -378,10 +394,10 @@
                     this._player = M, this.team = null == M ? void 0 : M.team
                 }
                 catapultPilot() {
-                    this._player = void 0, this.thrust = 0, this.elevator = 0, this.sprite = N(this.color, !1)
+                    this._player = void 0, this.thrust = 0, this.elevator = 0, this.sprite = N(this.color, !1, this.skin)
                 }
-                setColor(M) {
-                    this.color = M, this.sprite = N(M)
+                setSkin(M, j) {
+                    this.color = M, this.skin = j, this.sprite = N(M, !0, j)
                 }
             }
         }, function(M, j, t) {
@@ -644,18 +660,18 @@
                 setTimeout(() => {
                     M.classList.add("hide")
                 }, 7e3), setTimeout(() => {
-                    M.parentElement.removeChild(M)
+                    M.remove()
                 }, 7300)
             }
 
             function T(M, j, t = '<div class="icon target"></div>') {
                 const L = document.createElement("div");
-                L.innerHTML = `<span class="message">${M.html()} ${t} ${j.html()}</span>`, Object(u.a)(".log").appendChild(L), y(L), j.team && j.team == M.team || M == j ? M.kills-- : (M.kills++, M.isHuman && window.BitShop && window.BitShop.reward()), j.deaths++, M.isHuman && i.c.killed++, j.isHuman && i.c.deaths++
+                L.innerHTML = `<span class="message">${M.html()} ${t} ${j.html()}</span>`, Object(u.a)(".log").appendChild(L), y(L), window.bitOnLog && window.bitOnLog(L.innerHTML), j.team && j.team == M.team || M == j ? M.kills-- : (M.kills++, window.BitShop && window.BitShop.onKill(M)), j.deaths++, M.isHuman && i.c.killed++, j.isHuman && i.c.deaths++
             }
 
             function A(M) {
                 const j = document.createElement("div");
-                j.innerHTML = `<span class="message">${g} ${M.html()}</span>`, Object(u.a)(".log").appendChild(j), y(j), M.deaths++, M.isHuman && i.c.deaths++
+                j.innerHTML = `<span class="message">${g} ${M.html()}</span>`, Object(u.a)(".log").appendChild(j), y(j), window.bitOnLog && window.bitOnLog(j.innerHTML), M.deaths++, M.isHuman && i.c.deaths++
             }
             let n, c, o, S;
 
@@ -970,7 +986,7 @@
                         j.ammo--;
                         const t = function(M) {
                             const j = new e.a(M);
-                            return j.move(Object(N.a)(M.position, Object(N.e)(M.forward, M.radius + 5))), j.velocity = Object(N.a)(Object(N.c)(M.velocity), Object(N.e)(M.forward, 120)), j
+                            return j.move(Object(N.a)(M.position, Object(N.e)(M.forward, M.radius + 5))), j.velocity = Object(N.a)(Object(N.c)(M.velocity), Object(N.e)(M.forward, 120 * (M.bulletSpeed || 1))), j
                         }(j);
                         M.add(t)
                     }
@@ -1056,7 +1072,9 @@
             "use strict";
 
             function L(M, j) {
-                const t = j.getContext("2d"),
+                const t = j.getContext("2d", {
+                        alpha: !1
+                    }),
                     L = {
                         offsetX: 0,
                         offsetY: 0,
@@ -1066,7 +1084,7 @@
                     };
 
                 function N() {
-                    let M = (window.devicePixelRatio || 1) / L.cameraScale,
+                    let M = Math.min(window.devicePixelRatio || 1, window.bitRenderScale || 1.5) / L.cameraScale,
                         {
                             width: N,
                             height: i
@@ -1458,6 +1476,7 @@
                 for (let L of t.particles) {
                     const t = L.getX() - j.offsetX,
                         i = L.getY() - j.offsetY;
+                    if (t < -200 || i < -200 || t > j.width + 200 || i > j.height + 200) continue;
                     M.save(), M.translate(t, i), L instanceof N.f ? (M.rotate(L.angle), M.globalAlpha = L.opacity, M.scale(L.scale, L.scale), L.sprite.drawMiddle(M)) : L instanceof N.a ? L.sprites[L.frame].drawMiddle(M) : L instanceof N.b ? L.sprite.drawMiddle(M) : L instanceof N.c ? (M.globalAlpha = 1 - Math.min(1, Math.abs((Object(D.g)() - L.createdAt) / L.duration)), L.sprite.drawMiddle(M)) : (M.fillStyle = L.color, M.fillRect(0, 0, L.size, L.size)), M.restore()
                 }
                 a(M)
@@ -1659,9 +1678,10 @@
                         e = requestAnimationFrame(T);
                         const A = Object(D.g)();
                         let n = (A - g) / 1e3;
-                        for (n > .25 && (n = .25), g = A, I += n, Object(L.c)(t, n); I >= y;) O(t, y), I -= y;
+                        window.bitAdaptQuality && window.bitAdaptQuality(n);
+                        for (n > .1 && (n = .1), g = A, I += n, t.remote || Object(L.c)(t, n); I >= y;) t.remote || O(t, y), I -= y;
                         Object(N.g)(t, y);
-                        const c = I / y;
+                        const c = t.remote ? t.remote.alpha() : I / y;
                         i(M, c), a(j, M, t, c, u)
                     }(),
                     function() {
@@ -2038,6 +2058,24 @@
                 S = t(21);
             t(81), t(84);
             var z = t(3);
+            window.BitEngine = {
+                require: t,
+                World: S.a,
+                Plane: y.a,
+                Player: T.a,
+                sprites: A.b,
+                Sprite: A.a,
+                decorate: a.b,
+                camera: u.b,
+                follow: u.a,
+                loop: I.a,
+                scoreboard: c.f,
+                minimap: c.e,
+                cockpit: c.i,
+                controls: D,
+                vec: o.s,
+                consts: e
+            };
             Object(z.b)((function() {
                 if (n.c.killed > 1 && n.c.deaths > 1 && n.c.cowKilled > 1) {
                     if (document.querySelector(".stats").innerHTML = `\n        You fired <em>${n.c.bullets.toLocaleString()}</em> <i class="ammo"></i> bullets \n        and <em>${n.c.missiles.toLocaleString()}</em> <i class="missile"></i> missiles\n        and destroyed <i class="target"></i> <em>${n.c.killed.toLocaleString()}</em> planes,\n        and unfortunately died <i class="skull"></i> <em>${n.c.deaths.toLocaleString()}</em> times. <br>\n        Also inadvertently you killed <em>${n.c.cowKilled.toLocaleString()}</em> <img src="${t(25)}" alt="cow" style="height: 14px"> cows. \n    `, n.c.killed > 1e3) {
@@ -2094,6 +2132,7 @@
                         for (let j of M.players) j.disableAI()
                     }
                 }();
+                window.BitEngine.stopDemo = r;
                 Object(z.a)("#game").addEventListener("submit", M => {
                     M.preventDefault();
                     let j = "death-match",
@@ -2150,194 +2189,13 @@
                                                 I = new T.a(t, N, u);
                                             u.player = I, M.players.push(I), I.maxAmmo = u.maxAmmo = u.ammo = j <= 1 ? e.f : e.b, u.landed = !0, u.move(Object(o.s)(j * M.width / e.j - 800, M.ground)), M.add(u), I.disableAI = Object(L.a)(M, I)
                                         }
+                                        window.BitNet && window.BitNet.onWorld(M, z);
                                         const s = document.querySelector("#canvas"),
                                             [x, w] = Object(u.b)(1.25, s);
                                         Object(I.a)(x, w, M, (j, t) => {
                                             Object(u.a)(j, M, z, t)
                                         }, j => {
                                             Object(c.f)(j, M.players)
-                                        }), Object(c.e)(M)
-                                    }();
-                                    break;
-                                case "teams":
-                                    ! function() {
-                                        const M = new S.a({
-                                            width: 15e3,
-                                            height: 4e3,
-                                            ground: 0,
-                                            stratosphere: 50
-                                        });
-                                        M.ground = M.height - A.b.ground.height, M.players = [], Object(a.b)(M), Object(a.a)(M);
-                                        const j = new T.b("#fd6a79");
-                                        j.name = "Red", j.startingPosition = 12e3;
-                                        const t = new T.b("#145ece");
-                                        t.name = "Blue", t.startingPosition = 2e3;
-                                        let N = location.search.match(/count=([0-9]+)vs([0-9]+)/);
-                                        N && (j.count = parseInt(N[1]), t.count = parseInt(N[2]));
-                                        let z = new g.a(j.startingPosition, M.ground),
-                                            r = new g.a(t.startingPosition, M.ground);
-                                        M.add(z), M.add(r);
-                                        let s = new y.a("#ff0015"),
-                                            x = new T.a(Object(n.a)("nickname") || "YOU", s.color, s);
-                                        x.isHuman = !0, x.join(j), s.player = x, M.players.push(x), x.maxAmmo = e.f, s.maxAmmo = e.f, s.ammo = e.f, s.landed = !0, s.move(Object(o.s)(j.startingPosition - 130, M.ground)), M.add(s), Object(D.a)(M, x, {
-                                            thrustLevers: {
-                                                up: ["ArrowUp", "KeyW"],
-                                                down: ["ArrowDown", "KeyS"]
-                                            },
-                                            elevator: {
-                                                up: ["ArrowLeft", "KeyA"],
-                                                down: ["ArrowRight", "KeyD"]
-                                            },
-                                            fire: "Space",
-                                            missile: "KeyX",
-                                            catapult: "KeyC"
-                                        });
-                                        let w = !1;
-                                        M.onCrash = function(j) {
-                                            j.player && (j.player.detach(), setTimeout(() => {
-                                                const t = j.player;
-                                                if (!t) return;
-                                                if (t.inGame()) return;
-                                                let L = t.team;
-                                                if (!L) return;
-                                                L.points--, L.points <= 0 && setTimeout(() => {
-                                                    w || (w = !0, alert((null == L ? void 0 : L.name) + " team loses\n\n  ¯\\_(ツ)_/¯"), location.href = "?mode=teams")
-                                                }, 2 * e.n);
-                                                const N = new y.a(t.color);
-                                                N.life = e.h, N.ammo = N.maxAmmo = t.maxAmmo, N.landed = !0, N.move(Object(o.s)(L.startingPosition, M.ground)), t.control(N), M.add(N)
-                                            }, 6e3))
-                                        };
-                                        for (let t = 1; t < j.count; t++) {
-                                            const N = i.a.pop() || "no name",
-                                                u = new y.a(j.color),
-                                                I = new T.a(N, j.color, u);
-                                            I.number = t, I.join(j), u.player = I, M.players.push(I), I.maxAmmo = u.maxAmmo = u.ammo = 0 == t ? e.f : e.b, u.landed = !0, u.move(Object(o.s)(j.startingPosition + 50 * t, M.ground)), M.add(u), I.disableAI = Object(L.a)(M, I)
-                                        }
-                                        for (let j = 0; j < t.count; j++) {
-                                            const N = i.a.pop() || "no name",
-                                                u = new y.a(t.color),
-                                                I = new T.a(N, t.color, u);
-                                            I.number = j, I.join(t), u.player = I, M.players.push(I), I.maxAmmo = u.maxAmmo = u.ammo = 0 == j ? e.f : e.b, u.landed = !0, u.move(Object(o.s)(t.startingPosition + 50 * j, M.ground)), u.angle = 2 * Math.PI * Math.random(), M.add(u), I.disableAI = Object(L.a)(M, I)
-                                        }
-                                        const l = document.querySelector("#canvas"),
-                                            [O, C] = Object(u.b)(1.25, l);
-                                        Object(I.a)(O, C, M, (j, t) => {
-                                            Object(u.a)(j, M, x, t)
-                                        }, M => {
-                                            Object(c.h)(M, j, t)
-                                        }), Object(c.e)(M)
-                                    }();
-                                    break;
-                                case "duel":
-                                    ! function() {
-                                        const M = new S.a({
-                                            width: 15e3,
-                                            height: 4e3,
-                                            ground: 0,
-                                            stratosphere: 50
-                                        });
-                                        M.ground = M.height - A.b.ground.height, M.players = [], M.onCrash = function(j) {
-                                            j.player && (j.player.detach(), setTimeout(() => {
-                                                const t = j.player;
-                                                if (!t) return;
-                                                if (t.inGame()) return;
-                                                const L = new y.a(t.color);
-                                                L.life = e.h, L.ammo = L.maxAmmo = t.maxAmmo, L.landed = !0, L.move(Object(o.s)(M.width * Math.random(), M.ground)), t.control(L), M.add(L)
-                                            }, 2e3))
-                                        }, Object(a.b)(M), Object(a.a)(M);
-                                        let j = new g.a(M.width / 2 + 110, M.ground);
-                                        M.add(j);
-                                        const t = new y.a("#ff0015"),
-                                            N = new T.a(Object(n.a)("nickname") || "YOU", "#ff0015", t);
-                                        N.isHuman = !0, N.control(t), M.players.push(N), N.maxAmmo = e.f, t.maxAmmo = e.f, t.ammo = e.f, t.landed = !0, t.move(Object(o.s)(M.width / 2, M.ground)), M.add(t), Object(D.a)(M, N, {
-                                            thrustLevers: {
-                                                up: ["ArrowUp", "KeyW"],
-                                                down: ["ArrowDown", "KeyS"]
-                                            },
-                                            elevator: {
-                                                up: ["ArrowLeft", "KeyA"],
-                                                down: ["ArrowRight", "KeyD"]
-                                            },
-                                            fire: "Space",
-                                            missile: "KeyX",
-                                            catapult: "KeyC"
-                                        });
-                                        {
-                                            const j = i.a.pop() || "no name",
-                                                t = "#145ece",
-                                                N = new y.a(t),
-                                                u = new T.a(j, t, N);
-                                            N.player = u, M.players.push(u), u.maxAmmo = e.f, N.maxAmmo = e.f, N.ammo = e.f, N.landed = !0, N.move(Object(o.s)(M.width * Math.random(), M.ground)), M.add(N), u.disableAI = Object(L.a)(M, u, {
-                                                missileChance: .3
-                                            })
-                                        }
-                                        const z = document.querySelector("#canvas"),
-                                            [r, s] = Object(u.b)(1.25, z);
-                                        Object(I.a)(r, s, M, (j, t) => {
-                                            Object(u.a)(j, M, N, t)
-                                        }, j => {
-                                            Object(c.f)(j, M.players)
-                                        }), Object(c.e)(M)
-                                    }();
-                                    break;
-                                case "survival":
-                                    ! function() {
-                                        const M = new S.a({
-                                            width: 15e3,
-                                            height: 4e3,
-                                            ground: 0,
-                                            stratosphere: 50
-                                        });
-                                        M.ground = M.height - A.b.ground.height, M.players = [], Object(a.b)(M), Object(a.a)(M);
-                                        let j = new g.a(M.width / 2 + 110, M.ground);
-                                        M.add(j);
-                                        const t = new URLSearchParams(window.location.search);
-                                        let z, r = parseInt(t.get("size") || "2"),
-                                            s = Object(N.a)(),
-                                            x = new T.b("#ff0015"),
-                                            w = new y.a(x.color),
-                                            l = new T.a(Object(n.a)("nickname") || "YOU", x.color, w);
-                                        l.join(x), l.isHuman = !0, l.control(w), M.players.push(l), w.ammo = w.maxAmmo = l.maxAmmo = 100, w.missiles = w.maxMissiles = l.maxMissiles = 10, w.landed = !0, w.move(Object(o.s)(M.width / 2 - 100, M.ground)), M.add(w), Object(D.a)(M, l, {
-                                            thrustLevers: {
-                                                up: ["ArrowUp", "KeyW"],
-                                                down: ["ArrowDown", "KeyS"]
-                                            },
-                                            elevator: {
-                                                up: ["ArrowLeft", "KeyA"],
-                                                down: ["ArrowRight", "KeyD"]
-                                            },
-                                            fire: "Space",
-                                            missile: "KeyX",
-                                            catapult: "KeyC"
-                                        });
-                                        let O = () => {
-                                            z = new T.b(s.pop() || "black");
-                                            for (let j = 0; j < r; j++) {
-                                                const t = i.a.pop() || "no name",
-                                                    N = new y.a(z.color),
-                                                    u = new T.a(t, z.color, N);
-                                                u.number = j, u.join(z), 0 === j && (z.leader = u), u.control(N), M.players.push(u), N.ammo = N.maxAmmo = u.maxAmmo = e.b, N.move(Object(o.s)(M.width * Math.random(), -100)), N.angle = 2 * Math.PI * Math.random(), M.add(N), u.disableAI = Object(L.a)(M, u)
-                                            }
-                                        };
-                                        M.onCrash = function(M) {
-                                            if (M.player) {
-                                                let j = M.player;
-                                                if (j.detach(), j.disableAI(), j.isHuman) setTimeout(() => {
-                                                    alert(`Good run! But ${r} opponents turned out to be too much for you.\n\n  (╯°□°)╯︵ ┻━┻`), location.href = "?mode=survival"
-                                                }, 3 * e.n);
-                                                else {
-                                                    let M = !0;
-                                                    for (let j of z.members) j.inGame() && (M = !1);
-                                                    M && (r++, setTimeout(O, 3 * e.n))
-                                                }
-                                            }
-                                        }, O();
-                                        const C = document.querySelector("#canvas"),
-                                            [E, d] = Object(u.b)(1.25, C);
-                                        Object(I.a)(E, d, M, (j, t) => {
-                                            Object(u.a)(j, M, l, t)
-                                        }, M => {
-                                            Object(c.g)(M, x, z)
                                         }), Object(c.e)(M)
                                     }();
                                     break;
