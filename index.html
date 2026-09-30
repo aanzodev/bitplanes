@@ -40,20 +40,25 @@
                 <div>
                     <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked autofocus> Death match</label>
                 </div>
-                <div>
-                    <label title="Fight between teams."><input type="radio" name="mode" value="teams"> Teams</label>
-                </div>
-                <div>
-                    <label title="One on one duel."><input type="radio" name="mode" value="duel"> Duel</label>
-                </div>
-                <div>
-                    <label title="Survive with a waives of enemies."><input type="radio" name="mode" value="survival"> Survival</label>
-                </div>
             </div>
             <div class="action">
                 <button class="btn">‣ Start</button>
                 <button type="button" class="btn shop-open-btn open-shop">Hangar</button>
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
+            </div>
+            <div class="online">
+                <p>
+                    <strong>Play online with friends:</strong>
+                </p>
+                <div class="online-row">
+                    <button type="button" class="btn host-game">Host a room</button>
+                    <span class="online-or">or</span>
+                    <label>
+                        <input type="text" class="room-code" placeholder="Room code" maxlength="5" autocomplete="off" spellcheck="false">
+                    </label>
+                    <button type="button" class="btn join-game">Join</button>
+                </div>
+                <p class="online-status">Host a room to get a code, then share it with your friends.</p>
             </div>
         </form>
 
@@ -110,6 +115,9 @@
 </div>
 <canvas id="canvas"></canvas>
 
+<script type="text/javascript" src="peerjs.min.js"></script>
+<script type="text/javascript" src="quality.js"></script>
 <script type="text/javascript" src="shop.js"></script>
+<script type="text/javascript" src="net.js"></script>
 <script type="text/javascript" src="script.js"></script></body>
 </html>

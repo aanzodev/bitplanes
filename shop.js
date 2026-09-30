@@ -14,6 +14,12 @@
             thrust: 0.9, turn: 0.85, life: 3, ammo: 5, missiles: 2, reload: 1},
         {id: "phantom", name: "Phantom", price: 1000, color: "#7b2ff7", desc: "Elite fighter, better at everything.",
             thrust: 1.2, turn: 1.2, life: 2, ammo: 5, missiles: 1, reload: 0.8},
+        {id: "f16", name: "F-16 Falcon", price: 2500, color: "#9aa7b4", skin: "jet", desc: "Light jet fighter with a fast gun.",
+            thrust: 1.3, turn: 1.25, life: 1, ammo: 5, missiles: 0, reload: 0.85, bulletSpeed: 1.25},
+        {id: "a10", name: "A-10 Warthog", price: 5000, color: "#6b7a4b", skin: "jet", desc: "Flying tank with a huge cannon belt.",
+            thrust: 1.05, turn: 0.95, life: 4, ammo: 20, missiles: 1, reload: 0.7, bulletSpeed: 1.2},
+        {id: "f22", name: "F-22 Raptor", price: 10000, color: "#4a5560", skin: "jet", desc: "Stealth fighter. 3 missiles and faster bullets built in.",
+            thrust: 1.4, turn: 1.35, life: 2, ammo: 5, missiles: 1, reload: 0.8, bulletSpeed: 1.6},
     ];
 
     const UPGRADES = [
@@ -51,25 +57,31 @@
 
     function apply(plane) {
         const player = plane.player;
-        if (!player || !player.isHuman || plane.shopPlayer === player) return;
+        if (!player || plane.shopPlayer === player) return;
+        const l = player.loadout || (player.isHuman && loadout());
+        if (!l) return;
         plane.shopPlayer = player;
-        const p = selectedPlane();
-        plane.maxThrust = Math.round(BASE_THRUST * p.thrust * (1 + 0.08 * level("engine")));
-        plane.turnRate = p.turn * (1 + 0.08 * level("handling"));
-        plane.reloadRate = p.reload * (1 - 0.1 * level("reload"));
-        plane.life = Math.max(1, plane.life + p.life + level("armor"));
-        const ammo = p.ammo + 3 * level("ammo");
-        plane.maxAmmo = Math.max(1, plane.maxAmmo + ammo);
-        plane.ammo = Math.max(0, Math.min(plane.maxAmmo, plane.ammo + ammo));
-        const missiles = p.missiles + level("missiles");
-        plane.maxMissiles += missiles;
-        plane.missiles += missiles;
+        plane.maxThrust = Math.round(BASE_THRUST * l.thrust);
+        plane.turnRate = l.turn;
+        plane.reloadRate = l.reload;
+        plane.bulletSpeed = l.bulletSpeed;
+        plane.life = Math.max(1, plane.life + l.life);
+        plane.maxAmmo = Math.max(1, plane.maxAmmo + l.ammo);
+        plane.ammo = Math.max(0, Math.min(plane.maxAmmo, plane.ammo + l.ammo));
+        plane.maxMissiles += l.missiles;
+        plane.missiles += l.missiles;
         if (plane.thrust > plane.maxThrust) plane.thrust = plane.maxThrust;
-        // In team modes the plane keeps its team colors.
-        if (!player.team && plane.setColor) {
-            plane.setColor(p.color);
-            player.color = p.color;
+        if (plane.setSkin) {
+            // In team modes the plane keeps its team colors.
+            const color = player.team ? plane.color : (player.loadoutColor || l.color);
+            if (color !== plane.color || l.skin !== (plane.skin || "")) plane.setSkin(color, l.skin);
+            player.color = color;
         }
+    }
+
+    function onKill(player) {
+        if (player.isHuman) reward();
+        else if (player.remote && window.BitNet) window.BitNet.rewardRemote(player);
     }
 
     function reward() {
@@ -110,8 +122,8 @@
         save();
     }
 
-    function planeImage(color) {
-        return window.bitPlaneImage ? window.bitPlaneImage(color) : "";
+    function planeImage(p) {
+        return window.bitPlaneImage ? window.bitPlaneImage(p.color, true, p.skin) : "";
     }
 
     function statBar(value) {
@@ -133,14 +145,16 @@
                 else action = `<button type="button" class="shop-btn buy" data-buy-plane="${p.id}" ${state.coins < p.price ? "disabled" : ""}>${p.price} <i class="coin"></i></button>`;
                 return `
                     <div class="shop-plane${selected ? " selected" : ""}">
-                        <img src="${planeImage(p.color)}" alt="${p.name}">
+                        <img src="${planeImage(p)}" alt="${p.name}">
                         <strong>${p.name}</strong>
                         <small>${p.desc}</small>
                         <div class="stats-list">
-                            <span>Speed</span>${statBar(p.thrust / 1.25)}
-                            <span>Turn</span>${statBar(p.turn / 1.25)}
-                            <span>Armor</span>${statBar((3 + p.life) / 6)}
-                            <span>Ammo</span>${statBar((15 + p.ammo) / 25)}
+                            <span>Speed</span>${statBar(p.thrust / 1.4)}
+                            <span>Turn</span>${statBar(p.turn / 1.4)}
+                            <span>Armor</span>${statBar((3 + p.life) / 7)}
+                            <span>Ammo</span>${statBar((15 + p.ammo) / 35)}
+                            <span>Missiles</span>${statBar((2 + p.missiles) / 4)}
+                            <span>Bullets</span>${statBar((p.bulletSpeed || 1) / 1.6)}
                         </div>
                         ${action}
                     </div>`;
@@ -190,7 +204,50 @@
         render();
     }
 
-    window.BitShop = {apply, reward};
+    function addCoins(amount = 1000) {
+        state.coins = Math.max(0, state.coins + Math.floor(Number(amount) || 0));
+        save();
+        return state.coins;
+    }
+
+    function setCoins(amount) {
+        state.coins = Math.max(0, Math.floor(Number(amount) || 0));
+        save();
+        return state.coins;
+    }
+
+    function resetShop() {
+        state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}};
+        save();
+        return "Shop reset";
+    }
+
+    function unlockAll() {
+        state.owned = PLANES.map(p => p.id);
+        UPGRADES.forEach(u => state.upgrades[u.id] = u.max);
+        save();
+        return "Everything unlocked";
+    }
+
+    // Test commands, usable from the browser console.
+    window.addCoins = addCoins;
+    window.setCoins = setCoins;
+    window.resetShop = resetShop;
+    window.unlockAll = unlockAll;
+    console.info("Shop test commands: addCoins(1000), setCoins(10000), unlockAll(), resetShop(). " +
+        "Or open the page with ?coins=10000");
+
+    // ?coins=N adds N coins, e.g. index.html?coins=10000
+    const params = new URLSearchParams(location.search);
+    if (params.has("coins")) {
+        addCoins(params.get("coins"));
+        // Drop the param so a refresh doesn't add the coins again.
+        params.delete("coins");
+        const query = params.toString();
+        history.replaceState(null, "", location.pathname + (query ? "?" + query : "") + location.hash);
+    }
+
+    window.BitShop = {apply, reward, onKill, loadout, addCoins, setCoins, planes: PLANES, selected: selectedPlane};
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
     else init();
