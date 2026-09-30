@@ -80,7 +80,8 @@ Everyone flies their own plane and upgrades, and kills earn coins for whoever
 made them. A ping meter under the room code shows your round trip time
 to the host (for the host: each friend's ping). Green is under 80 ms, yellow
 under 160 ms, red above. The host's browser runs the game, so the host should have the best
-connection. If the host closes the page the room ends.
+connection. Each guest flies their own plane in their own browser, so turning,
+thrust and bullets react instantly; the host decides hits and deaths. If the host closes the page the room ends.
 
 Players connect directly to each other (WebRTC via [PeerJS](https://peerjs.com)).
 The free PeerJS cloud server is only used to find each other. To use your own
@@ -109,6 +110,7 @@ js/
     sync.js             Turning game objects into network messages
     host.js             Hosting a room
     guest.js            Joining a room
+    prediction.js       Guests fly their own plane locally (no input lag)
     lobby.js            Host / Join buttons
   engine/               The game itself, one module per file
     registry.js         Modules register here…

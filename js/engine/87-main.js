@@ -30,6 +30,7 @@ BitModules[87] = function (M, j, t) {
         camera: u.b,
         follow: u.a,
         loop: I.a,
+        physicsStep: I.b,
         scoreboard: c.f,
         minimap: c.e,
         cockpit: c.i,

@@ -68,6 +68,7 @@
     }
 
     function applyLook(o, key) {
+        o.look = key;
         const [sprite, cow] = String(key).split("~");
         const s = spriteFromKey(sprite);
         if (s) o.sprite = s;
