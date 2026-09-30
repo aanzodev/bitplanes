@@ -12,7 +12,10 @@
     O.role = null; // "host" | "guest"
 
     const PREFIX = "bitplanes-room-";
-    const SNAPSHOT_MS = 50;
+    const SNAPSHOT_MS = 33; // ~30 snapshots per second
+    // Guests draw the world this far in the past so there are always two
+    // snapshots to blend between, even when one arrives a bit late.
+    const RENDER_DELAY_MS = 90;
     const TIMEOUT_MS = 6000;
     const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     const GUEST_COLORS = ["#145ece", "#f36a20", "#70ba01", "#d23be7", "#34bbe6", "#dbaf02", "#ff0786"];
@@ -108,6 +111,6 @@
         setTimeout(() => div.remove(), 7300);
     }
 
-    Object.assign(O, {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
+    Object.assign(O, {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
     Object.assign(O, {engine, peerOptions, makeCode, cleanName, round, status, banner, safeHtml, addLog});
 })();
