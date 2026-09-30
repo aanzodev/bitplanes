@@ -1,4 +1,3 @@
-// Hangar shop: earn coins for kills, buy planes and upgrades.
 (function () {
     const STORAGE_KEY = "shop";
     const COINS_PER_KILL = 10;
@@ -56,24 +55,6 @@
         return PLANES.find(p => p.id === state.selected) || PLANES[0];
     }
 
-    // Final stats of the selected plane plus upgrades. Sent to the host in online games.
-    function loadout() {
-        const p = selectedPlane();
-        return {
-            color: p.color,
-            skin: p.skin || "",
-            thrust: p.thrust * (1 + 0.08 * level("engine")),
-            turn: p.turn * (1 + 0.08 * level("handling")),
-            reload: p.reload * (1 - 0.1 * level("reload")),
-            bulletSpeed: p.bulletSpeed || 1,
-            life: p.life + level("armor"),
-            ammo: p.ammo + 3 * level("ammo"),
-            missiles: p.missiles + level("missiles"),
-        };
-    }
-
-    // Called by the physics loop for every plane; applies the loadout once per pilot.
-    // Local humans use this browser's shop; remote players bring their own loadout.
     function apply(plane) {
         const player = plane.player;
         if (!player || plane.shopPlayer === player) return;
