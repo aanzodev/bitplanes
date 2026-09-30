@@ -116,7 +116,3 @@ main input.room-code {
 .ping.bad .bars > i:nth-child(1) { background: #e0453a; }
 
 .ping.waiting { color: #5b6b7a; }
-
-.ping.ping-title {
-    color: #333;
-}

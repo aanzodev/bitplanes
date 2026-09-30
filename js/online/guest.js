@@ -112,9 +112,8 @@
     }
 
     // Ping: the host echoes our timestamp back; the round trip is the ping.
-    // We also tell the host our latest ping so it can show it.
     function sendPing() {
-        if (guest.conn && guest.conn.open) guest.conn.send({t: "ping", c: performance.now(), r: guest.rtt});
+        if (guest.conn && guest.conn.open) guest.conn.send({t: "ping", c: performance.now()});
     }
 
     function onPong(msg) {

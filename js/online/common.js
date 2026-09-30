@@ -69,19 +69,16 @@
         if (el) el.textContent = text;
     }
 
-    // Ping meter (online games only). rows: [{name, ms}], name empty for the guest's own ping.
-    // options.title labels the meter; options.empty is shown when there are no rows.
-    function pingMeter(rows, options = {}) {
+    // Ping meter (online games, players who joined a room). rows: [{name, ms}], name empty for your own ping.
+    function pingMeter(rows) {
         let el = document.querySelector(".ping-meter");
         if (!el) {
             el = document.createElement("div");
             el.className = "ping-meter";
             document.querySelector(".ui").appendChild(el);
         }
-        el.hidden = !rows.length && !options.title;
-        const title = options.title ? `<span class="ping ping-title">${options.title}</span>` : "";
-        const empty = !rows.length && options.empty ? `<span class="ping waiting">${options.empty}</span>` : "";
-        el.innerHTML = title + empty + rows.map(({name, ms}) => {
+        el.hidden = !rows.length;
+        el.innerHTML = rows.map(({name, ms}) => {
             const level = typeof ms !== "number" ? "waiting" : ms < 80 ? "good" : ms < 160 ? "ok" : "bad";
             const label = typeof ms !== "number" ? "…" : Math.round(ms) + " ms";
             const who = name ? cleanName(name) : "Ping";

@@ -91,8 +91,8 @@ Or add `?coins=10000` to the page URL to add coins once.
    They can join at any time during the match.
 
 Everyone flies their own plane and upgrades, and kills earn coins for whoever
-made them. A ping meter under the room code shows your round trip time
-to the host (for the host: each friend's ping). Green is under 80 ms, yellow
+made them. Players who join see their ping to the host under the room code
+(the host runs the game, so it has no ping). Green is under 80 ms, yellow
 under 160 ms, red above. The host's browser runs the game, so the host should have the best
 connection. Each guest flies their own plane in their own browser, so turning,
 thrust and bullets react instantly; the host decides hits and deaths. If the host closes the page the room ends.
