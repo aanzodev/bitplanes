@@ -1,0 +1,119 @@
+/* In-game menu (Esc). */
+
+.pause-toggle {
+    position: absolute;
+    top: 44px;
+    right: 360px;
+    width: 34px;
+    height: 28px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.pause-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 40px 16px;
+    background: rgba(10, 30, 50, 0.45);
+}
+
+.pause-menu[hidden] {
+    display: none;
+}
+
+.pause-panel {
+    width: 100%;
+    max-width: 720px;
+    padding: 24px 30px 20px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+
+.pause-panel h2 {
+    font-size: 34px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.pause-panel h3 {
+    margin: 20px 0 6px;
+    font-size: 20px;
+}
+
+.pause-note,
+.pause-hint,
+.pause-keys {
+    margin: 4px 0 8px;
+    font-size: 14px;
+    color: #5b6b7a;
+}
+
+.pause-note {
+    text-align: center;
+}
+
+.pause-keys {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.pause-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.btn.leave-game {
+    background: #b3261e;
+}
+
+.pause-planes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+}
+
+.pause-plane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.pause-plane img {
+    width: 54px;
+    height: 33px;
+}
+
+.pause-plane.special {
+    border-color: #000;
+}
+
+.pause-plane.selected {
+    border-color: #0a0;
+    box-shadow: 0 0 0 2px #0a0;
+}
+
+.pause-paint {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}

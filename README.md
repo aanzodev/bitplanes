@@ -28,6 +28,7 @@ It also works on GitHub Pages as is. There is no build step.
 | <kbd>Q</kbd> | Drop flares: breaks missile locks (F-16, A-10 and F-22 only) |
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in game) |
+| <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online games keep running |
 
 ## Hangar
 
@@ -113,8 +114,10 @@ css/
   hangar.css            Hangar shop
   online.css            Online play
   game.css              In-game HUD
+  pause.css             In-game menu
 js/
   quality.js            Lowers render resolution when frames get slow
+  pause.js              In-game menu (Esc): resume, plane, paint, leave
   audio/
     profiles.js         How each plane sounds (edit to tweak)
     sound.js            Synthesized engine, guns, missiles, flares, explosions

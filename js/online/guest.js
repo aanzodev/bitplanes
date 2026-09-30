@@ -308,5 +308,9 @@
         });
     }
 
-    Object.assign(O, {join, guestState: guest});
+    function sendToHost(msg) {
+        if (guest.conn && guest.conn.open) guest.conn.send(msg);
+    }
+
+    Object.assign(O, {join, sendToHost, guestState: guest});
 })();
