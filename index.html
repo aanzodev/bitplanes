@@ -27,6 +27,7 @@
             <li><kbd>Space</kbd> — fire a gun. <kbd>X</kbd> — deploy a missile.</li>
             <li><kbd>C</kbd> — catapult / parachute and get new plane at the barn.</li>
         </ul>
+        <p>Every kill earns <strong>10</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
 
         <form id="game">
             <label>
@@ -51,12 +52,29 @@
             </div>
             <div class="action">
                 <button class="btn">‣ Start</button>
+                <button type="button" class="btn shop-open-btn open-shop">Hangar</button>
+                <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
             </div>
         </form>
 
         <div class="stats"></div>
         <canvas class="demo"></canvas>
     </section>
+
+    <div class="shop" hidden>
+        <div class="shop-panel" role="dialog" aria-label="Hangar">
+            <div class="shop-header">
+                <h2>Hangar</h2>
+                <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
+                <button type="button" class="close-shop" aria-label="Close">×</button>
+            </div>
+            <h3>Planes</h3>
+            <div class="shop-planes"></div>
+            <h3>Upgrades</h3>
+            <p class="shop-note">Upgrades apply to whichever plane you fly.</p>
+            <div class="shop-upgrades"></div>
+        </div>
+    </div>
 </main>
 
 <div class="ui">
@@ -88,9 +106,11 @@
         </div>
     </div>
     <canvas class="minimap"></canvas>
+    <div class="hud-coins"><i class="coin"></i> <span class="coin-count">0</span></div>
     <div class="log"></div>
 </div>
 <canvas id="canvas"></canvas>
 
+<script type="text/javascript" src="shop.js"></script>
 <script type="text/javascript" src="script.js"></script></body>
 </html>
