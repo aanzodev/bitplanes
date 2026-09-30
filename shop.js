@@ -1,4 +1,3 @@
-// Hangar shop: earn coins for kills, buy planes and upgrades.
 (function () {
     const STORAGE_KEY = "shop";
     const COINS_PER_KILL = 10;
@@ -50,7 +49,6 @@
         return PLANES.find(p => p.id === state.selected) || PLANES[0];
     }
 
-    // Called by the physics loop for every plane; applies the loadout once per pilot.
     function apply(plane) {
         const player = plane.player;
         if (!player || !player.isHuman || plane.shopPlayer === player) return;
