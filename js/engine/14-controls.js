@@ -250,6 +250,22 @@ BitModules[14] = function (M, j, t) {
         }
     }
 
+    // White smoke trail behind a burning flare.
+    function X(M, t) {
+        const k = setInterval(() => {
+            if (!M.particles.has(t)) return clearInterval(k);
+            const s = new P.f(Q.b.puff);
+            (s.position = Object(N.c)(t.position)),
+                (s.velocity = Object(N.s)(0.1 * t.velocity.x, -1)),
+                (s.angle = 2 * Math.PI * Math.random()),
+                (s.scale = 0.45 + 0.25 * Math.random()),
+                (s.scaleRate = 0.7),
+                (s.opacity = 0.75),
+                (s.opacityRate = 0.3),
+                M.particles.add(s);
+        }, 30);
+    }
+
     // Flares: drop decoys that break the lock of missiles chasing this plane.
     function F(M, j) {
         if (!M.has(j) || !(j.maxFlares > 0) || !(j.flares > 0)) return;
@@ -260,17 +276,27 @@ BitModules[14] = function (M, j, t) {
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
-        for (let k = 0; k < 6; k++) {
-            const t = new P.c(Q.b.flare);
-            (t.duration = 1200 + 500 * Math.random()),
-                (t.position = Object(N.c)(j.position)),
-                (t.velocity = Object(N.s)(
-                    0.4 * j.velocity.x + 40 * (Math.random() - 0.5),
-                    0.4 * j.velocity.y + 10 + 20 * Math.random(),
-                )),
-                (t.size = 3),
-                M.particles.add(t);
-        }
+        // Release 8 flares in quick pairs. Like a real jet they are shot out
+        // below and behind the plane in a fan, then arc down trailing smoke.
+        for (let k = 0; k < 8; k++)
+            setTimeout(
+                () => {
+                    if (!M.has(j)) return;
+                    const t = new P.c(Q.b.flare),
+                        fan = (k % 2 ? 0.55 : 0) + (0.45 * Math.floor(k / 2)) / 3 + 0.1 * Math.random();
+                    (t.duration = 1800 + 700 * Math.random()),
+                        (t.position = Object(N.a)(j.position, Object(N.e)(j.forward, -10), Object(N.e)(j.normal, -4))),
+                        (t.velocity = Object(N.a)(
+                            Object(N.e)(j.velocity, 0.55),
+                            Object(N.e)(j.forward, -28 + 14 * fan),
+                            Object(N.e)(j.normal, -8 - 36 * fan),
+                        )),
+                        (t.size = 4),
+                        M.particles.add(t),
+                        X(M, t);
+                },
+                90 * Math.floor(k / 2),
+            );
         0 !== j.flares ||
             j.flareReloading ||
             ((j.flareReloading = !0),

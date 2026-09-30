@@ -68,7 +68,7 @@
         window.bitOnLog = html => broadcast({t: "log", h: html});
 
         updateHostBanner();
-        setInterval(sendSnapshots, SNAPSHOT_MS);
+        keepRunning(world);
         // Drop guests that went silent (closed tab, lost connection).
         setInterval(() => {
             const now = performance.now();
@@ -81,6 +81,28 @@
         }, 1000);
         window.addEventListener("beforeunload", () => host.peer && host.peer.destroy());
         host.pending.splice(0).forEach(spawnGuest);
+    }
+
+    // Browsers pause animation frames in covered or hidden windows, and slow
+    // down their timers. A Web Worker timer is not slowed down, so it keeps the
+    // host's game simulating and sending snapshots while the host looks away.
+    function keepRunning(world) {
+        let last = 0;
+        const beat = () => {
+            world.tick && world.tick();
+            const now = performance.now();
+            if (now - last >= SNAPSHOT_MS) {
+                last = now;
+                sendSnapshots();
+            }
+        };
+        try {
+            const src = "setInterval(function () { postMessage(0); }, 16);";
+            const worker = new Worker(URL.createObjectURL(new Blob([src], {type: "text/javascript"})));
+            worker.onmessage = beat;
+        } catch (e) {
+            setInterval(beat, 16);
+        }
     }
 
     function updateHostBanner() {
