@@ -320,10 +320,14 @@
             }));
             var L = t(2);
 
-            function N(M, j = !0) {
-                let t = "data:image/svg+xml;base64," + btoa(`<?xml version="1.0" encoding="UTF-8"?>\n<svg width="36px" height="22px" viewBox="0 0 36 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n    <g id="plane" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n        <path d="M9,20 L6.5,14.837989" id="Line-5" stroke="#000000" stroke-linecap="square"></path>\n        <path d="M9,20 L12.5,15" id="Line-6" stroke="#000000" stroke-linecap="square"></path>\n        <path d="M1,10.6473106 L5.5,10.6473106" id="Line-2" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M1.5,1.5 L1.5,19.5" id="Line-3" stroke="#616161" opacity="0.897600446" stroke-linecap="square"></path>\n        ${j?'<circle id="Oval" stroke="#000000" fill="#8B572A" cx="18" cy="6" r="3"></circle>':""}\n        <circle id="Oval" stroke="#000000" fill="#D8D8D8" cx="9" cy="19" r="2"></circle>\n        <path d="M7,6 C9.64828465,6 12.1482847,6 14.5,6 C16.3325123,8.43421188 19,8.78938418 21,6 C24.1271127,9 26.9158998,8.38196373 29.3663615,4.1458912 C30.796177,0.0888319406 35,1.37620196 35,4.1458912 L35,9.52014093 C27.1897306,13.6293783 18.3448695,15.3528534 14.4693514,16 C11.9889294,16.2076026 9.49914561,15.8742692 7,15 L7,6 Z" id="Path-2" stroke="#000000" fill="${M}"></path>\n        <path d="M15.5,13.5 L11.5,2.57605962" id="Line-4" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M11.5,13.5 L7.5,2.57605962" id="Line-4" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M7,6 L4.04141777,6 C2.65286074,8.33959901 2.65286074,12.4359008 4.04141777,15 L7,15 L7,6 Z" id="Path-3" stroke="#000000" fill="#3ED53E"></path>\n        <rect id="Rectangle" stroke="#000000" fill="#F5A623" x="4.5" y="0.5" width="10" height="2" rx="1"></rect>\n        <rect id="Rectangle" stroke-opacity="0.5" stroke="#000000" fill="#F5A623" x="28.5" y="7.5" width="6" height="2" rx="1"></rect>\n        <rect id="Rectangle" stroke-opacity="0.5019941" stroke="#000000" fill="#C28219" x="8.5" y="12.5" width="10" height="2" rx="1"></rect>\n        <polygon id="Path-4" fill-opacity="0.545891608" fill="#FFFFFF" points="7 9.63371095 7 7.5 3.46379584 7.5 3 9.63371095"></polygon>\n    </g>\n</svg>`);
-                return new L.a(t, 36, 22)
+            function P(M, j = !0) {
+                return "data:image/svg+xml;base64," + btoa(`<?xml version="1.0" encoding="UTF-8"?>\n<svg width="36px" height="22px" viewBox="0 0 36 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n    <g id="plane" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n        <path d="M9,20 L6.5,14.837989" id="Line-5" stroke="#000000" stroke-linecap="square"></path>\n        <path d="M9,20 L12.5,15" id="Line-6" stroke="#000000" stroke-linecap="square"></path>\n        <path d="M1,10.6473106 L5.5,10.6473106" id="Line-2" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M1.5,1.5 L1.5,19.5" id="Line-3" stroke="#616161" opacity="0.897600446" stroke-linecap="square"></path>\n        ${j?'<circle id="Oval" stroke="#000000" fill="#8B572A" cx="18" cy="6" r="3"></circle>':""}\n        <circle id="Oval" stroke="#000000" fill="#D8D8D8" cx="9" cy="19" r="2"></circle>\n        <path d="M7,6 C9.64828465,6 12.1482847,6 14.5,6 C16.3325123,8.43421188 19,8.78938418 21,6 C24.1271127,9 26.9158998,8.38196373 29.3663615,4.1458912 C30.796177,0.0888319406 35,1.37620196 35,4.1458912 L35,9.52014093 C27.1897306,13.6293783 18.3448695,15.3528534 14.4693514,16 C11.9889294,16.2076026 9.49914561,15.8742692 7,15 L7,6 Z" id="Path-2" stroke="#000000" fill="${M}"></path>\n        <path d="M15.5,13.5 L11.5,2.57605962" id="Line-4" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M11.5,13.5 L7.5,2.57605962" id="Line-4" stroke="#000000" stroke-width="1.5" stroke-linecap="square"></path>\n        <path d="M7,6 L4.04141777,6 C2.65286074,8.33959901 2.65286074,12.4359008 4.04141777,15 L7,15 L7,6 Z" id="Path-3" stroke="#000000" fill="#3ED53E"></path>\n        <rect id="Rectangle" stroke="#000000" fill="#F5A623" x="4.5" y="0.5" width="10" height="2" rx="1"></rect>\n        <rect id="Rectangle" stroke-opacity="0.5" stroke="#000000" fill="#F5A623" x="28.5" y="7.5" width="6" height="2" rx="1"></rect>\n        <rect id="Rectangle" stroke-opacity="0.5019941" stroke="#000000" fill="#C28219" x="8.5" y="12.5" width="10" height="2" rx="1"></rect>\n        <polygon id="Path-4" fill-opacity="0.545891608" fill="#FFFFFF" points="7 9.63371095 7 7.5 3.46379584 7.5 3 9.63371095"></polygon>\n    </g>\n</svg>`)
             }
+
+            function N(M, j = !0) {
+                return new L.a(P(M, j), 36, 22)
+            }
+            window.bitPlaneImage = P;
             var i = t(13),
                 u = t(1),
                 e = t(0);
@@ -375,6 +379,9 @@
                 }
                 catapultPilot() {
                     this._player = void 0, this.thrust = 0, this.elevator = 0, this.sprite = N(this.color, !1)
+                }
+                setColor(M) {
+                    this.color = M, this.sprite = N(M)
                 }
             }
         }, function(M, j, t) {
@@ -643,7 +650,7 @@
 
             function T(M, j, t = '<div class="icon target"></div>') {
                 const L = document.createElement("div");
-                L.innerHTML = `<span class="message">${M.html()} ${t} ${j.html()}</span>`, Object(u.a)(".log").appendChild(L), y(L), j.team && j.team == M.team || M == j ? M.kills-- : M.kills++, j.deaths++, M.isHuman && i.c.killed++, j.isHuman && i.c.deaths++
+                L.innerHTML = `<span class="message">${M.html()} ${t} ${j.html()}</span>`, Object(u.a)(".log").appendChild(L), y(L), j.team && j.team == M.team || M == j ? M.kills-- : (M.kills++, M.isHuman && window.BitShop && window.BitShop.reward()), j.deaths++, M.isHuman && i.c.killed++, j.isHuman && i.c.deaths++
             }
 
             function A(M) {
@@ -659,7 +666,7 @@
                     for (let t = 0; t < L.i - M.missiles; t++) j[t].classList.add("hidden");
                     for (let t = L.i - M.missiles; t < L.i; t++) j[t].classList.remove("hidden")
                 } else c.innerText = "" + M.missiles;
-                if (S.style.transform = `translateY(-${j*M.thrust/L.k}px)`, M.maxAmmo > L.f) n.innerText = "" + M.ammo;
+                if (S.style.transform = `translateY(-${j*Math.min(1,M.thrust/(M.maxThrust||L.k))}px)`, M.maxAmmo > L.f) n.innerText = "" + M.ammo;
                 else {
                     let j = [...n.querySelectorAll(".ammo")];
                     for (let t = 0; t < M.ammo; t++) j[t].classList.remove("hidden");
@@ -902,7 +909,7 @@
                     y = !1;
                 return setInterval(() => {
                         let t = j.hasPlane();
-                        if (t) u && (c(M, t), g.c.bullets++, N()), e && (t.thrust -= 2, t.thrust < 0 && (t.thrust = 0), N()), I && (t.thrust += 2, t.thrust > L.k && (t.thrust = L.k), N()), t.elevator = D && !y ? -1 : !D && y ? 1 : 0;
+                        if (t) u && (c(M, t), g.c.bullets++, N()), e && (t.thrust -= 2, t.thrust < 0 && (t.thrust = 0), N()), I && (t.thrust += 2, t.thrust > (t.maxThrust || L.k) && (t.thrust = t.maxThrust || L.k), N()), t.elevator = D && !y ? -1 : !D && y ? 1 : 0;
                         else {
                             const M = j.hasPilot();
                             M && (M.landed && (D && !y ? M.velocity.x = -10 : !D && y && (M.velocity.x = 10)), M.parachute && (D && !y ? M.velocity.x = -20 : !D && y && (M.velocity.x = 20)), M.landed && I && (M.landed = !1, M.velocity.y = -10))
@@ -948,7 +955,7 @@
             function A(M, j) {
                 const t = Object(N.h)(M.velocity);
                 let i = 1 - t / (L.l * L.d);
-                t > L.l && (i = 1 - 1 / L.d), M.angle += i * L.e * M.elevator * j, M.angle < 0 && (M.angle += 2 * Math.PI), M.angle > 2 * Math.PI && (M.angle -= 2 * Math.PI)
+                t > L.l && (i = 1 - 1 / L.d), M.angle += i * L.e * (M.turnRate || 1) * M.elevator * j, M.angle < 0 && (M.angle += 2 * Math.PI), M.angle > 2 * Math.PI && (M.angle -= 2 * Math.PI)
             }
 
             function n(M, j) {
@@ -969,7 +976,7 @@
                     }
                     0 !== j.ammo || j.gunReloading || (j.gunReloading = !0, j.setTimeout(() => {
                         j.ammo = j.maxAmmo, j.gunReloading = !1
-                    }, 3 * L.n))
+                    }, 3 * L.n * (j.reloadRate || 1)))
                 }
             }
 
@@ -1017,7 +1024,7 @@
                     }
                     0 !== j.missiles || j.missileReloading || (j.missileReloading = !0, j.setTimeout(() => {
                         j.missiles = j.maxMissiles, j.missileReloading = !1
-                    }, 10 * L.n))
+                    }, 10 * L.n * (j.reloadRate || 1)))
                 }
             }
 
@@ -1596,6 +1603,7 @@
                         for (let t of M.bodies) x(j, t) && (t instanceof e.a && j.plane !== t && !t.landed && (M.onCrash(j), M.delete(j), Object(A.b)(M, j), Object(A.c)(M, j), t.player && j.player && Object(S.d)(t.player, j.player, S.b)), t instanceof u.a && (Object(A.d)(M, t), M.onCrash(j), M.delete(j), M.delete(t), Object(A.b)(M, j), Object(A.c)(M, j), t.source.player && j.player && Object(S.d)(t.source.player, j.player, S.a)))
                 }(M);
                 for (let t of M) {
+                    t instanceof e.a && window.BitShop && window.BitShop.apply(t);
                     t.forward = Object(g.s)(Math.sin(-t.angle - Math.PI / 2), Math.cos(-t.angle - Math.PI / 2)), t.normal = Object(g.s)(Math.sin(-t.angle + Math.PI), Math.cos(-t.angle + Math.PI)), t instanceof u.a && (C(t, M), t.thrust > 0 && Object(A.f)(M, t)), t instanceof e.a && (E(t, M), t.life < l.h && Object(A.g)(M, t)), t instanceof c.b && d(t), t instanceof c.a && m(t), t instanceof n.a && h(t), t instanceof i.a && U(t, M);
                     const L = Object(g.d)(t.force, t.mass);
                     t instanceof e.a && t.landed ? (0 === t.thrust ? t.velocity.x += -t.velocity.x / 2 * j : t.velocity.x += l.m * L.x * j, t.angle = Math.PI / 8, t.velocity.y = 0, t.previous.x = t.position.x, t.previous.y = t.position.y, t.position.x += l.m * t.velocity.x * j, t.position.y = M.ground - 7) : t instanceof i.a && t.landed ? (t.velocity.y = 0, t.previous.x = t.position.x, t.previous.y = t.position.y, t.position.x += l.m * t.velocity.x * j, t.position.y = M.ground - t.sprite.height / 2) : t instanceof c.b && t.landed ? (t.velocity.y = 0, t.velocity.x += l.m * L.x * j, t.previous.x = t.position.x, t.previous.y = t.position.y, t.position.x += l.m * t.velocity.x * j, t.position.y = M.ground - t.sprite.height / 2) : (t.velocity.x += l.m * L.x * j, t.velocity.y += l.m * L.y * j, t.previous.x = t.position.x, t.previous.y = t.position.y, t.position.x += l.m * t.velocity.x * j, t.position.y += l.m * t.velocity.y * j), t.position.x + t.radius < 0 && (t.previous.x = t.position.x = M.width), t.position.x - t.radius > M.width && (t.previous.x = t.position.x = 0)
