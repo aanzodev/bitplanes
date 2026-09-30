@@ -1,0 +1,194 @@
+/* In-game HUD: cockpit, minimap, kill log. */
+
+#canvas {
+    display: none;
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.ui {
+    display: none;
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.cockpit {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: calc(50vw - 90px);
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 0 0 5px 5px;
+}
+
+.missile-capacity {
+    margin-right: 10px;
+    padding-top: 3px;
+}
+
+.missile-capacity .missile {
+    transform: rotate(-90deg) scale(1.2);
+    transition: transform 500ms ease-in;
+}
+
+.missile-capacity .missile.hidden {
+    transform: translateY(-30px) rotate(-90deg);
+}
+
+.missile-capacity{
+    display: flex;
+    font-family: monospace;
+    color: #364f7f;
+    font-size: 20px;
+    margin-left: 4px;
+    margin-right: 15px;
+}
+
+.ammo-capacity {
+    display: flex;
+    font-family: monospace;
+    color: #364f7f;
+    font-size: 20px;
+    margin-left: 13px;
+    margin-right: 7px;
+}
+
+.ammo-capacity > .ammo {
+    margin-left: 1px;
+    transition: transform 50ms ease-in;
+}
+
+.ammo-capacity > .ammo.hidden {
+    transform: translateY(-30px);
+}
+
+.thrust {
+    position: relative;
+    width: 10px;
+    height: 30px;
+    border-radius: 4px;
+    background-image: linear-gradient(179.4deg, rgba(12, 20, 69, 1) -16.9%, rgba(71, 30, 84, 1) 119.9%);
+}
+
+.thrust-level {
+    position: absolute;
+    bottom: 0;
+    left: -6px;
+    width: 21px;
+    height: 7px;
+    border-radius: 10px;
+    background-image: linear-gradient(179.1deg, rgba(247, 238, 238, 1) -1.9%, rgba(247, 202, 201, 1) 44.9%, rgba(145, 168, 208, 1) 96.1%);
+    transition: transform 100ms linear;
+}
+
+.minimap {
+    position: absolute;
+    width: 300px;
+    height: 70px;
+    right: 10px;
+    top: 10px;
+}
+
+.log {
+    position: absolute;
+    top: 90px;
+    right: 10px;
+    text-align: right;
+    font-size: 19px;
+}
+
+.log > div {
+    overflow: hidden;
+    max-height: 24px;
+    margin-bottom: 2px;
+    transition: max-height 300ms;
+}
+
+.log > div.hide {
+    max-height: 0;
+}
+
+.message {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.3);
+    text-shadow: 0 1px 0 rgb(82, 161, 255);
+    border-radius: 5px;
+    padding: 0 3px;
+}
+
+.message > * {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.skull {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background: url(../assets/icons/skull.svg) no-repeat center center;
+}
+
+.target {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background: url(../assets/icons/target.svg) no-repeat center center;
+}
+
+.missile {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background: url(../assets/icons/missile.svg) no-repeat center center;
+}
+
+.ammo {
+    display: inline-block;
+    width: 6px;
+    height: 13px;
+    background-size: contain;
+    background: url(../assets/icons/ammo.svg) no-repeat center center;
+}
+
+@media screen and (max-width: 900px) {
+    .minimap {
+        width: 150px;
+    }
+
+    .log {
+        font-size: 12px;
+    }
+
+    .score-board {
+        font-size: 12px;
+    }
+}
+
+.flare-capacity {
+    display: flex;
+    gap: 2px;
+    margin-right: 10px;
+}
+
+.flare-capacity[hidden] {
+    display: none;
+}
+
+.flare-capacity .flare.hidden {
+    opacity: 0.2;
+    box-shadow: none;
+}
