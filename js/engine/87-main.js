@@ -211,6 +211,7 @@ BitModules[87] = function (M, j, t) {
                                         (I.disableAI = Object(L.a)(M, I)));
                                 }
                                 (window.BitEngine.world = M), (window.BitEngine.player = z);
+                                window.BitSound && window.BitSound.setListener(() => z.hasPlane() || z.hasPilot());
                                 window.BitNet && window.BitNet.onWorld(M, z);
                                 const s = document.querySelector("#canvas"),
                                     [x, w] = Object(u.b)(1.25, s);

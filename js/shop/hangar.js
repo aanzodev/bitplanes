@@ -2,8 +2,26 @@
 (function () {
     const shop = window.BitShop;
 
-    function planeImage(p) {
-        return window.bitPlaneImage ? window.bitPlaneImage(p.color, true, p.skin) : "";
+    function planeImage(p, color = shop.colorOf(p)) {
+        return window.bitPlaneImage ? window.bitPlaneImage(color, true, p.skin) : "";
+    }
+
+    // Paint shop for the plane you fly: a big preview and color swatches.
+    function paintSection(state) {
+        const p = shop.selected();
+        const current = (state.paint && state.paint[p.id]) || null;
+        const swatches = shop.paints.map(({name, color}) => {
+            const active = color === current ? " active" : "";
+            const style = color ? `background: ${color}` : "";
+            const label = color ? "" : "✕";
+            return `<button type="button" class="paint-swatch${active}${color ? "" : " factory"}" data-paint="${color || ""}" title="${name}" style="${style}">${label}</button>`;
+        }).join("");
+        return `
+            <div class="paint-preview"><img src="${planeImage(p)}" alt="${p.name}"></div>
+            <div>
+                <p class="shop-note">Painting your <strong>${p.name}</strong>. Paint is free.</p>
+                <div class="paint-swatches">${swatches}</div>
+            </div>`;
     }
 
     function statBar(value) {
@@ -59,6 +77,8 @@
         document.querySelectorAll(".coin-count").forEach(el => el.textContent = state.coins.toLocaleString());
         const planes = document.querySelector(".shop-planes");
         if (planes) planes.innerHTML = shop.planes.map(p => planeCard(p, state)).join("");
+        const paint = document.querySelector(".shop-paint");
+        if (paint) paint.innerHTML = paintSection(state);
         const upgrades = document.querySelector(".shop-upgrades");
         if (upgrades) upgrades.innerHTML = shop.upgrades.map(u => upgradeRow(u, state)).join("");
     }
@@ -79,6 +99,7 @@
             if (btn.dataset.select) shop.selectPlane(btn.dataset.select);
             if (btn.dataset.buyPlane) shop.buyPlane(btn.dataset.buyPlane);
             if (btn.dataset.buyUpgrade) shop.buyUpgrade(btn.dataset.buyUpgrade);
+            if (btn.dataset.paint !== undefined) shop.setPaint(btn.dataset.paint || null);
         });
         document.addEventListener("keydown", e => {
             if (e.key === "Escape" && panel) panel.hidden = true;

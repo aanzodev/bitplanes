@@ -96,6 +96,7 @@
                 return o && o.constructor === engineClasses().Pilot ? o : undefined;
             },
         };
+        window.BitSound && window.BitSound.setListener(() => me.hasPlane() || me.hasPilot());
         const [camera, ctx] = e.camera(1.25, document.querySelector("#canvas"));
         e.loop(camera, ctx, world, (cam, alpha) => e.follow(cam, world, me, alpha), g => e.scoreboard(g, world.players));
         e.minimap(world);
@@ -188,6 +189,12 @@
         o.netId = id;
         guest.objects.set(id, o);
         world.add(o);
+        // Sounds for things the host fired (our own bullets are simulated locally).
+        const S = window.BitSound;
+        if (S && guest.started) {
+            if (cls === 2) S.gunAt(o.position);
+            if (cls === 1) S.missileAt(o.position);
+        }
     }
 
     function removeObject(world, o) {
@@ -205,6 +212,7 @@
         updateOffset(ts, now);
 
         for (const d of msg.d || []) createObject(world, d);
+        guest.started = true; // no sounds for everything already flying when we joined
         for (const [id, look] of msg.k || []) {
             const o = guest.objects.get(id);
             if (o) applyLook(o, look);

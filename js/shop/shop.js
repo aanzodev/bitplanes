@@ -4,9 +4,9 @@
     const STORAGE_KEY = "shop";
     const COINS_PER_KILL = 10;
     const BASE_THRUST = 17;
-    const {planes: PLANES, upgrades: UPGRADES} = window.BitCatalog;
+    const {planes: PLANES, upgrades: UPGRADES, paints: PAINTS} = window.BitCatalog;
 
-    let state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}};
+    let state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}};
     try {
         state = Object.assign(state, JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"));
     } catch (e) {}
@@ -32,11 +32,17 @@
         return PLANES.find(p => p.id === state.selected) || PLANES[0];
     }
 
+    // A plane's color: its paint job if it has one, otherwise factory colors.
+    function colorOf(p) {
+        return (state.paint && state.paint[p.id]) || p.color;
+    }
+
     // Final stats of the selected plane plus upgrades. Sent to the host in online games.
     function loadout() {
         const p = selectedPlane();
         return {
-            color: p.color,
+            planeId: p.id,
+            color: colorOf(p),
             skin: p.skin || "",
             thrust: p.thrust * (1 + 0.08 * level("engine")),
             turn: p.turn * (1 + 0.08 * level("handling")),
@@ -57,6 +63,7 @@
         const l = player.loadout || (player.isHuman && loadout());
         if (!l) return;
         plane.shopPlayer = player;
+        plane.planeId = l.planeId;
         plane.maxThrust = Math.round(BASE_THRUST * l.thrust);
         plane.turnRate = l.turn;
         plane.reloadRate = l.reload;
@@ -119,6 +126,15 @@
         save();
     }
 
+    function setPaint(color) {
+        const p = selectedPlane();
+        if (color !== null && !PAINTS.some(x => x.color === color)) return;
+        state.paint = state.paint || {};
+        if (color) state.paint[p.id] = color;
+        else delete state.paint[p.id];
+        save();
+    }
+
     // ------------------------------------------------ test commands (console)
 
     function addCoins(amount = 1000) {
@@ -134,7 +150,7 @@
     }
 
     function resetShop() {
-        state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}};
+        state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}};
         save();
         return "Shop reset";
     }
@@ -165,9 +181,10 @@
 
     window.BitShop = {
         apply, reward, onKill, loadout, addCoins, setCoins,
-        buyPlane, selectPlane, buyUpgrade, level, upgradeCost,
+        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, level, upgradeCost,
         planes: PLANES,
         upgrades: UPGRADES,
+        paints: PAINTS,
         selected: selectedPlane,
         state: () => state,
         onChange: fn => listeners.push(fn),

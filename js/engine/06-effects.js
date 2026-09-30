@@ -65,6 +65,7 @@ BitModules[6] = function (M, j, t) {
     }
 
     function g(M, j, t = !1) {
+        window.BitSound && window.BitSound.explosion(j.position);
         const L = new N.a(i.b.explosion);
         ((L.frameDuration = 50),
             (L.position = Object(e.s)(j.position.x, t ? M.ground : j.position.y)),

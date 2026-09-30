@@ -45,6 +45,17 @@ window.BitCatalog = {
             thrust: 1.4, turn: 1.35, life: 2, ammo: 5, missiles: 1, reload: 0.8, bulletSpeed: 1.6, flares: 3},
     ],
 
+    // Paint colors for any plane (free). The first entry means "factory colors".
+    paints: [
+        {name: "Factory", color: null},
+        {name: "Red", color: "#e8202e"}, {name: "Orange", color: "#ff7a00"}, {name: "Yellow", color: "#f5c400"},
+        {name: "Lime", color: "#7ccc1a"}, {name: "Green", color: "#2e9e44"}, {name: "Olive", color: "#6b7a4b"},
+        {name: "Teal", color: "#00a8b5"}, {name: "Sky", color: "#3aa7f0"}, {name: "Blue", color: "#1f4fd1"},
+        {name: "Purple", color: "#7b2ff7"}, {name: "Pink", color: "#ff4fa3"}, {name: "Brown", color: "#8b5a2b"},
+        {name: "Silver", color: "#c0c6cc"}, {name: "Gunmetal", color: "#4a5560"}, {name: "White", color: "#f4f4f4"},
+        {name: "Black", color: "#222222"},
+    ],
+
     upgrades: [
         {id: "engine", name: "Engine", desc: "+8% top speed", max: 5, base: 40},
         {id: "handling", name: "Handling", desc: "+8% turn rate", max: 5, base: 40},

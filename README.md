@@ -27,6 +27,7 @@ It also works on GitHub Pages as is. There is no build step.
 | <kbd>X</kbd> | Fire a missile |
 | <kbd>Q</kbd> | Drop flares: breaks missile locks (F-16, A-10 and F-22 only) |
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
+| <kbd>M</kbd> | Sound on / off (also the 🔊 button in game) |
 
 ## Hangar
 
@@ -51,8 +52,21 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 
 ★ Special planes have a black border in the Hangar and carry flares.
 
+**Paint** any plane you own with one of 16 colors in the Hangar (free).
+
 Upgrades (engine, handling, armor, ammo belt, reload, missile rack) apply to
 whichever plane you fly. Coins and purchases are saved in your browser.
+
+### Sound
+
+Every plane has its own engine sound, synthesized live with the Web Audio API
+(no audio files): each propeller plane has its own pitch, cylinder rhythm and
+tone (the Spitfire and P-51 get a smooth Merlin growl, the P-51 its air-scoop
+whistle, the Sopwith Camel a sputtering rotary). The special jets get turbine
+roar and whine: F-16 with afterburner, the A-10's high "hair dryer" whistle and
+GAU-8 *BRRRT*, the F-22's deep afterburner rumble. Guns, missiles, flares and
+explosions from other planes get quieter and pan with distance. Tweak the
+sounds in `js/audio/profiles.js`.
 
 ### Test commands
 
@@ -101,6 +115,9 @@ css/
   game.css              In-game HUD
 js/
   quality.js            Lowers render resolution when frames get slow
+  audio/
+    profiles.js         How each plane sounds (edit to tweak)
+    sound.js            Synthesized engine, guns, missiles, flares, explosions
   shop/
     catalog.js          Planes and upgrades for sale (edit prices/stats here)
     shop.js             Coins, purchases, applying a plane in game
