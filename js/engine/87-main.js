@@ -91,7 +91,7 @@ BitModules[87] = function (M, j, t) {
                                 M.add(L));
                         }, 2e3));
                 }),
-                Object(a.b)(M));
+                ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)));
             let j = Object(N.a)();
             for (let t = 0; t < e.j; t++) {
                 const t = i.a.pop() || "no name",
@@ -168,7 +168,7 @@ BitModules[87] = function (M, j, t) {
                                                     M.add(L));
                                             }, 2e3));
                                     }),
-                                    Object(a.b)(M),
+                                    ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)),
                                     Object(a.a)(M));
                                 let j = new g.a(M.width / 2 + 110, M.ground);
                                 M.add(j);
@@ -211,6 +211,7 @@ BitModules[87] = function (M, j, t) {
                                         (I.disableAI = Object(L.a)(M, I)));
                                 }
                                 (window.BitEngine.world = M), (window.BitEngine.player = z);
+                                window.BitMaps && window.BitMaps.announce(M.map);
                                 window.BitSound && window.BitSound.setListener(() => z.hasPlane() || z.hasPilot());
                                 window.BitNet && window.BitNet.onWorld(M, z);
                                 const s = document.querySelector("#canvas"),
@@ -240,7 +241,7 @@ BitModules[87] = function (M, j, t) {
                                 let j, t;
                                 ((M.ground = M.height - A.b.ground.height),
                                     (M.players = []),
-                                    Object(a.b)(M),
+                                    ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)),
                                     Object(a.a)(M));
                                 const N = new URLSearchParams(window.location.search);
                                 j = t = parseInt(N.get("size") || "50");
@@ -366,7 +367,7 @@ BitModules[87] = function (M, j, t) {
                                     ground: 0,
                                     stratosphere: 50,
                                 });
-                                ((M.ground = M.height - A.b.ground.height), (M.players = []), Object(a.b)(M));
+                                ((M.ground = M.height - A.b.ground.height), (M.players = []), ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)));
                                 const j = new y.a("#ff0015"),
                                     t = new T.a("YOU", "#ff0015", j);
                                 (M.players.push(t),

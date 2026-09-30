@@ -29,7 +29,8 @@ BitModules[14] = function (M, j, t) {
         g = t(7),
         a = t(9),
         P = t(10),
-        Q = t(2);
+        Q = t(2),
+        R = t(6);
 
     function y(M, j, t) {
         let N = Object(i.f)(() => {
@@ -174,6 +175,8 @@ BitModules[14] = function (M, j, t) {
                     (function (M, j) {
                         function t() {
                             var t, L;
+                            // Decoyed by flares: chase the nearest flare instead.
+                            if (M.has(j) && j.flared) return void K(M, j);
                             if (M.has(j))
                                 if (void 0 !== j.target)
                                     if (M.has(j.target)) {
@@ -190,8 +193,11 @@ BitModules[14] = function (M, j, t) {
                                     for (let I of M)
                                         if (I instanceof u.a) {
                                             if (I === j.source) continue;
-                                            // Flares: a flared missile flies blind, and burning flares hide the plane.
-                                            if (j.flared || I.flareUntil > performance.now()) continue;
+                                            // Burning flares hide the plane and lure the missile to them.
+                                            if (I.flareUntil > performance.now()) {
+                                                Object(N.q)(j.position, I.position) < 700 && (j.flared = !0);
+                                                continue;
+                                            }
                                             if (
                                                 void 0 !==
                                                     (null === (t = I.player) || void 0 === t
@@ -248,6 +254,23 @@ BitModules[14] = function (M, j, t) {
                 M.add(L),
                 j.control(L));
         }
+    }
+
+    // A missile lured by flares steers to the nearest one and explodes on it.
+    function K(M, j) {
+        let t,
+            L = 900;
+        for (const i of M.particles)
+            if (i.sprite === Q.b.flare) {
+                const M = Object(N.q)(j.position, i.position);
+                M < L && ((t = i), (L = M));
+            }
+        if (!t) return void (j.elevator = 0);
+        if (L < 30) return void (Object(R.d)(M, j), M.delete(j), M.particles.delete(t));
+        const i = Object(N.b)(Object(N.r)(t.position, j.position), j.forward);
+        ((j.elevator = Math.sign(i) > 0 ? 1 : -1),
+            Object(N.a)(j.position, Object(N.e)(j.velocity, 4)).y > M.ground &&
+                (j.elevator = Math.sign(j.forward.x) > 0 ? -1 : 1));
     }
 
     // White smoke trail behind a burning flare.

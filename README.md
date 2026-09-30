@@ -25,7 +25,7 @@ It also works on GitHub Pages as is. There is no build step.
 | <kbd>←</kbd> <kbd>→</kbd> | Pitch (elevator) |
 | <kbd>Space</kbd> | Fire the gun |
 | <kbd>X</kbd> | Fire a missile |
-| <kbd>Q</kbd> | Drop flares: breaks missile locks (F-16, A-10 and F-22 only) |
+| <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets only) |
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in game) |
 | <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online games keep running |
@@ -39,19 +39,34 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | Plane | Price | Notes |
 |---|---:|---|
 | Classic | free | Balanced starter biplane |
-| Swift | 150 | Fast and agile, fewer bullets |
-| Gunship | 300 | Big ammo belt, quick reload |
-| Fortress | 500 | Heavy armor, extra missiles, slow |
-| Sopwith Camel | 750 | Turns on a dime |
-| Phantom | 1,000 | Better at everything |
-| A6M Zero | 1,200 | Light and nimble prop fighter |
-| Spitfire | 1,500 | Quick climber, eight guns |
-| P-51 Mustang | 2,000 | Fast escort fighter |
-| **F-16 Falcon** ★ | 2,500 | Jet, fast gun, 3 flares |
-| **A-10 Warthog** ★ | 5,000 | Flying tank, huge cannon belt, 3 flares |
-| **F-22 Raptor** ★ | 10,000 | 3 missiles, faster bullets, 3 flares |
+| Swift | 300 | Fast and agile, fewer bullets |
+| Gunship | 600 | Big ammo belt, quick reload |
+| Fortress | 1,000 | Heavy armor, extra missiles, slow |
+| Sopwith Camel | 1,500 | Turns on a dime |
+| Phantom | 2,000 | Better at everything (biplane) |
+| A6M Zero | 2,500 | Light and nimble prop fighter |
+| Spitfire | 3,000 | Quick climber, eight guns |
+| Bf 109 | 3,500 | Fast climber, hard-hitting cannon |
+| P-51 Mustang | 4,000 | Fast escort fighter |
+| F4U Corsair | 5,000 | Tough navy fighter with rockets |
+| **MiG-21 Fishbed** ★ | 7,000 | Cheap fast jet, 2 flares |
+| **F-16 Falcon** ★ | 9,000 | Fast gun, 3 flares |
+| **MiG-29 Fulcrum** ★ | 12,000 | Agile twin-engine jet |
+| **A-10 Warthog** ★ | 15,000 | Flying tank, huge cannon belt |
+| **F-15 Eagle** ★ | 20,000 | Powerful air superiority fighter |
+| **Su-27 Flanker** ★ | 24,000 | Long range, turns hard |
+| **F-35 Lightning** ★ | 30,000 | Stealth, second only to the Raptor |
+| **F-22 Raptor** ★ | 40,000 | The best: 3 missiles, fastest bullets |
 
-★ Special planes have a black border in the Hangar and carry flares.
+★ Special jets have a black border in the Hangar and carry flares: press
+<kbd>Q</kbd> and missiles chasing you turn toward the flares and explode on them.
+
+## Maps
+
+Every game picks a random map (never the same one twice in a row):
+Countryside, Desert, Arctic, Sunset and Night. Online, everyone who joins
+plays on the host's map. Map art is in `assets/sprites/maps/` and the list is
+in `js/maps.js`.
 
 **Paint** any plane you own with one of 16 colors in the Hangar (free).
 
@@ -118,6 +133,7 @@ css/
 js/
   quality.js            Lowers render resolution when frames get slow
   pause.js              In-game menu (Esc): resume, plane, paint, leave
+  maps.js               Maps (random each game)
   audio/
     profiles.js         How each plane sounds (edit to tweak)
     sound.js            Synthesized engine, guns, missiles, flares, explosions
