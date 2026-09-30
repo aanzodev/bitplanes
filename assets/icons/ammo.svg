@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="6px" height="13px" viewBox="0 0 6 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ammo</title>
+    <g id="ammo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(3.000000, 6.500000) scale(-1, 1) rotate(90.000000) translate(-3.000000, -6.500000) translate(-3.500000, 3.500000)" stroke="#000000">
+            <path d="M12.5,0.5 L2.93352161,0.5 C2.19432671,0.5 1.61505919,0.7692392 1.21034609,1.19212374 C0.736279584,1.68747563 0.5,2.38071298 0.5,3.06523547 C0.5,3.7239887 0.719125689,4.38236858 1.18542644,4.8488669 C1.58777745,5.25138839 2.17212754,5.5 2.93352161,5.5 L12.5,5.5 L12.5,0.5 Z" id="Rectangle" fill="#D39A3C"></path>
+            <line x1="4" y1="2.7554553e-16" x2="4" y2="5" id="Line" stroke-linejoin="round"></line>
+        </g>
+        <path d="M4,1.21498318 C4.33333333,1.21498318 4.66666667,1.5971982 5,2.36162822 L5,12 L4,12 L4,1.21498318 Z" id="Rectangle" fill-opacity="0.47" fill="#FFFFFF"></path>
+    </g>
+</svg>

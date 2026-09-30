@@ -167,3 +167,6 @@ BitModules[79] = function (M, j, t) {
 BitModules[80] = function (M, j, t) {
     M.exports = t.p + "units/angel.svg";
 };
+BitModules[88] = function (M, j, t) {
+    M.exports = t.p + "effects/flare.svg";
+};

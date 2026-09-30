@@ -7,7 +7,15 @@ main .welcome {
     margin: 20px auto;
     padding: 40px 50px;
     background: #fff;
-    border-radius: 10px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(20, 70, 110, 0.18);
+}
+
+main .tagline {
+    margin: -12px 0 24px;
+    text-align: center;
+    color: #5b6b7a;
+    font-size: 15px;
 }
 
 main .logo {
@@ -15,7 +23,7 @@ main .logo {
     width: 36px;
     height: 22px;
     background-size: contain;
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNOSAyMGwtMi41LTUuMTYyTTkgMjBsMy41LTUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIvPjxwYXRoIGQ9Ik0xIDEwLjY0N2g0LjUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiLz48cGF0aCBkPSJNMS41IDEuNXYxOCIgc3Ryb2tlPSIjNjE2MTYxIiBvcGFjaXR5PSIuODk4IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIi8+PGNpcmNsZSBzdHJva2U9IiMwMDAiIGZpbGw9IiM4QjU3MkEiIGN4PSIxOCIgY3k9IjYiIHI9IjMiLz48Y2lyY2xlIHN0cm9rZT0iIzAwMCIgZmlsbD0iI0Q4RDhEOCIgY3g9IjkiIGN5PSIxOSIgcj0iMiIvPjxwYXRoIGQ9Ik03IDZoNy41QzE2LjMzMyA4LjQzNCAxOSA4Ljc5IDIxIDZjMy4xMjcgMyA1LjkxNiAyLjM4MiA4LjM2Ni0xLjg1NEMzMC43OTYuMDg5IDM1IDEuMzc2IDM1IDQuMTQ2VjkuNTJjLTcuODEgNC4xMS0xNi42NTUgNS44MzMtMjAuNTMgNi40OC0yLjQ4MS4xLTQuOTctLjI4OC03LjQ3LTEuMTYyVjZ6IiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSIjODRGMDBEIi8+PHBhdGggZD0iTTE1LjUgMTMuNWwtNC0xMC45MjRNMTEuNSAxMy41bC00LTEwLjkyNCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIvPjxwYXRoIGQ9Ik03IDZINC4wNDFjLTEuMzg4IDIuMzQtMS4zODggNi40MzYgMCA5SDdWNnoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIGZpbGw9IiMzRUQ1M0UiLz48cmVjdCBzdHJva2U9IiMwMDAiIGZpbGw9IiNGNUE2MjMiIHg9IjQuNSIgeT0iLjUiIHdpZHRoPSIxMCIgaGVpZ2h0PSIyIiByeD0iMSIvPjxyZWN0IHN0cm9rZS1vcGFjaXR5PSIuNSIgc3Ryb2tlPSIjMDAwIiBmaWxsPSIjRjVBNjIzIiB4PSIyOC41IiB5PSI3LjUiIHdpZHRoPSI2IiBoZWlnaHQ9IjIiIHJ4PSIxIi8+PHJlY3QgZmlsbD0iI0MyODIxOSIgeD0iOCIgeT0iMTMiIHdpZHRoPSIxMSIgaGVpZ2h0PSIyIiByeD0iMSIvPjxwYXRoIGZpbGwtb3BhY2l0eT0iLjU0NiIgZmlsbD0iI0ZGRiIgZD0iTTcgOS42MzRWNy41SDMuNDY0TDMgOS42MzR6Ii8+PC9nPjwvc3ZnPg==) no-repeat;
+    background: url(../assets/icons/logo.svg) no-repeat;
 }
 
 main h1 {

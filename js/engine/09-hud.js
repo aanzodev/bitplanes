@@ -157,6 +157,8 @@ BitModules[9] = function (M, j, t) {
     function z(M) {
         const j = o.offsetHeight - S.offsetHeight;
         if (2 == M.maxMissiles) {
+            c.querySelectorAll(".missile").length < 2 &&
+                (c.innerHTML = '<div class="missile"></div><div class="missile"></div>');
             let j = [...c.querySelectorAll(".missile")];
             for (let t = 0; t < L.i - M.missiles; t++) j[t].classList.add("hidden");
             for (let t = L.i - M.missiles; t < L.i; t++) j[t].classList.remove("hidden");
@@ -167,10 +169,21 @@ BitModules[9] = function (M, j, t) {
         )
             n.innerText = "" + M.ammo;
         else {
+            n.querySelectorAll(".ammo").length < M.maxAmmo &&
+                (n.innerHTML = '<div class="ammo"></div>'.repeat(M.maxAmmo));
             let j = [...n.querySelectorAll(".ammo")];
             for (let t = 0; t < M.ammo; t++) j[t].classList.remove("hidden");
             for (let t = M.ammo; t < M.maxAmmo; t++) j[t].classList.add("hidden");
         }
+        // Flares (Q), only on planes that carry them.
+        const f = document.querySelector(".flare-capacity");
+        f &&
+            ((f.hidden = !(M.maxFlares > 0)),
+            M.maxFlares > 0 &&
+                (f.innerHTML = Array.from(
+                    { length: M.maxFlares },
+                    (_, k) => `<i class="flare${k < M.flares ? "" : " hidden"}"></i>`,
+                ).join("")));
     }
 
     function r(M) {

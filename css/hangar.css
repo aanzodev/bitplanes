@@ -83,7 +83,7 @@
 .shop-planes {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
+    gap: 18px 12px;
 }
 
 .shop-plane {
@@ -97,8 +97,56 @@
     text-align: center;
 }
 
+.shop-plane {
+    position: relative;
+}
+
 .shop-plane.selected {
     border-color: #0a0;
+}
+
+/* Special planes (F-16, A-10, F-22) get a black border. */
+.shop-plane.special {
+    border: 3px solid #000;
+    background: linear-gradient(180deg, #f4f6f8 0%, #fff 45%);
+}
+
+.shop-plane.special.selected {
+    box-shadow: 0 0 0 3px #0a0;
+}
+
+.special-badge {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: #000;
+    color: #ffd66b;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.plane-perk {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+.plane-perk kbd {
+    margin: 0 2px;
+}
+
+.flare {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 20%, #ffd66b 45%, #ffb02e 75%);
+    box-shadow: 0 0 4px #ffb02e;
 }
 
 .shop-plane img {

@@ -23,8 +23,30 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
+    // WWII style propeller fighter (skin "prop").
+    function K(M, j) {
+        return (
+            "data:image/svg+xml;base64," +
+            btoa(`<svg width="36px" height="22px" viewBox="0 0 36 22" xmlns="http://www.w3.org/2000/svg">
+    <path d="M26.5 11 L29.5 3.5 L33.8 3.5 L34 11 Z" fill="${M}" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M13 16.5 L12 19" stroke="#000" stroke-width="1"/>
+    <circle cx="12" cy="19.6" r="1.6" fill="#D8D8D8" stroke="#000" stroke-width="0.6"/>
+    <path d="M4 10.2 Q6 8 11 8 L30 9.5 L34.5 11 L34.2 12.6 L28 14 L11 15.2 Q6 15.2 4 13.2 Z" fill="${M}" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M4 10.2 Q6 8 8.5 8.2 L8.5 15 Q6 15.2 4 13.2 Z" fill="#3a3a3a"/>
+    <path d="M27.5 11.8 L35 11.8" stroke="#000" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M10.5 13.2 L22.5 13.2 L20.5 17.2 L12.5 17.2 Z" fill="${M}" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M10.5 13.2 L22.5 13.2 L20.5 17.2 L12.5 17.2 Z" fill="#000" fill-opacity="0.2"/>
+    <path d="M13 8.3 C14.2 4.6 19.2 4.6 20.6 8.8 Z" fill="${j ? "#9fdcff" : "#46616e"}" stroke="#000" stroke-width="1"/>
+    ${j ? '<circle cx="16.6" cy="7" r="1.7" fill="#8B572A" stroke="#000" stroke-width="0.6"/>' : ""}
+    <path d="M2.3 3 L2.3 19.5" stroke="#616161" stroke-opacity="0.9" stroke-linecap="square"/>
+    <circle cx="3" cy="11.6" r="1.6" fill="#555" stroke="#000" stroke-width="0.6"/>
+</svg>`)
+        );
+    }
+
     function P(M, j = !0, t) {
         if ("jet" === t) return J(M, j);
+        if ("prop" === t) return K(M, j);
         return (
             "data:image/svg+xml;base64," +
             btoa(

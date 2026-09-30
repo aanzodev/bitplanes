@@ -95,5 +95,6 @@ BitModules[2] = function (M, j, t) {
         },
         parachute: new L(t(79), 53, 36),
         angel: new L(t(80), 13, 11),
+        flare: new L(t(88), 12, 12),
     };
 };

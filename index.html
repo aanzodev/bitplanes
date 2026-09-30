@@ -20,6 +20,7 @@
             Bit Planes
             <i class="logo"></i>
         </h1>
+        <p class="tagline">Dogfight biplanes and jets, earn coins, and fly with friends online.</p>
         <p>
             <strong>Controls:</strong><br>
         </p>
@@ -28,6 +29,7 @@
             <li>Arrows <kbd>←</kbd><kbd>→</kbd> — elevator controls.</li>
             <li><kbd>Space</kbd> — fire a gun. <kbd>X</kbd> — deploy a missile.</li>
             <li><kbd>C</kbd> — catapult / parachute and get new plane at the barn.</li>
+            <li><kbd>Q</kbd> — drop flares to shake off missiles (F-16, A-10 and F-22).</li>
         </ul>
         <p>Every kill earns <strong>10</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
 
@@ -90,6 +92,7 @@
             <div class="missile"></div>
             <div class="missile"></div>
         </div>
+        <div class="flare-capacity" title="Flares (Q)" hidden></div>
         <div class="thrust">
             <div class="thrust-level"></div>
         </div>
@@ -120,8 +123,14 @@
 <!-- Libraries and add-ons -->
 <script src="js/vendor/peerjs.min.js"></script>
 <script src="js/quality.js"></script>
-<script src="js/shop.js"></script>
-<script src="js/net.js"></script>
+<script src="js/shop/catalog.js"></script>
+<script src="js/shop/shop.js"></script>
+<script src="js/shop/hangar.js"></script>
+<script src="js/online/common.js"></script>
+<script src="js/online/sync.js"></script>
+<script src="js/online/host.js"></script>
+<script src="js/online/guest.js"></script>
+<script src="js/online/lobby.js"></script>
 <!-- Game engine: each file registers a module, boot.js starts the game -->
 <script src="js/engine/registry.js"></script>
 <script src="js/engine/00-vector.js"></script>

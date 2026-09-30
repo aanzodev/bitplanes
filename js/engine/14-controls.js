@@ -15,6 +15,9 @@ BitModules[14] = function (M, j, t) {
         }),
         t.d(j, "b", function () {
             return S;
+        }),
+        t.d(j, "f", function () {
+            return F;
         }));
     var L = t(1),
         N = t(0),
@@ -24,7 +27,9 @@ BitModules[14] = function (M, j, t) {
         I = t(5),
         D = t(8),
         g = t(7),
-        a = t(9);
+        a = t(9),
+        P = t(10),
+        Q = t(2);
 
     function y(M, j, t) {
         let N = Object(i.f)(() => {
@@ -66,6 +71,9 @@ BitModules[14] = function (M, j, t) {
                     else if (L.code === t.missile) {
                         let t = j.hasPlane();
                         t && (o(M, t), g.c.missiles++, N());
+                    } else if (L.code === (t.flare || "KeyQ")) {
+                        let t = j.hasPlane();
+                        t && (F(M, t), N());
                     } else {
                         if (L.code !== t.catapult) return;
                         if (j.hasPlane()) S(M, j);
@@ -182,6 +190,8 @@ BitModules[14] = function (M, j, t) {
                                     for (let I of M)
                                         if (I instanceof u.a) {
                                             if (I === j.source) continue;
+                                            // Flares: a flared missile flies blind, and burning flares hide the plane.
+                                            if (j.flared || I.flareUntil > performance.now()) continue;
                                             if (
                                                 void 0 !==
                                                     (null === (t = I.player) || void 0 === t
@@ -238,5 +248,34 @@ BitModules[14] = function (M, j, t) {
                 M.add(L),
                 j.control(L));
         }
+    }
+
+    // Flares: drop decoys that break the lock of missiles chasing this plane.
+    function F(M, j) {
+        if (!M.has(j) || !(j.maxFlares > 0) || !(j.flares > 0)) return;
+        j.flares--;
+        j.flareUntil = performance.now() + 1500;
+        for (let t of M.bodies)
+            t instanceof I.a &&
+                t.source !== j &&
+                (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
+                ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
+        for (let k = 0; k < 6; k++) {
+            const t = new P.c(Q.b.flare);
+            (t.duration = 1200 + 500 * Math.random()),
+                (t.position = Object(N.c)(j.position)),
+                (t.velocity = Object(N.s)(
+                    0.4 * j.velocity.x + 40 * (Math.random() - 0.5),
+                    0.4 * j.velocity.y + 10 + 20 * Math.random(),
+                )),
+                (t.size = 3),
+                M.particles.add(t);
+        }
+        0 !== j.flares ||
+            j.flareReloading ||
+            ((j.flareReloading = !0),
+            j.setTimeout(() => {
+                (j.flares = j.maxFlares), (j.flareReloading = !1);
+            }, 8 * L.n));
     }
 };
