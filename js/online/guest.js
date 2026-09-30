@@ -82,9 +82,12 @@
         e.decorate(world);
         world.remote = {alpha: guestAlpha};
         guest.world = world;
+        O.prediction.start(world, m => guest.conn && guest.conn.open && guest.conn.send(m));
 
         const me = {
             hasPlane: () => {
+                const local = O.prediction.plane();
+                if (local) return local;
                 const o = guest.objects.get(guest.me);
                 return o && o.constructor === engineClasses().Plane ? o : undefined;
             },
@@ -158,6 +161,7 @@
             o.previous = o.position;
             o.angle = a;
         }
+        O.prediction.step();
         return 1;
     }
 
@@ -242,8 +246,9 @@
             },
         }));
 
+        O.prediction.sync(guest.objects.get(guest.me), msg.h);
         const plane = guest.objects.get(guest.me);
-        if (msg.h && plane && plane.constructor === engineClasses().Plane) {
+        if (!O.prediction.plane() && msg.h && plane && plane.constructor === engineClasses().Plane) {
             [plane.ammo, plane.maxAmmo, plane.missiles, plane.maxMissiles, plane.thrust, plane.maxThrust,
                 plane.flares, plane.maxFlares] = msg.h;
             e.cockpit(plane);
@@ -257,6 +262,7 @@
         const send = () => {
             if (!guest.conn || !guest.conn.open) return;
             const i = guest.input;
+            O.prediction.setInput({...i});
             guest.conn.send({t: "in", s: {u: !!i.up, d: !!i.down, l: !!i.left, r: !!i.right, f: !!i.fire}});
         };
         document.addEventListener("keydown", ev => {

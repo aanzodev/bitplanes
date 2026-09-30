@@ -15,7 +15,7 @@
     const SNAPSHOT_MS = 33; // ~30 snapshots per second
     // Guests draw the world this far in the past so there are always two
     // snapshots to blend between, even when one arrives a bit late.
-    const RENDER_DELAY_MS = 90;
+    const RENDER_DELAY_MS = 60;
     const TIMEOUT_MS = 6000;
     const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     const GUEST_COLORS = ["#145ece", "#f36a20", "#70ba01", "#d23be7", "#34bbe6", "#dbaf02", "#ff0786"];
@@ -70,15 +70,18 @@
     }
 
     // Ping meter (online games only). rows: [{name, ms}], name empty for the guest's own ping.
-    function pingMeter(rows) {
+    // options.title labels the meter; options.empty is shown when there are no rows.
+    function pingMeter(rows, options = {}) {
         let el = document.querySelector(".ping-meter");
         if (!el) {
             el = document.createElement("div");
             el.className = "ping-meter";
             document.querySelector(".ui").appendChild(el);
         }
-        el.hidden = !rows.length;
-        el.innerHTML = rows.map(({name, ms}) => {
+        el.hidden = !rows.length && !options.title;
+        const title = options.title ? `<span class="ping ping-title">${options.title}</span>` : "";
+        const empty = !rows.length && options.empty ? `<span class="ping waiting">${options.empty}</span>` : "";
+        el.innerHTML = title + empty + rows.map(({name, ms}) => {
             const level = typeof ms !== "number" ? "waiting" : ms < 80 ? "good" : ms < 160 ? "ok" : "bad";
             const label = typeof ms !== "number" ? "…" : Math.round(ms) + " ms";
             const who = name ? cleanName(name) : "Ping";

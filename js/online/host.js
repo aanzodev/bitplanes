@@ -113,7 +113,8 @@
 
     // Each friend's ping, as they last measured it.
     function updatePingMeter() {
-        pingMeter([...host.clients.values()].filter(c => c.player).map(c => ({name: c.name, ms: c.rtt})));
+        const rows = [...host.clients.values()].filter(c => c.player).map(c => ({name: c.name, ms: c.rtt}));
+        pingMeter(rows, {title: "📶 Friends' ping", empty: "waiting for friends…"});
     }
 
     function hostLog(html) {
@@ -167,7 +168,9 @@
             return;
         }
         if (!client || !client.player) return;
-        if (msg.t === "ping") {
+        if (msg.t === "st" && Array.isArray(msg.s)) {
+            applyGuestPlane(client, msg.s);
+        } else if (msg.t === "ping") {
             if (client.conn.open) client.conn.send({t: "pong", c: msg.c});
             const r = Number(msg.r);
             client.rtt = msg.r != null && Number.isFinite(r) && r >= 0 && r < 60000 ? r : undefined;
@@ -176,7 +179,7 @@
             client.input = {u: !!msg.s.u, d: !!msg.s.d, l: !!msg.s.l, r: !!msg.s.r, f: !!msg.s.f};
             // Turn right away instead of waiting for the next control tick.
             const plane = client.player.hasPlane(), i = client.input;
-            if (plane) plane.elevator = i.l && !i.r ? -1 : !i.l && i.r ? 1 : 0;
+            if (plane && !plane.remoteDriven) plane.elevator = i.l && !i.r ? -1 : !i.l && i.r ? 1 : 0;
         } else if (msg.t === "act") {
             const world = host.world, player = client.player, controls = engine().controls;
             const plane = player.hasPlane();
@@ -226,12 +229,30 @@
     }
 
     // Mirrors the keyboard controls, but driven by the guest's key presses.
+    // The guest flies its own plane and reports where it is; copy that onto
+    // our plane. Hits, damage and crashes are still worked out here.
+    function applyGuestPlane(client, s) {
+        const plane = client.player.hasPlane(), world = host.world;
+        const [id, x, y, vx, vy, a, thrust, elevator, landed] = s.map(Number);
+        if (!plane || plane.netId !== id || ![x, y, vx, vy, a, thrust].every(Number.isFinite)) return;
+        const max = plane.maxThrust || engine().consts.k;
+        plane.remoteDriven = true;
+        plane.previous = plane.position;
+        plane.position = {x: Math.min(world.width, Math.max(0, x)), y: Math.min(world.ground, Math.max(-5000, y))};
+        plane.velocity = {x: vx, y: vy};
+        plane.angle = a;
+        plane.thrust = Math.min(max, Math.max(0, thrust));
+        plane.elevator = Math.sign(elevator) || 0;
+        plane.landed = !!landed;
+    }
+
     function startRemoteControl(world, player, client) {
         const controls = engine().controls, consts = engine().consts;
         return setInterval(() => {
             const input = client.input, plane = player.hasPlane();
             if (plane) {
                 if (input.f) controls.d(world, plane);
+                if (plane.remoteDriven) return; // the guest flies it and reports its position
                 if (input.d) plane.thrust = Math.max(0, plane.thrust - 2);
                 if (input.u) plane.thrust = Math.min(plane.maxThrust || consts.k, plane.thrust + 2);
                 plane.elevator = input.l && !input.r ? -1 : !input.l && input.r ? 1 : 0;
@@ -308,7 +329,11 @@
         for (const client of host.clients.values()) {
             if (!client.player || !client.conn.open) continue;
             const defs = [], looks = [];
+            // A guest draws its own bullets itself, so leave those out.
+            const mine = client.player.object;
+            const own = o => o.source === mine && o.constructor === engineClasses().bodies[2];
             for (const o of all) {
+                if (own(o)) continue;
                 const look = lookKey(o);
                 if (!client.known.has(o)) {
                     client.known.add(o);
@@ -319,12 +344,12 @@
                     looks.push([o.netId, look]);
                 }
             }
-            const mine = client.player.object;
             const hud = mine && mine.constructor === engineClasses().Plane
                 ? [mine.ammo, mine.maxAmmo, mine.missiles, mine.maxMissiles, mine.thrust, mine.maxThrust || consts.k,
-                    mine.flares || 0, mine.maxFlares || 0]
+                    mine.flares || 0, mine.maxFlares || 0, mine.landed ? 1 : 0]
                 : null;
-            client.conn.send({t: "s", ts: round(performance.now(), 1), o: entries, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud});
+            const list = mine ? entries.filter((e, k) => !own(all[k])) : entries;
+            client.conn.send({t: "s", ts: round(performance.now(), 1), o: list, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud});
         }
     }
 

@@ -1,9 +1,12 @@
 // Rendering, physics step and the main loop.
 BitModules[22] = function (M, j, t) {
     "use strict";
-    t.d(j, "a", function () {
+    (t.d(j, "a", function () {
         return Y;
-    });
+    }),
+        t.d(j, "b", function () {
+            return Z;
+        }));
     var L = t(14),
         N = t(10),
         i = t(11),
@@ -455,6 +458,12 @@ BitModules[22] = function (M, j, t) {
     function U(M, j) {
         ((M.force = Object(g.s)(0, M.mass * l.a)),
             M.running ? (M.velocity.x = M.direction == i.b.Right ? 10 : -10) : (M.velocity.x = 0));
+    }
+
+    // One fixed physics step for a world, without drawing. Online guests use
+    // it to fly their own plane locally.
+    function Z(M, j) {
+        (Object(L.c)(M, j), O(M, j));
     }
 
     function Y(M, j, t, i, u) {
