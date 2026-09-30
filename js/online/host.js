@@ -162,7 +162,20 @@
             return;
         }
         if (!client || !client.player) return;
-        if (msg.t === "st" && Array.isArray(msg.s)) {
+        if (msg.t === "loadout") {
+            // New plane choice from the guest's menu: used for their next plane.
+            client.loadout = cleanLoadout(msg.l);
+            client.player.loadout = client.loadout;
+            client.player.loadoutColor = client.loadout.color;
+        } else if (msg.t === "paint" && /^#[0-9a-f]{3,8}$/i.test(msg.c)) {
+            // New paint: repaint the guest's current plane right away.
+            const player = client.player, plane = player.hasPlane();
+            client.loadout.color = player.loadoutColor = msg.c;
+            if (plane && plane.planeId === client.loadout.planeId) {
+                plane.setSkin(msg.c, plane.skin);
+                player.color = msg.c;
+            }
+        } else if (msg.t === "st" && Array.isArray(msg.s)) {
             applyGuestPlane(client, msg.s);
         } else if (msg.t === "ping") {
             // Echo the guest's timestamp so it can measure its own ping.

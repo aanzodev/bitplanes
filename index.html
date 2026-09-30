@@ -11,6 +11,7 @@
     <link href="css/hangar.css" rel="stylesheet">
     <link href="css/online.css" rel="stylesheet">
     <link href="css/game.css" rel="stylesheet">
+    <link href="css/pause.css" rel="stylesheet">
 </head>
 <body>
 <main>
@@ -30,7 +31,7 @@
             <li><kbd>Space</kbd> — fire a gun. <kbd>X</kbd> — deploy a missile.</li>
             <li><kbd>C</kbd> — catapult / parachute and get new plane at the barn.</li>
             <li><kbd>Q</kbd> — drop flares to shake off missiles (F-16, A-10 and F-22).</li>
-            <li><kbd>M</kbd> — sound on / off.</li>
+            <li><kbd>M</kbd> — sound on / off. <kbd>Esc</kbd> — menu: pause, change plane or paint, leave.</li>
         </ul>
         <p>Every kill earns <strong>10</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
 
@@ -119,10 +120,28 @@
     </div>
     <canvas class="minimap"></canvas>
     <button type="button" class="sound-toggle" title="Sound on (M)">🔊</button>
+    <button type="button" class="pause-toggle" title="Menu (Esc)">⏸</button>
     <div class="hud-coins"><i class="coin"></i> <span class="coin-count">0</span></div>
     <div class="log"></div>
 </div>
 <canvas id="canvas"></canvas>
+
+<div class="pause-menu" hidden>
+    <div class="pause-panel" role="dialog" aria-label="Menu">
+        <h2 class="pause-title">Paused</h2>
+        <p class="pause-note"></p>
+        <div class="pause-actions">
+            <button type="button" class="btn resume-game">▶ Resume</button>
+            <button type="button" class="btn leave-game">Leave to home</button>
+        </div>
+        <h3>Your plane</h3>
+        <p class="pause-hint"></p>
+        <div class="pause-planes"></div>
+        <h3>Paint</h3>
+        <div class="pause-paint"></div>
+        <p class="pause-keys"><kbd>Esc</kbd> resume</p>
+    </div>
+</div>
 
 <!-- Libraries and add-ons -->
 <script src="js/vendor/peerjs.min.js"></script>
@@ -132,6 +151,7 @@
 <script src="js/shop/catalog.js"></script>
 <script src="js/shop/shop.js"></script>
 <script src="js/shop/hangar.js"></script>
+<script src="js/pause.js"></script>
 <script src="js/online/common.js"></script>
 <script src="js/online/sync.js"></script>
 <script src="js/online/prediction.js"></script>
