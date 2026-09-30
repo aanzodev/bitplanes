@@ -17,6 +17,20 @@ python3 -m http.server 8000
 
 It also works on GitHub Pages as is. There is no build step.
 
+### One-line version (loads from GitHub)
+
+`play.html` is a single line: it loads the game from this GitHub repo through
+the [jsDelivr](https://www.jsdelivr.com) CDN, so it always runs the latest code
+on `main`. Save it anywhere (or paste this line into any page) and open it:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js"></script>
+```
+
+`js/loader.js` reads `index.html` from the same place and loads its page,
+styles, scripts and images from there. jsDelivr caches files from a branch for
+a while, so a new push can take some hours to show up.
+
 ## Controls
 
 | Key | Action |

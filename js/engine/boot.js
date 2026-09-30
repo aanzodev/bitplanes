@@ -67,6 +67,6 @@
         (t.o = function (M, j) {
             return Object.prototype.hasOwnProperty.call(M, j);
         }),
-        (t.p = "assets/sprites/"),
+        (t.p = (window.BitBase || "") + "assets/sprites/"),
         t((t.s = 87)));
 })(window.BitModules);

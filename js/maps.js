@@ -4,7 +4,8 @@
 // A map sets the sky colors, the ground tile, two background layers and the
 // small objects standing on the ground. Art lives in assets/sprites/maps/<id>/.
 window.BitMaps = (function () {
-    const BASE = "assets/sprites/maps/";
+    // BitBase is set by js/loader.js when the game is loaded from a CDN.
+    const BASE = (window.BitBase || "") + "assets/sprites/maps/";
     const LIST = [
         {id: "countryside", name: "Countryside"},
         {id: "desert", name: "Desert", sky: "#f5d9a3", space: "#3c6ea8", cloudAlpha: 0.5,
