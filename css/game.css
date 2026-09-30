@@ -192,3 +192,16 @@
     opacity: 0.2;
     box-shadow: none;
 }
+
+.sound-toggle {
+    position: absolute;
+    top: 44px;
+    right: 320px;
+    width: 34px;
+    height: 28px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: 16px;
+    cursor: pointer;
+}

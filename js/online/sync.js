@@ -121,6 +121,11 @@
         }
         if (("sprite" in f && !p.sprite) || (p.sprites && p.sprites.some(s => !s))) return;
         world.particles.add(p);
+        const S = window.BitSound;
+        if (S && p.position) {
+            if (f.sprites && String(f.sprites[0]).startsWith("explosion")) S.explosion(p.position);
+            if (f.sprite === "flare") S.flaresAt(p.position);
+        }
     }
 
     Object.assign(O, {engineClasses, indexSprites, spriteKey, spriteFromKey, lookKey, applyLook, serializeParticle, spawnParticle});

@@ -288,3 +288,53 @@
         grid-row: 2;
     }
 }
+
+/* Paint */
+
+.shop-paint {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.paint-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 100px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #9be2fe, #d6f1ff);
+}
+
+.paint-preview img {
+    width: 144px;
+    height: 88px;
+}
+
+.paint-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 440px;
+}
+
+.paint-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    font-size: 13px;
+    color: #666;
+}
+
+.paint-swatch.factory {
+    background: repeating-linear-gradient(45deg, #fff, #fff 4px, #eee 4px, #eee 8px);
+}
+
+.paint-swatch.active {
+    border: 3px solid #0a0;
+    box-shadow: 0 0 0 2px #fff inset;
+}

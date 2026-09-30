@@ -129,7 +129,7 @@ BitModules[14] = function (M, j, t) {
     function c(M, j) {
         if (M.has(j)) {
             if (j.ammo > 0) {
-                j.ammo--;
+                (j.ammo--, window.BitSound && window.BitSound.gun(j));
                 const t = (function (M) {
                     const j = new e.a(M);
                     return (
@@ -158,7 +158,7 @@ BitModules[14] = function (M, j, t) {
     function o(M, j) {
         if (M.has(j)) {
             if (j.missiles > 0) {
-                j.missiles--;
+                (j.missiles--, window.BitSound && window.BitSound.missile(j));
                 const t = (function (M) {
                     const j = new I.a(M);
                     return (
@@ -269,7 +269,7 @@ BitModules[14] = function (M, j, t) {
     // Flares: drop decoys that break the lock of missiles chasing this plane.
     function F(M, j) {
         if (!M.has(j) || !(j.maxFlares > 0) || !(j.flares > 0)) return;
-        j.flares--;
+        (j.flares--, window.BitSound && window.BitSound.flares(j));
         j.flareUntil = performance.now() + 1500;
         for (let t of M.bodies)
             t instanceof I.a &&
