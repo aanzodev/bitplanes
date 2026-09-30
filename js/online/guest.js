@@ -2,7 +2,7 @@
 // sends key presses back.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
 
     const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {}};
 
@@ -59,6 +59,7 @@
             startGuestWorld(msg);
         }
         else if (msg.t === "s" && guest.world) applySnapshot(msg);
+        else if (msg.t === "pong") onPong(msg);
         else if (msg.t === "log") addLog(String(msg.h || ""));
         else if (msg.t === "coins" && window.BitShop) window.BitShop.reward();
     }
@@ -98,10 +99,25 @@
         bindGuestKeys();
         banner("Room " + guest.code);
         setInterval(() => {
-            if (guest.conn && guest.conn.open) guest.conn.send({t: "ping"});
+            sendPing();
             if (performance.now() - guest.last > TIMEOUT_MS) hostLeft();
         }, 1000);
         window.addEventListener("beforeunload", () => guest.conn && guest.conn.close());
+        pingMeter([{name: "", ms: null}]);
+        sendPing();
+    }
+
+    // Ping: the host echoes our timestamp back; the round trip is the ping.
+    // We also tell the host our latest ping so it can show it.
+    function sendPing() {
+        if (guest.conn && guest.conn.open) guest.conn.send({t: "ping", c: performance.now(), r: guest.rtt});
+    }
+
+    function onPong(msg) {
+        const sample = performance.now() - Number(msg.c);
+        if (!Number.isFinite(sample) || sample < 0) return;
+        guest.rtt = typeof guest.rtt === "number" ? guest.rtt * 0.6 + sample * 0.4 : sample;
+        pingMeter([{name: "", ms: guest.rtt}]);
     }
 
     function lerpAngle(a, b, t) {

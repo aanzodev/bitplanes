@@ -2,7 +2,7 @@
 // drives them with the guests' key presses and sends out snapshots.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, peerOptions, makeCode, cleanName, round, status, banner, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, peerOptions, makeCode, cleanName, round, status, banner, pingMeter, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
 
     const host = {peer: null, code: null, world: null, clients: new Map(), pending: [], nextId: 1, fx: new Set()};
 
@@ -108,6 +108,12 @@
     function updateHostBanner() {
         const n = [...host.clients.values()].filter(c => c.player).length;
         banner(`Room code: ${host.code} · ${n} friend${n === 1 ? "" : "s"} connected`);
+        updatePingMeter();
+    }
+
+    // Each friend's ping, as they last measured it.
+    function updatePingMeter() {
+        pingMeter([...host.clients.values()].filter(c => c.player).map(c => ({name: c.name, ms: c.rtt})));
     }
 
     function hostLog(html) {
@@ -161,7 +167,12 @@
             return;
         }
         if (!client || !client.player) return;
-        if (msg.t === "in" && msg.s) {
+        if (msg.t === "ping") {
+            if (client.conn.open) client.conn.send({t: "pong", c: msg.c});
+            const r = Number(msg.r);
+            client.rtt = msg.r != null && Number.isFinite(r) && r >= 0 && r < 60000 ? r : undefined;
+            updatePingMeter();
+        } else if (msg.t === "in" && msg.s) {
             client.input = {u: !!msg.s.u, d: !!msg.s.d, l: !!msg.s.l, r: !!msg.s.r, f: !!msg.s.f};
             // Turn right away instead of waiting for the next control tick.
             const plane = client.player.hasPlane(), i = client.input;

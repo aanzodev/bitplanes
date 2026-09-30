@@ -69,6 +69,24 @@
         if (el) el.textContent = text;
     }
 
+    // Ping meter (online games only). rows: [{name, ms}], name empty for the guest's own ping.
+    function pingMeter(rows) {
+        let el = document.querySelector(".ping-meter");
+        if (!el) {
+            el = document.createElement("div");
+            el.className = "ping-meter";
+            document.querySelector(".ui").appendChild(el);
+        }
+        el.hidden = !rows.length;
+        el.innerHTML = rows.map(({name, ms}) => {
+            const level = typeof ms !== "number" ? "waiting" : ms < 80 ? "good" : ms < 160 ? "ok" : "bad";
+            const label = typeof ms !== "number" ? "…" : Math.round(ms) + " ms";
+            const who = name ? cleanName(name) : "Ping";
+            return `<span class="ping ${level}" title="Round trip time${name ? " to " + who : " to the host"}">` +
+                `<i class="bars"><i></i><i></i><i></i></i> ${who} <b>${label}</b></span>`;
+        }).join("");
+    }
+
     function banner(text) {
         let el = document.querySelector(".room-banner");
         if (!el) {
@@ -112,5 +130,5 @@
     }
 
     Object.assign(O, {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
-    Object.assign(O, {engine, peerOptions, makeCode, cleanName, round, status, banner, safeHtml, addLog});
+    Object.assign(O, {engine, peerOptions, makeCode, cleanName, round, status, banner, pingMeter, safeHtml, addLog});
 })();
