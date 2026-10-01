@@ -262,12 +262,6 @@
         document.body.appendChild(fpsBox);
         print('Bit Planes console. Type "help". Ctrl+Shift+K or ` to close.', "dim");
 
-        // On-screen buttons (handy where the editor or browser takes Ctrl+Shift+K).
-        document.querySelectorAll(".console-toggle, .console-open").forEach(b => b.addEventListener("click", ev => {
-            ev.preventDefault();
-            open ? hide() : show();
-        }));
-
         // Registered first on window (capture), so it runs before the game's keys
         // and the pause menu.
         window.addEventListener("keydown", ev => {

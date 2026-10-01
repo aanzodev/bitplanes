@@ -105,10 +105,9 @@ sounds in `js/audio/profiles.js`.
 
 ### Game console
 
-Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>, <kbd>`</kbd> or the ⌨ button
-(start screen and in game) to open the built-in console and type `help`.
-Firefox and online code editors keep Ctrl+Shift+K for themselves, so use the
-button or <kbd>`</kbd> there. <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
+A secret console: press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd>
+and type `help`. Firefox and online code editors keep Ctrl+Shift+K for
+themselves, so use <kbd>`</kbd> there (click on the game first). <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
 
 | Command | What it does |
 |---|---|
