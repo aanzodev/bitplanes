@@ -12,8 +12,22 @@
     const DEFAULT = "https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js";
     const me = document.currentScript ||
         [...document.querySelectorAll("script[src]")].find(s => /js\/loader\.js(\?.*)?$/.test(s.src));
-    const base = ((me && me.src) || DEFAULT).replace(/js\/loader\.js(\?.*)?$/, "");
-    window.BitBase = base; // asset paths (sprites, maps) are resolved against this
+    let base = ((me && me.src) || DEFAULT).replace(/js\/loader\.js(\?.*)?$/, "");
+
+    // jsDelivr keeps copies of branch files (like @main) for hours. Ask GitHub
+    // for the newest commit and load that exact version instead: commit links
+    // are always up to date, so every push shows up on the next page load.
+    async function newestBase() {
+        const m = base.match(/^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@/]+)@([^/]+)\/$/);
+        if (!m || /^[0-9a-f]{40}$/.test(m[3])) return base;
+        try {
+            const res = await fetch(`https://api.github.com/repos/${m[1]}/${m[2]}/commits/${m[3]}`,
+                {headers: {Accept: "application/vnd.github.sha"}});
+            const sha = res.ok ? (await res.text()).trim() : "";
+            if (/^[0-9a-f]{40}$/.test(sha)) return `https://cdn.jsdelivr.net/gh/${m[1]}/${m[2]}@${sha}/`;
+        } catch (e) {}
+        return base; // GitHub unreachable or rate limited: use the branch copy
+    }
 
     function loadScript(src) {
         return new Promise((resolve, reject) => {
@@ -63,6 +77,8 @@
     async function start() {
         await bodyReady();
         const done = showLoading();
+        base = await newestBase();
+        window.BitBase = base; // asset paths (sprites, maps) are resolved against this
         const res = await fetch(base + "index.html");
         if (!res.ok) throw new Error("index.html " + res.status);
         const doc = new DOMParser().parseFromString(await res.text(), "text/html");
