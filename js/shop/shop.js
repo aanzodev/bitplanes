@@ -37,30 +37,44 @@
         return (state.paint && state.paint[p.id]) || p.color;
     }
 
-    // Final stats of the selected plane plus upgrades. Sent to the host in online activities.
-    function loadout() {
-        const p = selectedPlane();
+    // Final stats of a plane plus upgrade levels (none for computer pilots).
+    function statsOf(p, color, lvl = () => 0) {
         return {
             planeId: p.id,
-            color: colorOf(p),
+            color,
             skin: p.skin || "",
-            thrust: p.thrust * (1 + 0.08 * level("engine")),
-            turn: p.turn * (1 + 0.08 * level("handling")),
-            reload: p.reload * (1 - 0.1 * level("reload")),
+            thrust: p.thrust * (1 + 0.08 * lvl("engine")),
+            turn: p.turn * (1 + 0.08 * lvl("handling")),
+            reload: p.reload * (1 - 0.1 * lvl("reload")),
             bulletSpeed: p.bulletSpeed || 1,
-            life: p.life + level("armor"),
-            ammo: p.ammo + 3 * level("ammo"),
-            missiles: p.missiles + level("missiles"),
+            life: p.life + lvl("armor"),
+            ammo: p.ammo + 3 * lvl("ammo"),
+            missiles: p.missiles + lvl("missiles"),
             flares: p.flares || 0,
         };
     }
 
+    // The selected plane with your upgrades. Sent to the host in online activities.
+    function loadout() {
+        const p = selectedPlane();
+        return statsOf(p, colorOf(p), level);
+    }
+
+    // Computer pilots in single player fly a random plane from the whole
+    // catalog, picked again every time they get a new plane.
+    function botLoadout() {
+        const p = PLANES[Math.floor(Math.random() * PLANES.length)];
+        return statsOf(p, p.color);
+    }
+
     // Called by the physics loop for every plane; applies the loadout once per pilot.
-    // Local humans use this browser's shop; remote players bring their own loadout.
+    // Local humans use this browser's shop; remote players bring their own loadout;
+    // computer pilots in single player get a random plane.
     function apply(plane) {
         const player = plane.player;
         if (!player || plane.shopPlayer === player) return;
-        const l = player.loadout || (player.isHuman && loadout());
+        const online = window.BitOnline && window.BitOnline.role;
+        const l = player.loadout || (player.isHuman ? loadout() : !online && botLoadout());
         if (!l) return;
         plane.shopPlayer = player;
         plane.planeId = l.planeId;
