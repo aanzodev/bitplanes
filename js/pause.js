@@ -140,7 +140,7 @@
         }, true);
     }
 
-    window.BitPause = {show, hide, isOpen: () => open};
+    window.BitPause = {show, hide, paint, isOpen: () => open};
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
     else init();

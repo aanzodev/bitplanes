@@ -43,6 +43,7 @@ a while, so a new push can take some hours to show up.
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in game) |
 | <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online games keep running |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd> | Game console (see below) |
 
 ## Hangar
 
@@ -98,6 +99,24 @@ GAU-8 *BRRRT*, the F-22's deep afterburner rumble. Guns, missiles, flares and
 explosions from other planes get quieter and pan with distance. Tweak the
 sounds in `js/audio/profiles.js`.
 
+### Game console
+
+Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> (or <kbd>`</kbd>; Firefox keeps
+Ctrl+Shift+K for its own console) to open the built-in console and type
+`help`. <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
+
+| Command | What it does |
+|---|---|
+| `coins`, `addcoins <n>`, `setcoins <n>` | Show / add / set coins |
+| `planes`, `give <plane>`, `plane <plane>` | List planes, own one free, fly one you own |
+| `paint <color>` | Paint your plane (`red`, `blue`, `factory`…) |
+| `unlockall`, `reset` | Own everything / start over |
+| `heal`, `refill`, `god` | Repair, reload, bullets can't shoot you down (single player) |
+| `maps`, `map <map>` | List maps / switch map now (single player) |
+| `mute`, `unmute`, `fps` | Sound off/on, FPS counter |
+| `room`, `ping` | Online room code, your ping |
+| `js <code>` | Run JavaScript |
+
 ### Test commands
 
 Open the browser console (F12) on the game page:
@@ -147,6 +166,7 @@ css/
 js/
   quality.js            Lowers render resolution when frames get slow
   pause.js              In-game menu (Esc): resume, plane, paint, leave
+  console.js            Built-in console (Ctrl+Shift+K)
   maps.js               Maps (random each game)
   audio/
     profiles.js         How each plane sounds (edit to tweak)
