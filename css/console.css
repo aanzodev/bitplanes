@@ -70,27 +70,3 @@
     display: none;
 }
 
-.console-toggle {
-    position: absolute;
-    top: 44px;
-    right: 400px;
-    width: 34px;
-    height: 28px;
-    border: none;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.3);
-    font-size: 15px;
-    cursor: pointer;
-}
-
-.console-open {
-    margin-left: 12px;
-    padding: 4px 10px;
-    border: 1px solid #ccd5dd;
-    border-radius: 5px;
-    background: #f4f7fa;
-    font: inherit;
-    font-size: 14px;
-    color: #445;
-    cursor: pointer;
-}
