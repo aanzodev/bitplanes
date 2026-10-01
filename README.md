@@ -80,6 +80,10 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | **F-35 Lightning** ★ | 30,000 | Stealth, second only to the Raptor |
 | **F-22 Raptor** ★ | 40,000 | The best: 3 missiles, fastest bullets |
 
+In single player the computer pilots fly random planes from this whole list,
+special jets included, picked again every time they get a new plane. Bots in
+jets drop flares when a missile closes in.
+
 ★ Special jets have a black border in the Hangar and carry flares: press
 <kbd>Q</kbd> and missiles chasing you turn toward the flares and explode on them.
 

@@ -73,6 +73,13 @@ BitModules[19] = function (M, j, t) {
                 }
                 const T = j.hasPlane();
                 if (T) {
+                    // Drop flares when a missile is closing in (jets that carry them).
+                    if (T.flares > 0 && !(T.flareUntil > performance.now()))
+                        for (let t of M.bodies)
+                            if (t instanceof e.a && t.target === T && Object(a.q)(t.position, T.position) < 450) {
+                                Math.random() < 0.15 && Object(N.f)(M, T);
+                                break;
+                            }
                     if (1 == T.life && M.barns.size > 0) {
                         let t,
                             L = 1 / 0;
