@@ -124,7 +124,7 @@ BitModules[14] = function (M, j, t) {
     function n(M, j) {
         const t = Object(N.h)(M.velocity);
         let i = 1 - t / (L.l * L.d);
-        (t > L.l && (i = 1 - 1 / 1.5), (M.angle += 10 * i * M.elevator * j));
+        (t > L.l && (i = 1 - 1 / 1.5), (M.angle += 10 * (M.smart ? 1.8 : 1) * i * M.elevator * j));
     }
 
     function c(M, j) {
@@ -171,6 +171,8 @@ BitModules[14] = function (M, j, t) {
                         j
                     );
                 })(j);
+                // F-22: smart missiles lock on fast, turn hard and resist flares.
+                t.smart = !!j.smartMissiles;
                 (j.timeout(L.n, () => (t.justDeployed = !1)),
                     (function (M, j) {
                         function t() {
@@ -180,21 +182,29 @@ BitModules[14] = function (M, j, t) {
                             if (M.has(j))
                                 if (void 0 !== j.target)
                                     if (M.has(j.target)) {
-                                        const t = Object(i.c)(j.position, j.target.position, M),
-                                            L = Object(N.b)(Object(N.r)(t, j.position), j.forward);
-                                        ((j.elevator = Math.sign(L) > 0 ? 1 : -1),
+                                        let t = Object(i.c)(j.position, j.target.position, M);
+                                        // Proximity fuse: close enough counts as a hit.
+                                        if (j.smart && Object(N.q)(j.position, t) < 50) return void (j.position = Object(N.c)(j.target.position));
+                                        // Smart missiles aim where the target is going, not where it is.
+                                        if (j.smart && j.target.velocity) {
+                                            const k = Math.min(1, Object(N.q)(j.position, t) / Math.max(1, Object(N.h)(j.velocity)));
+                                            t = Object(N.a)(t, Object(N.e)(j.target.velocity, k));
+                                        }
+                                        const L = Object(N.b)(Object(N.r)(t, j.position), j.forward);
+                                        // Smart missiles steer smoothly instead of zig-zagging.
+                                        ((j.elevator = j.smart ? Math.max(-1, Math.min(1, 4 * L)) : Math.sign(L) > 0 ? 1 : -1),
                                             Object(N.a)(j.position, Object(N.e)(j.velocity, 4)).y >
                                                 M.ground &&
                                                 (j.elevator = Math.sign(j.forward.x) > 0 ? -1 : 1));
                                     } else ((j.target = void 0), (j.elevator = 0));
                                 else {
                                     let i,
-                                        e = 700;
+                                        e = j.smart ? 1600 : 700;
                                     for (let I of M)
                                         if (I instanceof u.a) {
                                             if (I === j.source) continue;
                                             // Burning flares hide the plane and lure the missile to them.
-                                            if (I.flareUntil > performance.now()) {
+                                            if (I.flareUntil > performance.now() && !j.smart) {
                                                 Object(N.q)(j.position, I.position) < 700 && (j.flared = !0);
                                                 continue;
                                             }
@@ -215,17 +225,17 @@ BitModules[14] = function (M, j, t) {
                                         }
                                     if (i) {
                                         const M = Object(N.b)(Object(N.r)(i.position, j.position), j.forward);
-                                        (Math.abs(M) < Math.PI / 5 || e < 100) && (j.target = i);
+                                        (j.smart || Math.abs(M) < Math.PI / 5 || e < 100) && (j.target = i);
                                     }
                                 }
                         }
                         (j.setTimeout(function () {
-                            j.thrust = 8;
+                            j.thrust = j.smart ? 11 : 8;
                             const M = j.setInterval(t, 30);
                             setTimeout(() => {
                                 (clearInterval(M), (j.thrust = 0));
-                            }, 12 * L.n);
-                        }, 500),
+                            }, (j.smart ? 16 : 12) * L.n);
+                        }, j.smart ? 120 : 500),
                             (j.target = void 0));
                     })(M, t),
                     M.add(t));
@@ -298,6 +308,8 @@ BitModules[14] = function (M, j, t) {
             t instanceof I.a &&
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
+                // Smart (F-22) missiles see through flares 60% of the time.
+                !(t.smart && Math.random() < 0.6) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
         // Release 8 flares in quick pairs. Like a real jet they are shot out
         // below and behind the plane in a fan, then arc down trailing smoke.

@@ -53,6 +53,7 @@
                     <span>Bullets</span>${statBar((p.bulletSpeed || 1) / 1.6)}
                 </div>
                 ${p.flares ? `<div class="plane-perk"><i class="flare"></i> ${p.flares} flares <kbd>Q</kbd></div>` : ""}
+                ${p.smartMissiles ? `<div class="plane-perk">◎ Smart missiles</div>` : ""}
                 ${action}
             </div>`;
     }
