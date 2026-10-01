@@ -19,17 +19,21 @@ It also works on GitHub Pages as is. There is no build step.
 
 ### One-line version (loads from GitHub)
 
-`play.html` is a single line: it loads the game from this GitHub repo through
-the [jsDelivr](https://www.jsdelivr.com) CDN, so it always runs the latest code
-on `main`. Save it anywhere (or paste this line into any page) and open it:
+`play.html` is a single line that runs the newest game from this GitHub repo
+through the [jsDelivr](https://www.jsdelivr.com) CDN. It asks GitHub for the
+newest commit on `main` and loads exactly that version, so every push shows up
+the next time the page is opened (no waiting for jsDelivr's cache). Save it
+anywhere, or paste it into an online editor like OneCompiler.
+
+The short form also works:
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js"></script>
 ```
 
-`js/loader.js` reads `index.html` from the same place and loads its page,
-styles, scripts and images from there. jsDelivr caches files from a branch for
-a while, so a new push can take some hours to show up.
+`js/loader.js` does the same newest-commit lookup, then reads `index.html` and
+loads its page, styles, scripts and images. If GitHub can't be reached it falls
+back to jsDelivr's copy of `main`.
 
 ## Controls
 
@@ -101,9 +105,10 @@ sounds in `js/audio/profiles.js`.
 
 ### Game console
 
-Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> (or <kbd>`</kbd>; Firefox keeps
-Ctrl+Shift+K for its own console) to open the built-in console and type
-`help`. <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
+Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>, <kbd>`</kbd> or the ⌨ button
+(start screen and in game) to open the built-in console and type `help`.
+Firefox and online code editors keep Ctrl+Shift+K for themselves, so use the
+button or <kbd>`</kbd> there. <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
 
 | Command | What it does |
 |---|---|
