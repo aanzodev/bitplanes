@@ -54,7 +54,7 @@ BitModules[12] = function (M, j, t) {
         hasPilot() {
             if (this.object && this.object instanceof L.b) return this.object;
         }
-        inGame() {
+        inActivity() {
             return void 0 !== this.object;
         }
         detach() {

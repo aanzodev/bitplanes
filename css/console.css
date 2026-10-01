@@ -1,6 +1,6 @@
 /* Built-in console (Ctrl+Shift+K). */
 
-.game-console {
+.activity-console {
     position: fixed;
     left: 0;
     right: 0;
@@ -16,7 +16,7 @@
     color: #e6edf3;
 }
 
-.game-console[hidden] {
+.activity-console[hidden] {
     display: none;
 }
 

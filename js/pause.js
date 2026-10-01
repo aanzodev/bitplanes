@@ -1,11 +1,11 @@
-// In-game menu (Esc or the ⏸ button): resume, change your plane or paint,
+// In-activity menu (Esc or the ⏸ button): resume, change your plane or paint,
 // or leave to the start screen. Single player freezes while the menu is
-// open; online games keep running for everyone else.
+// open; online activities keep running for everyone else.
 (function () {
     const shop = window.BitShop;
     let open = false;
 
-    function inGame() {
+    function inActivity() {
         const ui = document.querySelector(".ui");
         return ui && ui.style.display === "block";
     }
@@ -32,7 +32,7 @@
     // ------------------------------------------------------------ open/close
 
     function show() {
-        if (open || !inGame()) return;
+        if (open || !inActivity()) return;
         open = true;
         const paused = !online();
         window.bitPaused = paused;
@@ -41,7 +41,7 @@
         document.querySelector(".pause-title").textContent = paused ? "Paused" : "Menu";
         document.querySelector(".pause-note").textContent = paused
             ? ""
-            : "The online game keeps going while this menu is open.";
+            : "The online activity keeps going while this menu is open.";
         render();
         document.querySelector(".pause-menu").hidden = false;
     }
@@ -118,8 +118,8 @@
             ev.currentTarget.blur();
             open ? hide() : show();
         });
-        document.querySelector(".resume-game").addEventListener("click", hide);
-        document.querySelector(".leave-game").addEventListener("click", leave);
+        document.querySelector(".resume-activity").addEventListener("click", hide);
+        document.querySelector(".leave-activity").addEventListener("click", leave);
         menu.addEventListener("click", ev => {
             if (ev.target === menu) return hide();
             const btn = ev.target.closest("button");
@@ -127,9 +127,9 @@
             if (btn.dataset.plane) choosePlane(btn.dataset.plane);
             if (btn.dataset.paint !== undefined) paint(btn.dataset.paint || null);
         });
-        // Runs before the game's own key handlers (window capture comes first).
+        // Runs before the activity's own key handlers (window capture comes first).
         window.addEventListener("keydown", ev => {
-            if (ev.code === "Escape" && inGame()) {
+            if (ev.code === "Escape" && inActivity()) {
                 ev.preventDefault();
                 ev.stopPropagation();
                 open ? hide() : show();

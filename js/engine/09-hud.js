@@ -102,7 +102,7 @@ BitModules[9] = function (M, j, t) {
                     (M.fillStyle = "#454545"),
                     M.drawImage(N.b.ui.targetMark.canvas, 10, i, 20, 20),
                     M.fillText(e.kills.toString(), 33, i + 1),
-                    e.inGame() || M.drawImage(N.b.ui.skull.canvas, 60, i, 20, 20),
+                    e.inActivity() || M.drawImage(N.b.ui.skull.canvas, 60, i, 20, 20),
                     (M.font =
                         'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'));
                 let I = M.measureText(e.name);

@@ -1,4 +1,4 @@
-// Starts the game: the module loader (from the original webpack build).
+// Starts the activity: the module loader (from the original webpack build).
 // Every engine file registers itself in window.BitModules first.
 !(function (M) {
     var j = {};

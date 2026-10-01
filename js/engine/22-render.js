@@ -489,7 +489,7 @@ BitModules[22] = function (M, j, t) {
                 (t.remote || O(t, y), (I -= y));
             return (Object(N.g)(t, y), n);
         }
-        // Lets the game keep running while the window is covered or hidden and
+        // Lets the activity keep running while the window is covered or hidden and
         // animation frames stop (used by online hosts).
         t.tick = function () {
             Object(D.g)() - g > 50 && step();

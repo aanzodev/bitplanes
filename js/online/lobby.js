@@ -4,8 +4,8 @@
     const {status} = O;
 
     function init() {
-        const hostBtn = document.querySelector(".host-game");
-        const joinBtn = document.querySelector(".join-game");
+        const hostBtn = document.querySelector(".host-activity");
+        const joinBtn = document.querySelector(".join-activity");
         const codeInput = document.querySelector(".room-code");
         if (typeof Peer === "undefined") {
             status("Online play is unavailable (PeerJS failed to load).");

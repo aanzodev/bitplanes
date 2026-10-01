@@ -1,4 +1,4 @@
-/* In-game menu (Esc). */
+/* In-activity menu (Esc). */
 
 .pause-toggle {
     position: absolute;
@@ -73,7 +73,7 @@
     margin-top: 12px;
 }
 
-.btn.leave-game {
+.btn.leave-activity {
     background: #b3261e;
 }
 

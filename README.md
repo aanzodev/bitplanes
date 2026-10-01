@@ -1,6 +1,6 @@
 # ✈️ Bit Planes
 
-A small browser dogfighting game. Fly biplanes, WWII fighters and jets, shoot
+A small browser dogfighting activity. Fly biplanes, WWII fighters and jets, shoot
 down computer pilots, earn coins, upgrade your plane and play with friends
 online using a room code.
 
@@ -19,7 +19,7 @@ It also works on GitHub Pages as is. There is no build step.
 
 ### One-line version (loads from GitHub)
 
-`play.html` is a single line that runs the newest game from this GitHub repo
+`play.html` is a single line that runs the newest activity from this GitHub repo
 through the [jsDelivr](https://www.jsdelivr.com) CDN. It asks GitHub for the
 newest commit on `main` and loads exactly that version, so every push shows up
 the next time the page is opened (no waiting for jsDelivr's cache). Save it
@@ -45,9 +45,9 @@ back to jsDelivr's copy of `main`.
 | <kbd>X</kbd> | Fire a missile |
 | <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets only) |
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
-| <kbd>M</kbd> | Sound on / off (also the 🔊 button in game) |
-| <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online games keep running |
-| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd> | Game console (see below) |
+| <kbd>M</kbd> | Sound on / off (also the 🔊 button in activity) |
+| <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online activities keep running |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd> | Activity console (see below) |
 
 ## Hangar
 
@@ -82,7 +82,7 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 
 ## Maps
 
-Every game picks a random map (never the same one twice in a row):
+Every activity picks a random map (never the same one twice in a row):
 Countryside, Desert, Arctic, Sunset and Night. Online, everyone who joins
 plays on the host's map. Map art is in `assets/sprites/maps/` and the list is
 in `js/maps.js`.
@@ -103,11 +103,11 @@ GAU-8 *BRRRT*, the F-22's deep afterburner rumble. Guns, missiles, flares and
 explosions from other planes get quieter and pan with distance. Tweak the
 sounds in `js/audio/profiles.js`.
 
-### Game console
+### Activity console
 
 A secret console: press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd>
 and type `help`. Firefox and online code editors keep Ctrl+Shift+K for
-themselves, so use <kbd>`</kbd> there (click on the game first). <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
+themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</kbd>/<kbd>↓</kbd> go through history, <kbd>Tab</kbd> completes.
 
 | Command | What it does |
 |---|---|
@@ -123,7 +123,7 @@ themselves, so use <kbd>`</kbd> there (click on the game first). <kbd>↑</kbd>/
 
 ### Test commands
 
-Open the browser console (F12) on the game page:
+Open the browser console (F12) on the activity page:
 
 | Command | What it does |
 |---|---|
@@ -136,7 +136,7 @@ Or add `?coins=10000` to the page URL to add coins once.
 
 ## Online play
 
-![In game](docs/screenshots/game.png)
+![In activity](docs/screenshots/activity.png)
 
 1. One player presses **Host a room**. A death match starts and a 5 character
    room code appears at the top of the screen.
@@ -145,8 +145,8 @@ Or add `?coins=10000` to the page URL to add coins once.
 
 Everyone flies their own plane and upgrades, and kills earn coins for whoever
 made them. Players who join see their ping to the host under the room code
-(the host runs the game, so it has no ping). Green is under 80 ms, yellow
-under 160 ms, red above. The host's browser runs the game, so the host should have the best
+(the host runs the activity, so it has no ping). Green is under 80 ms, yellow
+under 160 ms, red above. The host's browser runs the activity, so the host should have the best
 connection. Each guest flies their own plane in their own browser, so turning,
 thrust and bullets react instantly; the host decides hits and deaths. If the host closes the page the room ends.
 
@@ -165,36 +165,36 @@ css/
   menu.css              Start screen
   hangar.css            Hangar shop
   online.css            Online play
-  game.css              In-game HUD
-  pause.css             In-game menu
+  activity.css              In-activity HUD
+  pause.css             In-activity menu
 js/
   quality.js            Lowers render resolution when frames get slow
-  pause.js              In-game menu (Esc): resume, plane, paint, leave
+  pause.js              In-activity menu (Esc): resume, plane, paint, leave
   console.js            Built-in console (Ctrl+Shift+K)
-  maps.js               Maps (random each game)
+  maps.js               Maps (random each activity)
   audio/
     profiles.js         How each plane sounds (edit to tweak)
     sound.js            Synthesized engine, guns, missiles, flares, explosions
   shop/
     catalog.js          Planes and upgrades for sale (edit prices/stats here)
-    shop.js             Coins, purchases, applying a plane in game
+    shop.js             Coins, purchases, applying a plane in activity
     hangar.js           The Hangar screen
   online/
     common.js           Settings and helpers
-    sync.js             Turning game objects into network messages
+    sync.js             Turning activity objects into network messages
     host.js             Hosting a room
     guest.js            Joining a room
     prediction.js       Guests fly their own plane locally (no input lag)
     lobby.js            Host / Join buttons
-  engine/               The game itself, one module per file
+  engine/               The activity itself, one module per file
     registry.js         Modules register here…
     00-vector.js …      …vector math, constants, sprites, plane, missile,
-    87-main.js          controls, physics, rendering, AI, game modes…
+    87-main.js          controls, physics, rendering, AI, activity modes…
     assets.js           Sprite file paths
-    boot.js             …and boot.js starts the game
+    boot.js             …and boot.js starts the activity
   vendor/peerjs.min.js
 assets/
-  sprites/              Game sprites (units, effects, scenery, ui)
+  sprites/              Activity sprites (units, effects, scenery, ui)
   icons/                HUD and logo icons
 docs/screenshots/       Images for this README
 ```

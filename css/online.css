@@ -13,11 +13,11 @@ main .online {
     gap: 10px;
 }
 
-.btn.host-game {
+.btn.host-activity {
     background: #145ece;
 }
 
-.btn.join-game {
+.btn.join-activity {
     background: #145ece;
 }
 
@@ -56,7 +56,7 @@ main input.room-code {
     white-space: nowrap;
 }
 
-/* Ping meter (online games only) */
+/* Ping meter (online activities only) */
 
 .ping-meter {
     position: absolute;

@@ -1,11 +1,11 @@
-// Loads the whole game from wherever this script is hosted, for example
+// Loads the whole activity from wherever this script is hosted, for example
 // jsDelivr serving the GitHub repo:
 //
 //   <script src="https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js"></script>
 //
 // It reads index.html from the same place, adds its page markup and styles to
 // this page, then loads every script in the same order. So a page with just
-// that one line always runs the latest game from GitHub (see play.html).
+// that one line always runs the latest activity from GitHub (see play.html).
 (function () {
     // Where this script was loaded from. Some editors add scripts in ways where
     // document.currentScript is empty, so fall back to searching for it.
@@ -53,7 +53,7 @@
         (document.body || document.documentElement).appendChild(p);
     }
 
-    // Until every script has loaded, hide the game and show a loading line
+    // Until every script has loaded, hide the activity and show a loading line
     // (clicking Start too early would just reload the page).
     function showLoading() {
         const style = document.createElement("style");
@@ -104,7 +104,7 @@
             document.body.insertBefore(document.importNode(node, true), before);
         }
 
-        // The game's scripts, one after another like in index.html.
+        // The activity's scripts, one after another like in index.html.
         for (const s of doc.querySelectorAll("script[src]")) {
             const src = s.getAttribute("src");
             await loadScript(/^https?:/.test(src) ? src : base + src);

@@ -1,11 +1,11 @@
 // Online play: shared settings and helpers.
 //
-// One browser hosts: it runs the real game (a death match) and gets a room
+// One browser hosts: it runs the real activity (a death match) and gets a room
 // code. Friends join with that code over a direct WebRTC connection (PeerJS).
 // Guests send their key presses to the host; the host simulates their planes
 // and sends back snapshots of the world ~20 times a second, which guests draw.
 //
-// Files: common.js (this), sync.js (turning game objects into messages),
+// Files: common.js (this), sync.js (turning activity objects into messages),
 // host.js, guest.js and lobby.js (the buttons on the start screen).
 (function () {
     const O = window.BitOnline = {};
@@ -69,7 +69,7 @@
         if (el) el.textContent = text;
     }
 
-    // Ping meter (online games, players who joined a room). rows: [{name, ms}], name empty for your own ping.
+    // Ping meter (online activities, players who joined a room). rows: [{name, ms}], name empty for your own ping.
     function pingMeter(rows) {
         let el = document.querySelector(".ping-meter");
         if (!el) {

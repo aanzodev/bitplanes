@@ -1,4 +1,4 @@
-// Online play, host side: opens the room, adds guests' planes to the game,
+// Online play, host side: opens the room, adds guests' planes to the activity,
 // drives them with the guests' key presses and sends out snapshots.
 (function () {
     const O = window.BitOnline;
@@ -22,7 +22,7 @@
             status("Room " + code + " is open.");
             const dm = document.querySelector('input[name="mode"][value="death-match"]');
             if (dm) dm.checked = true;
-            document.getElementById("game").requestSubmit();
+            document.getElementById("activity").requestSubmit();
         });
         peer.on("connection", conn => {
             conn.on("data", msg => onHostData(conn, msg));
@@ -85,7 +85,7 @@
 
     // Browsers pause animation frames in covered or hidden windows, and slow
     // down their timers. A Web Worker timer is not slowed down, so it keeps the
-    // host's game simulating and sending snapshots while the host looks away.
+    // host's activity simulating and sending snapshots while the host looks away.
     function keepRunning(world) {
         let last = 0;
         const beat = () => {
@@ -289,7 +289,7 @@
         if (player && host.world) {
             const world = host.world;
             // Stop the death match from respawning a plane for someone who left.
-            player.inGame = () => true;
+            player.inActivity = () => true;
             const obj = player.object;
             if (obj && world.has(obj)) world.delete(obj);
             player.detach();
