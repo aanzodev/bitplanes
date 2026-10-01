@@ -68,7 +68,7 @@
         plane.turnRate = l.turn;
         plane.reloadRate = l.reload;
         plane.bulletSpeed = l.bulletSpeed;
-        plane.life = Math.max(1, plane.life + l.life);
+        plane.life = plane.maxLife = Math.max(1, plane.life + l.life);
         plane.maxAmmo = Math.max(1, plane.maxAmmo + l.ammo);
         plane.ammo = Math.max(0, Math.min(plane.maxAmmo, plane.ammo + l.ammo));
         plane.maxMissiles += l.missiles;
@@ -155,6 +155,14 @@
         return "Shop reset";
     }
 
+    // Own a plane for free (console "give").
+    function give(id) {
+        if (!PLANES.some(p => p.id === id)) return false;
+        if (!state.owned.includes(id)) state.owned.push(id);
+        save();
+        return true;
+    }
+
     function unlockAll() {
         state.owned = PLANES.map(p => p.id);
         UPGRADES.forEach(u => state.upgrades[u.id] = u.max);
@@ -181,7 +189,7 @@
 
     window.BitShop = {
         apply, reward, onKill, loadout, addCoins, setCoins,
-        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, level, upgradeCost,
+        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, level, upgradeCost, give, unlockAll, resetShop,
         planes: PLANES,
         upgrades: UPGRADES,
         paints: PAINTS,
