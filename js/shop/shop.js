@@ -46,11 +46,13 @@
             thrust: p.thrust * (1 + 0.08 * lvl("engine")),
             turn: p.turn * (1 + 0.08 * lvl("handling")),
             reload: p.reload * (1 - 0.1 * lvl("reload")),
-            bulletSpeed: p.bulletSpeed || 1,
+            bulletSpeed: (p.bulletSpeed || 1) * (1 + 0.06 * lvl("barrels")),
+            missileReload: 1 - 0.12 * lvl("loader"),
+            repair: lvl("repair"),
             life: p.life + lvl("armor"),
             ammo: p.ammo + 3 * lvl("ammo"),
             missiles: p.missiles + lvl("missiles"),
-            flares: p.flares || 0,
+            flares: (p.flares || 0) + lvl("flares"),
         };
     }
 
@@ -74,7 +76,8 @@
     // computer pilots in single player get a random plane.
     function apply(plane) {
         const player = plane.player;
-        if (!player || plane.shopPlayer === player) return;
+        if (!player) return;
+        if (plane.shopPlayer === player) return repair(plane);
         const online = window.BitOnline && window.BitOnline.role;
         const l = player.loadout || (player.isHuman ? loadout() : !online && botLoadout());
         if (!l) return;
@@ -84,6 +87,9 @@
         plane.turnRate = l.turn;
         plane.reloadRate = l.reload;
         plane.bulletSpeed = l.bulletSpeed;
+        plane.missileReloadRate = l.missileReload || 1;
+        plane.repairLevel = l.repair || 0;
+        plane.lastRepair = performance.now();
         plane.life = plane.maxLife = Math.max(1, plane.life + l.life);
         plane.maxAmmo = Math.max(1, plane.maxAmmo + l.ammo);
         plane.ammo = Math.max(0, Math.min(plane.maxAmmo, plane.ammo + l.ammo));
@@ -96,6 +102,19 @@
             const color = player.team ? plane.color : (player.loadoutColor || l.color);
             if (color !== plane.color || l.skin !== (plane.skin || "")) plane.setSkin(color, l.skin);
             player.color = color;
+        }
+    }
+
+    // Repair kit: while damaged, fix 1 hit point every 25s / 20s / 15s.
+    function repair(plane) {
+        const now = performance.now();
+        if (!plane.repairLevel || !(plane.life < plane.maxLife) || plane.life <= 0) {
+            plane.lastRepair = now;
+            return;
+        }
+        if (now - plane.lastRepair >= (30 - 5 * plane.repairLevel) * 1000) {
+            plane.life++;
+            plane.lastRepair = now;
         }
     }
 

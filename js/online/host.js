@@ -132,11 +132,13 @@
             thrust: n(l.thrust, 0.5, 2, 1),
             turn: n(l.turn, 0.5, 2, 1),
             reload: n(l.reload, 0.3, 1.5, 1),
-            bulletSpeed: n(l.bulletSpeed, 1, 2, 1),
+            bulletSpeed: n(l.bulletSpeed, 1, 2.2, 1),
+            missileReload: n(l.missileReload, 0.5, 1, 1),
+            repair: Math.round(n(l.repair, 0, 3, 0)),
             life: Math.round(n(l.life, 0, 10, 0)),
             ammo: Math.round(n(l.ammo, -10, 40, 0)),
             missiles: Math.round(n(l.missiles, 0, 6, 0)),
-            flares: Math.round(n(l.flares, 0, 6, 0)),
+            flares: Math.round(n(l.flares, 0, 8, 0)),
         };
     }
 

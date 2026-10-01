@@ -43,7 +43,7 @@ back to jsDelivr's copy of `main`.
 | <kbd>←</kbd> <kbd>→</kbd> | Pitch (elevator) |
 | <kbd>Space</kbd> | Fire the gun |
 | <kbd>X</kbd> | Fire a missile |
-| <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets and the B-2) |
+| <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets, the B-2, or any plane with the Flare pod upgrade) |
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in activity) |
 | <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online activities keep running |
@@ -98,9 +98,10 @@ Countryside, Desert, Arctic, Sunset and Night. Online, everyone who joins
 plays on the host's map. Map art is in `assets/sprites/maps/` and the list is
 in `js/maps.js`.
 
-**Paint** any plane you own with one of 16 colors in the Hangar (free).
+**Paint** any plane you own with one of 28 colors in the Hangar (free).
 
-Upgrades (engine, handling, armor, ammo belt, reload, missile rack) apply to
+Upgrades (engine, handling, armor, ammo belt, reload, missile rack, gun barrels,
+missile loader, flare pod, repair kit) apply to
 whichever plane you fly. Coins and purchases are saved in your browser.
 
 ### Sound

@@ -99,6 +99,10 @@ window.BitCatalog = {
         {name: "Purple", color: "#7b2ff7"}, {name: "Pink", color: "#ff4fa3"}, {name: "Brown", color: "#8b5a2b"},
         {name: "Silver", color: "#c0c6cc"}, {name: "Gunmetal", color: "#4a5560"}, {name: "White", color: "#f4f4f4"},
         {name: "Black", color: "#222222"},
+        {name: "Crimson", color: "#b0102a"}, {name: "Maroon", color: "#6b1a2a"}, {name: "Coral", color: "#ff6f61"},
+        {name: "Gold", color: "#d4a017"}, {name: "Sand", color: "#d8c08a"}, {name: "Mint", color: "#5fe0b0"},
+        {name: "Forest", color: "#1f5a32"}, {name: "Cyan", color: "#18d4f0"}, {name: "Navy", color: "#14245c"},
+        {name: "Indigo", color: "#3b2a8f"}, {name: "Lavender", color: "#b39ddb"}, {name: "Magenta", color: "#d61fbf"},
     ],
 
     upgrades: [
@@ -108,5 +112,9 @@ window.BitCatalog = {
         {id: "ammo", name: "Ammo belt", desc: "+3 rounds", max: 5, base: 30},
         {id: "reload", name: "Reload", desc: "-10% reload time", max: 5, base: 40},
         {id: "missiles", name: "Missile rack", desc: "+1 missile", max: 3, base: 80},
+        {id: "barrels", name: "Gun barrels", desc: "+6% bullet speed", max: 5, base: 50},
+        {id: "loader", name: "Missile loader", desc: "-12% missile reload time", max: 4, base: 60},
+        {id: "flares", name: "Flare pod", desc: "+1 flare (Q), any plane", max: 3, base: 120},
+        {id: "repair", name: "Repair kit", desc: "Fixes 1 hit point every 25s / 20s / 15s", max: 3, base: 150},
     ],
 };
