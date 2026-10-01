@@ -26,7 +26,10 @@
             const sha = res.ok ? (await res.text()).trim() : "";
             if (/^[0-9a-f]{40}$/.test(sha)) return `https://cdn.jsdelivr.net/gh/${m[1]}/${m[2]}@${sha}/`;
         } catch (e) {}
-        return base; // GitHub unreachable or rate limited: use the branch copy
+        // GitHub unreachable or rate limited: jsDelivr's branch copy can be
+        // hours old, so use the GitHub Pages site (updated about a minute
+        // after each push to main) instead.
+        return m[3] === "main" ? `https://${m[1].toLowerCase()}.github.io/${m[2]}/` : base;
     }
 
     function loadScript(src) {

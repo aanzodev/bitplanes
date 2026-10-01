@@ -33,7 +33,10 @@ The short form also works:
 
 `js/loader.js` does the same newest-commit lookup, then reads `index.html` and
 loads its page, styles, scripts and images. If GitHub can't be reached it falls
-back to jsDelivr's copy of `main`.
+back to the GitHub Pages site (https://aanzodev.github.io/bitplanes/), which
+updates about a minute after each merge. GitHub only answers 60 of these
+lookups per hour per network, so on a busy shared network this fallback is
+what keeps the activity up to date.
 
 ## Controls
 
