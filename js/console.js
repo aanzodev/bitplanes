@@ -74,10 +74,10 @@
             run: a => print(`Coins: ${shop().setCoins(number(a[0], "setcoins")).toLocaleString()}`, "ok"),
         },
         planes: {
-            help: "List planes (★ = special, ✓ = owned)",
+            help: "List planes (★ = special, ◆ = exclusive, ✓ = owned)",
             run() {
                 const st = shop().state();
-                shop().planes.forEach(p => print(`${st.owned.includes(p.id) ? "✓" : " "} ${p.special ? "★" : " "} ${p.id.padEnd(9)} ${p.name.padEnd(16)} ${p.price.toLocaleString()}`, "dim"));
+                shop().planes.forEach(p => print(`${st.owned.includes(p.id) ? "✓" : " "} ${p.special ? "★" : p.exclusive ? "◆" : " "} ${p.id.padEnd(9)} ${p.name.padEnd(16)} ${p.price.toLocaleString()}`, "dim"));
             },
         },
         give: {

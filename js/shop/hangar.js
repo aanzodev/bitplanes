@@ -36,10 +36,11 @@
         if (selected) action = `<button type="button" class="shop-btn equipped" disabled>Equipped</button>`;
         else if (owned) action = `<button type="button" class="shop-btn" data-select="${p.id}">Select</button>`;
         else action = `<button type="button" class="shop-btn buy" data-buy-plane="${p.id}" ${state.coins < p.price ? "disabled" : ""}>${p.price.toLocaleString()} <i class="coin"></i></button>`;
-        const classes = ["shop-plane", selected && "selected", p.special && "special"].filter(Boolean).join(" ");
+        const classes = ["shop-plane", selected && "selected", p.special && "special", p.exclusive && "exclusive"].filter(Boolean).join(" ");
         return `
             <div class="${classes}">
                 ${p.special ? '<span class="special-badge">Special</span>' : ""}
+                ${p.exclusive ? '<span class="special-badge exclusive-badge">Exclusive</span>' : ""}
                 <img src="${planeImage(p)}" alt="${p.name}">
                 <strong>${p.name}</strong>
                 <small>${p.desc}</small>

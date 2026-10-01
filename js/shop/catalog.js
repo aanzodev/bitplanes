@@ -3,8 +3,10 @@
 // Plane stats are multipliers or bonuses on top of the base plane:
 //   thrust, turn, reload, bulletSpeed  multipliers (1 = normal)
 //   life, ammo, missiles, flares       extra hit points / rounds / missiles / flares
-// skin: "" (biplane), "prop" (WWII fighter) or "jet".
+// skin: "" (biplane), "prop" (WWII fighter), "jet" or "bomber" (flying wing).
 // special: shown with a black border in the Hangar.
+// exclusive: shown with a gold border in the Hangar.
+// Computer pilots only fly planes that are neither special nor exclusive.
 window.BitCatalog = {
     planes: [
         {id: "classic", name: "Classic", price: 0, color: "#ff0015",
@@ -28,18 +30,33 @@ window.BitCatalog = {
         {id: "zero", name: "A6M Zero", price: 2500, color: "#d9d4bd", skin: "prop",
             desc: "Light and nimble prop fighter.",
             thrust: 1.2, turn: 1.4, life: 0, ammo: 5, missiles: 0, reload: 0.9},
+        {id: "hurricane", name: "Hurricane", price: 2800, color: "#7a7553", skin: "prop",
+            desc: "Sturdy workhorse with eight guns.",
+            thrust: 1.15, turn: 1.25, life: 1, ammo: 8, missiles: 0, reload: 0.9},
         {id: "spitfire", name: "Spitfire", price: 3000, color: "#6f8f5a", skin: "prop",
             desc: "Quick climber with eight guns.",
             thrust: 1.25, turn: 1.3, life: 1, ammo: 8, missiles: 0, reload: 0.85},
+        {id: "yak3", name: "Yak-3", price: 3200, color: "#8c9a86", skin: "prop",
+            desc: "Tiny, light and the tightest turner of the props.",
+            thrust: 1.25, turn: 1.45, life: 0, ammo: 4, missiles: 0, reload: 0.85},
         {id: "bf109", name: "Bf 109", price: 3500, color: "#7d8a96", skin: "prop",
             desc: "Fast climber with a hard-hitting cannon.",
             thrust: 1.3, turn: 1.15, life: 1, ammo: 4, missiles: 0, reload: 0.85, bulletSpeed: 1.2},
         {id: "mustang", name: "P-51 Mustang", price: 4000, color: "#b9c1c9", skin: "prop",
             desc: "Fast long-range escort fighter.",
             thrust: 1.3, turn: 1.15, life: 1, ammo: 10, missiles: 1, reload: 0.85, bulletSpeed: 1.1},
+        {id: "fw190", name: "Fw 190", price: 4500, color: "#6b7560", skin: "prop",
+            desc: "Armored fighter with heavy cannons.",
+            thrust: 1.3, turn: 1.15, life: 2, ammo: 6, missiles: 0, reload: 0.8, bulletSpeed: 1.2},
         {id: "corsair", name: "F4U Corsair", price: 5000, color: "#1f3a6b", skin: "prop",
             desc: "Tough navy fighter with rockets.",
             thrust: 1.25, turn: 1.1, life: 2, ammo: 10, missiles: 2, reload: 0.85, bulletSpeed: 1.1},
+        {id: "p47", name: "P-47 Thunderbolt", price: 5500, color: "#8a8f74", skin: "prop",
+            desc: "The Jug: huge, tough and loaded with rockets.",
+            thrust: 1.25, turn: 1.0, life: 3, ammo: 12, missiles: 2, reload: 0.85, bulletSpeed: 1.1},
+        {id: "p38", name: "P-38 Lightning", price: 6000, color: "#a7aeb5", skin: "prop",
+            desc: "Fast twin-engine fighter, guns in the nose.",
+            thrust: 1.35, turn: 1.1, life: 2, ammo: 10, missiles: 1, reload: 0.8, bulletSpeed: 1.15},
 
         // Special jets: black border in the Hangar, flares (Q). None beats the F-22.
         {id: "mig21", name: "MiG-21 Fishbed", price: 7000, color: "#9aa39a", skin: "jet", special: true,
@@ -66,6 +83,11 @@ window.BitCatalog = {
         {id: "f22", name: "F-22 Raptor", price: 40000, color: "#4a5560", skin: "jet", special: true,
             desc: "The best: 3 missiles, fastest bullets and flares.",
             thrust: 1.4, turn: 1.35, life: 2, ammo: 5, missiles: 1, reload: 0.8, bulletSpeed: 1.6, flares: 3},
+
+        // Exclusive: gold border in the Hangar.
+        {id: "b2", name: "B-2 Spirit", price: 100000, color: "#3b4148", skin: "bomber", exclusive: true,
+            desc: "Stealth bomber: massive armor, 6 missiles and 4 flares.",
+            thrust: 1.25, turn: 1.05, life: 6, ammo: 15, missiles: 4, reload: 0.8, bulletSpeed: 1.5, flares: 4},
     ],
 
     // Paint colors for any plane (free). The first entry means "factory colors".

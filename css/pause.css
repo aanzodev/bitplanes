@@ -106,6 +106,10 @@
     border-color: #000;
 }
 
+.pause-plane.exclusive {
+    border-color: #d4a017;
+}
+
 .pause-plane.selected {
     border-color: #0a0;
     box-shadow: 0 0 0 2px #0a0;

@@ -44,7 +44,24 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
+    // B-2 style flying wing (skin "bomber"), seen from the side: a thin wedge
+    // with a cockpit hump and no tail.
+    function B(M, j) {
+        return (
+            "data:image/svg+xml;base64," +
+            btoa(`<svg width="36px" height="22px" viewBox="0 0 36 22" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 13 Q5 10.3 9.5 9.6 Q12.5 6.6 16.5 7.4 Q20.5 8.2 23.5 9.9 L35 12.4 L33.5 13.9 Q19 15.6 6 14.9 Z" fill="${M}" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M1 13 Q6 14.8 6 14.9 Q19 15.6 33.5 13.9 L35 12.4 Q20 14.2 1 13 Z" fill="#000" fill-opacity="0.3"/>
+    <path d="M10.2 9.4 Q12.6 7.2 15.4 7.5 L14.8 9 Z" fill="${j ? "#9fdcff" : "#46616e"}" stroke="#000" stroke-width="0.8"/>
+    <path d="M19.5 8.6 Q22.5 8.6 25 10.4" fill="none" stroke="#000" stroke-width="0.9"/>
+    <path d="M26.5 11.1 L31.5 12.1" stroke="#1d1f22" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M7 12.6 L30 13.2" stroke="#000" stroke-opacity="0.25"/>
+</svg>`)
+        );
+    }
+
     function P(M, j = !0, t) {
+        if ("bomber" === t) return B(M, j);
         if ("jet" === t) return J(M, j);
         if ("prop" === t) return K(M, j);
         return (

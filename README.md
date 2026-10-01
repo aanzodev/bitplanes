@@ -43,7 +43,7 @@ back to jsDelivr's copy of `main`.
 | <kbd>←</kbd> <kbd>→</kbd> | Pitch (elevator) |
 | <kbd>Space</kbd> | Fire the gun |
 | <kbd>X</kbd> | Fire a missile |
-| <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets only) |
+| <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets and the B-2) |
 | <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in activity) |
 | <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online activities keep running |
@@ -64,10 +64,15 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | Sopwith Camel | 1,500 | Turns on a dime |
 | Phantom | 2,000 | Better at everything (biplane) |
 | A6M Zero | 2,500 | Light and nimble prop fighter |
+| Hurricane | 2,800 | Sturdy workhorse with eight guns |
 | Spitfire | 3,000 | Quick climber, eight guns |
+| Yak-3 | 3,200 | Tightest turner of the props |
 | Bf 109 | 3,500 | Fast climber, hard-hitting cannon |
 | P-51 Mustang | 4,000 | Fast escort fighter |
+| Fw 190 | 4,500 | Armored, heavy cannons |
 | F4U Corsair | 5,000 | Tough navy fighter with rockets |
+| P-47 Thunderbolt | 5,500 | Huge, tough, loaded with rockets |
+| P-38 Lightning | 6,000 | Fast twin-engine fighter |
 | **MiG-21 Fishbed** ★ | 7,000 | Cheap fast jet, 2 flares |
 | **F-16 Falcon** ★ | 9,000 | Fast gun, 3 flares |
 | **MiG-29 Fulcrum** ★ | 12,000 | Agile twin-engine jet |
@@ -75,11 +80,13 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | **F-15 Eagle** ★ | 20,000 | Powerful air superiority fighter |
 | **Su-27 Flanker** ★ | 24,000 | Long range, turns hard |
 | **F-35 Lightning** ★ | 30,000 | Stealth, second only to the Raptor |
-| **F-22 Raptor** ★ | 40,000 | The best: 3 missiles, fastest bullets |
+| **F-22 Raptor** ★ | 40,000 | The best jet: 3 missiles, fastest bullets |
+| **B-2 Spirit** ◆ | 100,000 | Exclusive stealth bomber: massive armor, 6 missiles, 4 flares |
 
-In single player the computer pilots fly random planes from this whole list,
-special jets included, picked again every time they get a new plane. Bots in
-jets drop flares when a missile closes in.
+In single player the computer pilots fly random planes from this list (never
+a special ★ or exclusive ◆ one), picked again every time they get a new plane.
+
+◆ Exclusive planes have a gold border in the Hangar.
 
 ★ Special jets have a black border in the Hangar and carry flares: press
 <kbd>Q</kbd> and missiles chasing you turn toward the flares and explode on them.

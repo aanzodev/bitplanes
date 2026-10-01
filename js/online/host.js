@@ -127,7 +127,7 @@
         };
         return {
             color: /^#[0-9a-f]{3,8}$/i.test(l.color) ? l.color : GUEST_COLORS[0],
-            skin: ["jet", "prop"].includes(l.skin) ? l.skin : "",
+            skin: ["jet", "prop", "bomber"].includes(l.skin) ? l.skin : "",
             planeId: typeof l.planeId === "string" && /^[a-z0-9]{1,20}$/.test(l.planeId) ? l.planeId : "classic",
             thrust: n(l.thrust, 0.5, 2, 1),
             turn: n(l.turn, 0.5, 2, 1),

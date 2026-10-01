@@ -67,7 +67,7 @@
         const flying = currentPlane();
         const planes = shop.planes.filter(p => state.owned.includes(p.id));
         document.querySelector(".pause-planes").innerHTML = planes.map(p => `
-            <button type="button" class="pause-plane${p.id === selected.id ? " selected" : ""}${p.special ? " special" : ""}" data-plane="${p.id}">
+            <button type="button" class="pause-plane${p.id === selected.id ? " selected" : ""}${p.special ? " special" : ""}${p.exclusive ? " exclusive" : ""}" data-plane="${p.id}">
                 <img src="${planeImage(p)}" alt="">
                 <span>${p.name}</span>
             </button>`).join("");
