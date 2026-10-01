@@ -1,4 +1,4 @@
-// Game sounds: your engine, guns, missiles, flares and explosions.
+// Activity sounds: your engine, guns, missiles, flares and explosions.
 // Everything is synthesized with the Web Audio API (no audio files).
 // Sounds from other planes get quieter and pan left/right with distance.
 // Press M or the speaker button to mute.
@@ -83,7 +83,7 @@
     }
 
     // Output for a one-shot sound at a world position (or right here if pos is null).
-    // Returns null when the sound is too far away or we are not in a game.
+    // Returns null when the sound is too far away or we are not in an activity.
     function output(pos, volume) {
         if (!s.listener || !ctx() || s.muted) return null;
         let v = volume, pan = 0;

@@ -1,4 +1,4 @@
-// Start screen and game modes. Entry point.
+// Start screen and activity modes. Entry point.
 BitModules[87] = function (M, j, t) {
     "use strict";
     t.r(j);
@@ -48,7 +48,7 @@ BitModules[87] = function (M, j, t) {
                 let M = document.createElement("div");
                 M.innerHTML =
                     '\n        <label title="Two big teams against each other."><input type="radio" name="mode" value="swarm"> Swarm</label>\n      ';
-                let j = document.querySelector(".game-modes");
+                let j = document.querySelector(".activity-modes");
                 j && j.appendChild(M);
             }
         }
@@ -122,7 +122,7 @@ BitModules[87] = function (M, j, t) {
             };
         })();
         window.BitEngine.stopDemo = r;
-        Object(z.a)("#game").addEventListener("submit", (M) => {
+        Object(z.a)("#activity").addEventListener("submit", (M) => {
             M.preventDefault();
             let j = "death-match",
                 t = document.getElementsByName("mode");
@@ -158,7 +158,7 @@ BitModules[87] = function (M, j, t) {
                                             setTimeout(() => {
                                                 const t = j.player;
                                                 if (!t) return;
-                                                if (t.inGame()) return;
+                                                if (t.inActivity()) return;
                                                 const L = new y.a(t.color);
                                                 ((L.life = e.h),
                                                     (L.ammo = L.maxAmmo = t.maxAmmo),

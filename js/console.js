@@ -1,4 +1,4 @@
-// Built-in game console. Open/close with Ctrl+Shift+K (or the ` key).
+// Built-in activity console. Open/close with Ctrl+Shift+K (or the ` key).
 // Type "help" for the list of commands. ↑/↓ = history, Tab = complete.
 (function () {
     const MAX_LINES = 200;
@@ -23,7 +23,7 @@
         return window.BitOnline && window.BitOnline.role;
     }
 
-    function inGame() {
+    function inActivity() {
         const ui = document.querySelector(".ui");
         return ui && ui.style.display === "block";
     }
@@ -34,10 +34,10 @@
         return p && p.hasPlane();
     }
 
-    // Cheats only make sense in your own single player game.
+    // Cheats only make sense in your own single player activity.
     function needSinglePlayer() {
-        if (online()) throw new Error("Not available in online games.");
-        if (!inGame()) throw new Error("Start a game first.");
+        if (online()) throw new Error("Not available in online activities.");
+        if (!inActivity()) throw new Error("Start an activity first.");
         const plane = myPlane();
         if (!plane) throw new Error("You don't have a plane right now.");
         return plane;
@@ -250,7 +250,7 @@
 
     function init() {
         el = document.createElement("div");
-        el.className = "game-console";
+        el.className = "activity-console";
         el.hidden = true;
         el.innerHTML = `<div class="con-out"></div><div class="con-in"><span>&gt;</span><input type="text" spellcheck="false" autocomplete="off" aria-label="Console command"></div>`;
         document.body.appendChild(el);
@@ -262,7 +262,7 @@
         document.body.appendChild(fpsBox);
         print('Bit Planes console. Type "help". Ctrl+Shift+K or ` to close.', "dim");
 
-        // Registered first on window (capture), so it runs before the game's keys
+        // Registered first on window (capture), so it runs before the activity's keys
         // and the pause menu.
         window.addEventListener("keydown", ev => {
             const toggle = (ev.code === "KeyK" && ev.ctrlKey && ev.shiftKey) || (ev.code === "Backquote" && !ev.ctrlKey && !ev.altKey);

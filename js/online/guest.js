@@ -48,7 +48,7 @@
             return;
         }
         guest.gone = true;
-        alert("The host left the game.");
+        alert("The host left the activity.");
         location.href = location.pathname;
     }
 
@@ -251,7 +251,7 @@
                 const o = guest.objects.get(objectId);
                 return o && o.constructor === engineClasses().Pilot ? o : undefined;
             },
-            inGame() {
+            inActivity() {
                 return guest.objects.has(objectId);
             },
         }));

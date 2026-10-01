@@ -10,7 +10,7 @@
     <link href="css/menu.css" rel="stylesheet">
     <link href="css/hangar.css" rel="stylesheet">
     <link href="css/online.css" rel="stylesheet">
-    <link href="css/game.css" rel="stylesheet">
+    <link href="css/activity.css" rel="stylesheet">
     <link href="css/pause.css" rel="stylesheet">
     <link href="css/console.css" rel="stylesheet">
 </head>
@@ -36,14 +36,14 @@
         </ul>
         <p>Every kill earns <strong>10</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
 
-        <form id="game">
+        <form id="activity">
             <label>
                 <input type="text" name="nickname" placeholder="Nickname">
             </label>
             <p>
-                <strong>Game mode:</strong>
+                <strong>Activity mode:</strong>
             </p>
-            <div class="game-modes">
+            <div class="activity-modes">
                 <div>
                     <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked autofocus> Death match</label>
                 </div>
@@ -58,12 +58,12 @@
                     <strong>Play online with friends:</strong>
                 </p>
                 <div class="online-row">
-                    <button type="button" class="btn host-game">Host a room</button>
+                    <button type="button" class="btn host-activity">Host a room</button>
                     <span class="online-or">or</span>
                     <label>
                         <input type="text" class="room-code" placeholder="Room code" maxlength="5" autocomplete="off" spellcheck="false">
                     </label>
-                    <button type="button" class="btn join-game">Join</button>
+                    <button type="button" class="btn join-activity">Join</button>
                 </div>
                 <p class="online-status">Host a room to get a code, then share it with your friends.</p>
             </div>
@@ -132,8 +132,8 @@
         <h2 class="pause-title">Paused</h2>
         <p class="pause-note"></p>
         <div class="pause-actions">
-            <button type="button" class="btn resume-game">▶ Resume</button>
-            <button type="button" class="btn leave-game">Leave to home</button>
+            <button type="button" class="btn resume-activity">▶ Resume</button>
+            <button type="button" class="btn leave-activity">Leave to home</button>
         </div>
         <h3>Your plane</h3>
         <p class="pause-hint"></p>
@@ -161,7 +161,7 @@
 <script src="js/online/host.js"></script>
 <script src="js/online/guest.js"></script>
 <script src="js/online/lobby.js"></script>
-<!-- Game engine: each file registers a module, boot.js starts the game -->
+<!-- Activity engine: each file registers a module, boot.js starts the activity -->
 <script src="js/engine/registry.js"></script>
 <script src="js/engine/00-vector.js"></script>
 <script src="js/engine/01-constants.js"></script>

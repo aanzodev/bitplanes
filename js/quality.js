@@ -1,5 +1,5 @@
-// Adaptive render resolution: if frames get slow, render the game canvas at a
-// lower pixel density so the game stays smooth.
+// Adaptive render resolution: if frames get slow, render the activity canvas at a
+// lower pixel density so the activity stays smooth.
 (function () {
     const steps = [1.5, 1.25, 1, 0.75];
     let index = 0;

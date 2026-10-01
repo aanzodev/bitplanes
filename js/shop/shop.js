@@ -1,5 +1,5 @@
 // Coins, owned planes and upgrades (saved in localStorage), and applying the
-// chosen plane to the player's aircraft in game.
+// chosen plane to the player's aircraft in activity.
 (function () {
     const STORAGE_KEY = "shop";
     const COINS_PER_KILL = 10;
@@ -37,7 +37,7 @@
         return (state.paint && state.paint[p.id]) || p.color;
     }
 
-    // Final stats of the selected plane plus upgrades. Sent to the host in online games.
+    // Final stats of the selected plane plus upgrades. Sent to the host in online activities.
     function loadout() {
         const p = selectedPlane();
         return {

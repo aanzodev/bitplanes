@@ -1,4 +1,4 @@
-// Online play: turning game objects, sprites and particles into small
+// Online play: turning activity objects, sprites and particles into small
 // messages and back again.
 (function () {
     const O = window.BitOnline;
