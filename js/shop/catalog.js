@@ -6,6 +6,7 @@
 // skin: "" (biplane), "prop" (WWII fighter), "jet" or "bomber" (flying wing).
 // special: shown with a black border in the Hangar.
 // exclusive: shown with a gold border in the Hangar.
+// smartMissiles: missiles lock on fast, turn hard and often ignore flares.
 // Computer pilots only fly planes that are neither special nor exclusive.
 window.BitCatalog = {
     planes: [
@@ -81,8 +82,9 @@ window.BitCatalog = {
             desc: "Stealth jet, second only to the Raptor.",
             thrust: 1.35, turn: 1.25, life: 2, ammo: 4, missiles: 1, reload: 0.8, bulletSpeed: 1.5, flares: 3},
         {id: "f22", name: "F-22 Raptor", price: 40000, color: "#4a5560", skin: "jet", special: true,
-            desc: "The best: 3 missiles, fastest bullets and flares.",
-            thrust: 1.4, turn: 1.35, life: 2, ammo: 5, missiles: 1, reload: 0.8, bulletSpeed: 1.6, flares: 3},
+            desc: "The best: 3 smart missiles that lock on fast, fastest bullets and flares.",
+            thrust: 1.4, turn: 1.35, life: 2, ammo: 5, missiles: 1, reload: 0.8, bulletSpeed: 1.6, flares: 3,
+            smartMissiles: true},
 
         // Exclusive: gold border in the Hangar.
         {id: "b2", name: "B-2 Spirit", price: 100000, color: "#3b4148", skin: "bomber", exclusive: true,

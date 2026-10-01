@@ -426,7 +426,8 @@ BitModules[22] = function (M, j, t) {
         const t = Object(g.h)(M.velocity),
             L = Object(g.s)(0, M.mass * l.a),
             N = Object(g.e)(M.forward, M.thrust),
-            i = Object(g.e)(Object(g.i)(Object(g.f)(M.velocity)), 2 ** (t - 1.2 * l.l));
+            // Smart (F-22) missiles have a higher top speed.
+            i = Object(g.e)(Object(g.i)(Object(g.f)(M.velocity)), 2 ** (t - (M.smart ? 1.4 : 1.2) * l.l));
         M.force = Object(g.a)(L, N, i);
     }
 

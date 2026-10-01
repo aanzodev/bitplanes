@@ -83,6 +83,8 @@
         if (!l) return;
         plane.shopPlayer = player;
         plane.planeId = l.planeId;
+        // Looked up here (not sent by guests), so only real F-22s get them.
+        plane.smartMissiles = !!(PLANES.find(p => p.id === l.planeId) || {}).smartMissiles;
         plane.maxThrust = Math.round(BASE_THRUST * l.thrust);
         plane.turnRate = l.turn;
         plane.reloadRate = l.reload;

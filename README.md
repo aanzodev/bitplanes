@@ -80,11 +80,15 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | **F-15 Eagle** ★ | 20,000 | Powerful air superiority fighter |
 | **Su-27 Flanker** ★ | 24,000 | Long range, turns hard |
 | **F-35 Lightning** ★ | 30,000 | Stealth, second only to the Raptor |
-| **F-22 Raptor** ★ | 40,000 | The best jet: 3 missiles, fastest bullets |
+| **F-22 Raptor** ★ | 40,000 | The best jet: 3 smart missiles, fastest bullets |
 | **B-2 Spirit** ◆ | 100,000 | Exclusive stealth bomber: massive armor, 6 missiles, 4 flares |
 
 In single player the computer pilots fly random planes from this list (never
 a special ★ or exclusive ◆ one), picked again every time they get a new plane.
+
+The F-22's **smart missiles** lock on as soon as they launch (any direction,
+twice the range), fly faster, turn harder, aim ahead of the target, explode
+when they pass close by and see through flares 60% of the time.
 
 ◆ Exclusive planes have a gold border in the Hangar.
 
