@@ -115,6 +115,16 @@
     box-shadow: 0 0 0 3px #0a0;
 }
 
+/* Exclusive planes (B-2) get a gold border. */
+.shop-plane.exclusive {
+    border: 3px solid #d4a017;
+    background: linear-gradient(180deg, #fff6d6 0%, #fff 45%);
+}
+
+.shop-plane.exclusive.selected {
+    box-shadow: 0 0 0 3px #0a0;
+}
+
 .special-badge {
     position: absolute;
     top: -11px;
@@ -127,6 +137,11 @@
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
+}
+
+.exclusive-badge {
+    background: #d4a017;
+    color: #000;
 }
 
 .plane-perk {

@@ -60,10 +60,12 @@
         return statsOf(p, colorOf(p), level);
     }
 
-    // Computer pilots in single player fly a random plane from the whole
-    // catalog, picked again every time they get a new plane.
+    // Computer pilots in single player fly a random plane (never a special or
+    // exclusive one), picked again every time they get a new plane.
+    const BOT_PLANES = PLANES.filter(p => !p.special && !p.exclusive);
+
     function botLoadout() {
-        const p = PLANES[Math.floor(Math.random() * PLANES.length)];
+        const p = BOT_PLANES[Math.floor(Math.random() * BOT_PLANES.length)];
         return statsOf(p, p.color);
     }
 

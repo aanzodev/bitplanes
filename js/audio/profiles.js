@@ -29,6 +29,11 @@ window.BitSoundProfiles = {
     mustang: {kind: "prop", base: 48, range: 56, wave: "triangle", pulse: 36, tone: 1200, whistle: 1250, gun: "mg"},
     bf109: {kind: "prop", base: 56, range: 58, wave: "sawtooth", pulse: 33, tone: 1350, gun: "mg"},
     corsair: {kind: "prop", base: 40, range: 44, wave: "sawtooth", pulse: 28, tone: 900, gun: "mg"},
+    hurricane: {kind: "prop", base: 50, range: 48, wave: "triangle", pulse: 32, tone: 1150, gun: "mg"},
+    yak3: {kind: "prop", base: 60, range: 56, wave: "sawtooth", pulse: 30, tone: 1450, gun: "mg"},
+    fw190: {kind: "prop", base: 42, range: 46, wave: "sawtooth", pulse: 29, tone: 1000, gun: "mg"},
+    p47: {kind: "prop", base: 36, range: 42, wave: "sawtooth", pulse: 30, tone: 850, gun: "mg"},
+    p38: {kind: "prop", base: 50, range: 54, wave: "triangle", pulse: 40, tone: 1250, gun: "mg"},
     mig21: {kind: "jet", roar: [600, 3000], whine: [2600, 5600], whineVol: 0.04, burner: 0.25, volume: 0.35, gun: "cannon"},
     f16: {kind: "jet", roar: [500, 2800], whine: [2200, 5200], whineVol: 0.05, burner: 0.25, volume: 0.35, gun: "cannon"},
     mig29: {kind: "jet", roar: [450, 2600], whine: [2000, 4800], whineVol: 0.045, burner: 0.25, volume: 0.35, gun: "cannon"},
@@ -37,4 +42,6 @@ window.BitSoundProfiles = {
     su27: {kind: "jet", roar: [330, 2300], whine: [1700, 4000], whineVol: 0.04, burner: 0.3, volume: 0.35, gun: "cannon"},
     f35: {kind: "jet", roar: [320, 2200], whine: [1600, 3800], whineVol: 0.035, burner: 0.25, volume: 0.3, idleSilent: true, gun: "cannon"},
     f22: {kind: "jet", roar: [300, 2200], whine: [1500, 3600], whineVol: 0.035, burner: 0.2, volume: 0.25, idleSilent: true, gun: "cannon"},
+    // B-2: four buried turbofans, a deep quiet hum with no afterburner.
+    b2: {kind: "jet", roar: [200, 1200], whine: [1100, 2400], whineVol: 0.02, burner: 0, volume: 0.25, idleSilent: true, gun: "cannon"},
 };
