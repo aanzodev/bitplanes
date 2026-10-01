@@ -237,7 +237,7 @@ BitModules[14] = function (M, j, t) {
                     () => {
                         ((j.missiles = j.maxMissiles), (j.missileReloading = !1));
                     },
-                    10 * L.n * (j.reloadRate || 1),
+                    10 * L.n * (j.reloadRate || 1) * (j.missileReloadRate || 1),
                 ));
         }
     }
