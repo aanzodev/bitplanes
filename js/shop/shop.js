@@ -4,9 +4,9 @@
     const STORAGE_KEY = "shop";
     const COINS_PER_KILL = 10;
     const BASE_THRUST = 17;
-    const {planes: PLANES, upgrades: UPGRADES, paints: PAINTS} = window.BitCatalog;
+    const {planes: PLANES, upgrades: UPGRADES, paints: PAINTS, patterns: PATTERNS} = window.BitCatalog;
 
-    let state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}};
+    let state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}, pattern: {}};
     try {
         state = Object.assign(state, JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"));
     } catch (e) {}
@@ -30,6 +30,20 @@
 
     function selectedPlane() {
         return PLANES.find(p => p.id === state.selected) || PLANES[0];
+    }
+
+    // A plane's paint pattern ("" for none).
+    function patternOf(p) {
+        return (state.pattern && state.pattern[p.id]) || "";
+    }
+
+    function setPattern(id) {
+        const p = selectedPlane();
+        if (!PATTERNS.some(x => x.id === id)) return;
+        state.pattern = state.pattern || {};
+        if (id) state.pattern[p.id] = id;
+        else delete state.pattern[p.id];
+        save();
     }
 
     // A plane's color: its paint job if it has one, otherwise factory colors.
@@ -59,16 +73,18 @@
     // The selected plane with your upgrades. Sent to the host in online activities.
     function loadout() {
         const p = selectedPlane();
-        return statsOf(p, colorOf(p), level);
+        return Object.assign(statsOf(p, colorOf(p), level), {pattern: patternOf(p)});
     }
 
     // Computer pilots in single player fly a random plane (never a special or
     // exclusive one), picked again every time they get a new plane.
-    const BOT_PLANES = PLANES.filter(p => !p.special && !p.exclusive);
+    const BOT_PLANES = PLANES.filter(p => !p.exclusive && (!p.special || p.bots));
 
     function botLoadout() {
         const p = BOT_PLANES[Math.floor(Math.random() * BOT_PLANES.length)];
-        return statsOf(p, p.color);
+        // Some bots show off a paint pattern.
+        const pattern = Math.random() < 0.3 ? PATTERNS[1 + Math.floor(Math.random() * (PATTERNS.length - 1))].id : "";
+        return Object.assign(statsOf(p, p.color), {pattern});
     }
 
     // Called by the physics loop for every plane; applies the loadout once per pilot.
@@ -102,7 +118,8 @@
         if (plane.setSkin) {
             // In team modes the plane keeps its team colors.
             const color = player.team ? plane.color : (player.loadoutColor || l.color);
-            if (color !== plane.color || l.skin !== (plane.skin || "")) plane.setSkin(color, l.skin);
+            const pattern = l.pattern || "";
+            if (color !== plane.color || l.skin !== (plane.skin || "") || pattern !== (plane.pattern || "")) plane.setSkin(color, l.skin, pattern);
             player.color = color;
         }
     }
@@ -187,7 +204,7 @@
     }
 
     function resetShop() {
-        state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}};
+        state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}, pattern: {}};
         save();
         return "Shop reset";
     }
@@ -226,10 +243,11 @@
 
     window.BitShop = {
         apply, reward, onKill, loadout, addCoins, setCoins,
-        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, level, upgradeCost, give, unlockAll, resetShop,
+        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, setPattern, patternOf, level, upgradeCost, give, unlockAll, resetShop,
         planes: PLANES,
         upgrades: UPGRADES,
         paints: PAINTS,
+        patterns: PATTERNS,
         selected: selectedPlane,
         state: () => state,
         onChange: fn => listeners.push(fn),

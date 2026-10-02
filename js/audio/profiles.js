@@ -19,6 +19,12 @@
 // gun: "mg" (machine gun), "cannon" (M61 Vulcan buzz) or "brrt" (A-10's GAU-8)
 window.BitSoundProfiles = {
     classic: {kind: "prop", base: 55, range: 45, wave: "sawtooth", pulse: 18, tone: 900, gun: "mg"},
+    cub: {kind: "prop", base: 72, range: 40, wave: "square", pulse: 16, tone: 1300, gun: "mg"},
+    tigermoth: {kind: "prop", base: 60, range: 38, wave: "square", pulse: 15, tone: 1000, gun: "mg"},
+    duster: {kind: "prop", base: 44, range: 34, wave: "sawtooth", pulse: 12, tone: 750, gun: "mg"},
+    fokker: {kind: "prop", base: 58, range: 42, wave: "square", pulse: 20, tone: 1050, sputter: 0.12, gun: "mg"},
+    spad: {kind: "prop", base: 52, range: 46, wave: "sawtooth", pulse: 22, tone: 1100, gun: "mg"},
+    i16: {kind: "prop", base: 46, range: 50, wave: "sawtooth", pulse: 26, tone: 1150, gun: "mg"},
     swift: {kind: "prop", base: 78, range: 62, wave: "sawtooth", pulse: 26, tone: 1500, gun: "mg"},
     gunship: {kind: "prop", base: 46, range: 36, wave: "sawtooth", pulse: 14, tone: 800, gun: "mg"},
     fortress: {kind: "prop", base: 36, range: 26, wave: "sawtooth", pulse: 10, tone: 650, gun: "mg"},

@@ -129,6 +129,7 @@
         return {
             color: /^#[0-9a-f]{3,8}$/i.test(l.color) ? l.color : GUEST_COLORS[0],
             skin: ["jet", "prop", "bomber"].includes(l.skin) ? l.skin : "",
+            pattern: (window.bitPlanePatterns || []).includes(l.pattern) ? l.pattern : "",
             planeId: typeof l.planeId === "string" && /^[a-z0-9]{1,20}$/.test(l.planeId) ? l.planeId : "classic",
             thrust: n(l.thrust, 0.5, 2, 1),
             turn: n(l.turn, 0.5, 2, 1),
@@ -174,8 +175,9 @@
             // New paint: repaint the guest's current plane right away.
             const player = client.player, plane = player.hasPlane();
             client.loadout.color = player.loadoutColor = msg.c;
+            client.loadout.pattern = (window.bitPlanePatterns || []).includes(msg.p) ? msg.p : "";
             if (plane && plane.planeId === client.loadout.planeId) {
-                plane.setSkin(msg.c, plane.skin);
+                plane.setSkin(msg.c, plane.skin, client.loadout.pattern);
                 player.color = msg.c;
             }
         } else if (msg.t === "st" && Array.isArray(msg.s)) {
@@ -230,7 +232,8 @@
         client.conn.send({
             t: "welcome",
             code: host.code,
-            world: {width: world.width, height: world.height, ground: world.ground, stratosphere: world.stratosphere, map: world.map && world.map.id},
+            world: {width: world.width, height: world.height, ground: world.ground, stratosphere: world.stratosphere, map: world.map && world.map.id,
+                weather: window.BitWeather ? window.BitWeather.current() : "clear"},
         });
         updateHostBanner();
         hostLog(`<span class="message">${player.html()} joined</span>`);

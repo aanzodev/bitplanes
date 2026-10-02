@@ -125,6 +125,7 @@
         e.minimap(world);
         bindGuestKeys();
         banner("Room " + guest.code);
+        window.BitWeather && window.BitWeather.force(w.weather);
         window.BitMaps && window.BitMaps.announce(world.map);
         setInterval(() => {
             sendPing();

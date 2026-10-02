@@ -2,9 +2,18 @@
 (function () {
     const shop = window.BitShop;
 
-    function planeImage(p, color = shop.colorOf(p)) {
-        return window.bitPlaneImage ? window.bitPlaneImage(color, true, p.skin) : "";
+    function planeImage(p, color = shop.colorOf(p), pattern = shop.patternOf(p)) {
+        return window.bitPlaneImage ? window.bitPlaneImage(color, true, p.skin, pattern) : "";
     }
+
+    // Pattern buttons, each showing the plane with that pattern.
+    function patternButtons(p) {
+        const current = shop.patternOf(p);
+        return `<div class="pattern-list">${shop.patterns.map(({id, name}) => `
+            <button type="button" class="pattern-btn${id === current ? " active" : ""}" data-pattern="${id}" title="${name}">
+                <img src="${planeImage(p, shop.colorOf(p), id)}" alt=""><span>${name}</span></button>`).join("")}</div>`;
+    }
+    window.BitPatternButtons = patternButtons;
 
     // Paint shop for the plane you fly: a big preview and color swatches.
     function paintSection(state) {
@@ -21,6 +30,7 @@
             <div>
                 <p class="shop-note">Painting your <strong>${p.name}</strong>. Paint is free.</p>
                 <div class="paint-swatches">${swatches}</div>
+                ${patternButtons(p)}
             </div>`;
     }
 
@@ -102,6 +112,7 @@
             if (btn.dataset.buyPlane) shop.buyPlane(btn.dataset.buyPlane);
             if (btn.dataset.buyUpgrade) shop.buyUpgrade(btn.dataset.buyUpgrade);
             if (btn.dataset.paint !== undefined) shop.setPaint(btn.dataset.paint || null);
+            if (btn.dataset.pattern !== undefined) shop.setPattern(btn.dataset.pattern);
         });
         document.addEventListener("keydown", e => {
             if (e.key === "Escape" && panel) panel.hidden = true;

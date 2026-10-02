@@ -28,23 +28,33 @@ BitModules[6] = function (M, j, t) {
         u = t(3),
         e = t(0);
 
+    // A damaged plane trails smoke: more and darker the more damage it has
+    // taken, and badly damaged planes burn with flames too.
     function I(M, j) {
-        const t = Object(u.g)();
-        if (t - j.lastSmoke > 80) {
+        const t = Object(u.g)(),
+            max = j.maxLife || L.h,
+            dmg = Math.max(0, Math.min(1, 1 - j.life / max));
+        if (t - j.lastSmoke > 130 - 90 * dmg) {
             j.lastSmoke = t;
-            let L = 1;
-            (5 == j.life && (L = 0.05),
-                4 == j.life && (L = 0.1),
-                3 == j.life && (L = 0.2),
-                2 == j.life && (L = 0.4),
-                1 == j.life && (L = 0.7));
-            const u = new N.f(i.b.puff);
-            ((u.position = Object(e.c)(j.position)),
-                (u.velocity = Object(e.a)(j.velocity, Object(e.e)(Object(e.f)(Object(e.i)(j.forward)), 20))),
-                (u.angle = 2 * Math.PI * Math.random()),
-                (u.scale = 1 + 0.5 * Math.random()),
-                (u.opacity = L + 0.2 * Math.random()),
-                M.particles.add(u));
+            const s = new N.f(i.b.puff);
+            ((s.position = Object(e.c)(j.position)),
+                (s.velocity = Object(e.a)(j.velocity, Object(e.e)(Object(e.f)(Object(e.i)(j.forward)), 20))),
+                (s.angle = 2 * Math.PI * Math.random()),
+                (s.scale = 1 + 0.5 * Math.random() + 0.7 * dmg),
+                (s.opacity = 0.1 + 0.65 * dmg + 0.2 * Math.random()),
+                M.particles.add(s));
+            // Half its armor gone: flames. Three quarters: big flames.
+            for (let k = dmg >= 0.75 ? 2 : dmg >= 0.5 ? 1 : 0; k > 0; k--) {
+                const f = new N.f(i.b.flare);
+                ((f.position = Object(e.a)(j.position, Object(e.e)(j.forward, -6 - 6 * Math.random()), Object(e.s)(4 * Math.random() - 2, 4 * Math.random() - 2))),
+                    (f.velocity = Object(e.a)(Object(e.e)(j.velocity, 0.7), Object(e.s)(8 * Math.random() - 4, -6 * Math.random()))),
+                    (f.angle = 2 * Math.PI * Math.random()),
+                    (f.scale = 0.8 + 0.6 * Math.random() + 0.5 * dmg),
+                    (f.scaleRate = -0.4),
+                    (f.opacity = 0.95),
+                    (f.opacityRate = 1.6),
+                    M.particles.add(f));
+            }
         }
     }
 

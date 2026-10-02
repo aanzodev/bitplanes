@@ -58,9 +58,15 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | Plane | Price | Notes |
 |---|---:|---|
 | Classic | free | Balanced starter biplane |
+| Piper Cub | 100 | Little yellow trainer, easy to fly |
+| Tiger Moth | 150 | Gentle old trainer biplane |
+| Crop Duster | 200 | Farm plane with a sturdy frame |
 | Swift | 300 | Fast and agile, fewer bullets |
 | Gunship | 600 | Big ammo belt, quick reload |
+| Fokker Dr.I | 450 | The Red Baron's tight turner |
+| SPAD XIII | 750 | Fast, strong WWI fighter |
 | Fortress | 1,000 | Heavy armor, extra missiles, slow |
+| Polikarpov I-16 | 1,200 | Stubby, quick monoplane |
 | Sopwith Camel | 1,500 | Turns on a dime |
 | Phantom | 2,000 | Better at everything (biplane) |
 | A6M Zero | 2,500 | Light and nimble prop fighter |
@@ -83,8 +89,10 @@ Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
 | **F-22 Raptor** ★ | 40,000 | The best jet: 3 smart missiles, fastest bullets |
 | **B-2 Spirit** ◆ | 100,000 | Exclusive stealth bomber: massive armor, 6 missiles, 4 flares |
 
-In single player the computer pilots fly random planes from this list (never
-a special ★ or exclusive ◆ one), picked again every time they get a new plane.
+In single player the computer pilots fly random planes from this list (the
+regular planes plus the MiG-21, F-16, MiG-29, A-10 and F-15, never the Su-27,
+F-35, F-22 or B-2), picked again every time they get a new plane. Some bots wear
+paint patterns, and bots in jets drop flares when a missile closes in.
 
 The F-22's **smart missiles** lock on as soon as they launch (any direction,
 twice the range), fly faster, turn harder, aim ahead of the target, explode
@@ -102,7 +110,16 @@ Countryside, Desert, Arctic, Sunset and Night. Online, everyone who joins
 plays on the host's map. Map art is in `assets/sprites/maps/` and the list is
 in `js/maps.js`.
 
-**Paint** any plane you own with one of 28 colors in the Hangar (free).
+**Paint** any plane you own with one of 28 colors in the Hangar (free), and
+add a **pattern** on top: camo, tiger stripes, checkers, a shark mouth or
+flames. Change both mid-flight from the Esc menu too.
+
+**Weather:** every match rolls clear skies, rain, fog or a thunderstorm with
+lightning and thunder (snow and blizzards on the Arctic map, a sandstorm in the
+Desert). Online, everyone gets the host's weather.
+
+**Damage:** hit planes trail smoke, thicker the more damage they've taken, and
+badly damaged planes catch fire.
 
 Upgrades (engine, handling, armor, ammo belt, reload, missile rack, gun barrels,
 missile loader, flare pod, repair kit) apply to
@@ -133,6 +150,8 @@ themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</k
 | `unlockall`, `reset` | Own everything / start over |
 | `heal`, `refill`, `god` | Repair, reload, bullets can't shoot you down (single player) |
 | `maps`, `map <map>` | List maps / switch map now (single player) |
+| `weather <type>` | Change the weather now: clear, rain, fog, storm (single player) |
+| `pattern <name>` | Paint pattern: camo, tiger, checkers, shark, flames, none |
 | `mute`, `unmute`, `fps` | Sound off/on, FPS counter |
 | `room`, `ping` | Online room code, your ping |
 | `js <code>` | Run JavaScript |
@@ -201,6 +220,7 @@ js/
   pause.js              In-activity menu (Esc): resume, plane, paint, leave
   console.js            Built-in console (Ctrl+Shift+K)
   maps.js               Maps (random each activity)
+  weather.js            Rain, snow, fog, sandstorms and thunderstorms
   audio/
     profiles.js         How each plane sounds (edit to tweak)
     sound.js            Synthesized engine, guns, missiles, flares, explosions

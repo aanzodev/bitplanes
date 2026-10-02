@@ -110,6 +110,27 @@
                 print(`Painted your ${shop().selected().name} ${paint.name.toLowerCase()}.`, "ok");
             },
         },
+        pattern: {
+            args: "<pattern>", help: "Paint pattern (camo, tiger, checkers, shark, flames, none)",
+            run(a) {
+                const q = String(a[0] || "").toLowerCase();
+                const pat = shop().patterns.find(x => (x.id || "none") === q || x.name.toLowerCase().replace(/\s+/g, "") === q);
+                if (!pat) throw new Error("Patterns: " + shop().patterns.map(x => x.id || "none").join(", "));
+                window.BitPause.paint(undefined, pat.id);
+                print(`Pattern: ${pat.name}.`, "ok");
+            },
+        },
+        weather: {
+            args: "<type>", help: "Change the weather now (clear, rain, fog, storm)",
+            run(a) {
+                const W = window.BitWeather;
+                const t = String(a[0] || "").toLowerCase();
+                if (!W.types.includes(t)) throw new Error("Weather: " + W.types.join(", ") + `. Now: ${W.name()}`);
+                if (online()) throw new Error("Not available in online activities.");
+                W.set(t);
+                print(`Weather: ${W.name()}.`, "ok");
+            },
+        },
         unlockall: {help: "Own every plane, max every upgrade", run: () => print(shop().unlockAll(), "ok")},
         reset: {help: "Reset coins, planes and upgrades", run: () => print(shop().resetShop(), "ok")},
         heal: {

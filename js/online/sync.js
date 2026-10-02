@@ -52,9 +52,10 @@
     function spriteFromKey(key) {
         if (spritesByKey.has(key)) return spritesByKey.get(key);
         if (typeof key === "string" && key.startsWith("plane|")) {
-            const [, color, pilot, skin] = key.split("|");
+            const [, color, pilot, skin, pattern] = key.split("|");
             if (!/^#[0-9a-f]{3,8}$/i.test(color)) return null;
-            const sprite = new (engine().Sprite)(window.bitPlaneImage(color, pilot === "1", skin || undefined), 36, 22);
+            const pat = (window.bitPlanePatterns || []).includes(pattern) ? pattern : "";
+            const sprite = new (engine().Sprite)(window.bitPlaneImage(color, pilot === "1", skin || undefined, pat), 36, 22);
             spritesByKey.set(key, sprite);
             return sprite;
         }

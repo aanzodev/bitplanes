@@ -353,3 +353,35 @@
     border: 3px solid #0a0;
     box-shadow: 0 0 0 2px #fff inset;
 }
+
+/* Paint patterns (Hangar and in-activity menu). */
+.pattern-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.pattern-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 6px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.pattern-btn img {
+    width: 48px;
+    height: 29px;
+}
+
+.pattern-btn.active {
+    border-color: #0a0;
+    box-shadow: 0 0 0 2px #0a0;
+}

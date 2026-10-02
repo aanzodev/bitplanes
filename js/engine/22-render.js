@@ -382,7 +382,7 @@ BitModules[22] = function (M, j, t) {
             ((t.forward = Object(g.s)(Math.sin(-t.angle - Math.PI / 2), Math.cos(-t.angle - Math.PI / 2))),
                 (t.normal = Object(g.s)(Math.sin(-t.angle + Math.PI), Math.cos(-t.angle + Math.PI))),
                 t instanceof u.a && (C(t, M), t.thrust > 0 && Object(A.f)(M, t)),
-                t instanceof e.a && (E(t, M), t.life < l.h && Object(A.g)(M, t)),
+                t instanceof e.a && (E(t, M), t.life < (t.maxLife || l.h) && Object(A.g)(M, t)),
                 t instanceof c.b && d(t),
                 t instanceof c.a && m(t),
                 t instanceof n.a && h(t),
@@ -502,6 +502,7 @@ BitModules[22] = function (M, j, t) {
                 window.bitAdaptQuality && window.bitAdaptQuality(n);
                 const c = t.remote ? t.remote.alpha() : I / y;
                 (i(M, c), a(j, M, t, c, u));
+                window.BitWeather && window.BitWeather.draw(j, M, t, n);
             })(),
             function () {
                 (cancelAnimationFrame(e), (t.tick = null));
