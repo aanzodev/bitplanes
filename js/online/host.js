@@ -2,7 +2,7 @@
 // drives them with the guests' key presses and sends out snapshots.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, peerOptions, makeCode, cleanName, round, status, banner, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, newPeer, errorText, makeCode, cleanName, round, status, banner, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
 
     const host = {peer: null, code: null, world: null, clients: new Map(), pending: [], nextId: 1, fx: new Set()};
 
@@ -15,8 +15,9 @@
 
     function openHostPeer() {
         const code = makeCode();
-        const peer = new Peer(PREFIX + code, peerOptions());
+        const peer = newPeer(PREFIX + code);
         host.peer = peer;
+        peer.on("waking", () => status("Waking up the online server… (the first room of the day can take up to a minute)"));
         peer.on("open", () => {
             host.code = code;
             status("Room " + code + " is open.");
@@ -44,7 +45,7 @@
                 // Never got a room: stop trying and let the player retry.
                 peer.destroy();
                 O.role = null;
-                status("Couldn't create a room (" + err.type + "). Check your internet connection.");
+                status("Couldn't create a room. " + errorText(err.type));
             } else {
                 console.warn("PeerJS:", err);
             }

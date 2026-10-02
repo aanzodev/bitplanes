@@ -7,7 +7,7 @@
         const hostBtn = document.querySelector(".host-activity");
         const joinBtn = document.querySelector(".join-activity");
         const codeInput = document.querySelector(".room-code");
-        if (typeof Peer === "undefined") {
+        if (typeof Peer === "undefined" && !O.serverUrl()) {
             status("Online play is unavailable (PeerJS failed to load).");
             if (hostBtn) hostBtn.disabled = true;
             if (joinBtn) joinBtn.disabled = true;

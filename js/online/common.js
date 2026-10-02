@@ -68,6 +68,26 @@
         });
     }
 
+    // The relay server to use (config.js or ?server=), or "" for direct connections.
+    function serverUrl() {
+        const q = new URLSearchParams(location.search).get("server");
+        if (q === "off") return "";
+        return q || window.BitOnlineServer || "";
+    }
+
+    // A PeerJS peer, or a RelayPeer when a relay server is set. Pass an id to host.
+    function newPeer(id) {
+        const url = serverUrl();
+        if (url) return new O.RelayPeer(url, id);
+        return id ? new Peer(id, peerOptions()) : new Peer(peerOptions());
+    }
+
+    function errorText(type) {
+        if (type === "server-error") return "Couldn't reach the online server. Check your internet connection and try again.";
+        if (type === "full") return "The online server is full right now. Try again in a bit.";
+        return "Couldn't connect (" + type + "). Check your internet connection and try again.";
+    }
+
     function makeCode() {
         let code = "";
         for (let i = 0; i < 5; i++) code += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
@@ -149,5 +169,5 @@
     }
 
     Object.assign(O, {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
-    Object.assign(O, {engine, peerOptions, makeCode, cleanName, round, status, banner, pingMeter, safeHtml, addLog});
+    Object.assign(O, {engine, peerOptions, serverUrl, newPeer, errorText, makeCode, cleanName, round, status, banner, pingMeter, safeHtml, addLog});
 })();
