@@ -240,6 +240,22 @@
         startStop([n, sub], dur);
     }
 
+    // A far-off rumble of thunder (storms).
+    function thunder() {
+        const out = output(null, 0.55);
+        if (!out) return;
+        const dur = 3, t = s.ctx.currentTime;
+        const n = noise(), lp = filter("lowpass", 900), g = gain(0);
+        chain(n, lp, g, out);
+        lp.frequency.exponentialRampToValueAtTime(90, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.9, t + 0.08);
+        g.gain.linearRampToValueAtTime(0.5, t + 0.6);
+        g.gain.linearRampToValueAtTime(0.7, t + 1);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        startStop([n], dur);
+    }
+
     // ---------------------------------------------------------- your engine
 
     function buildEngine(profile) {
@@ -365,7 +381,7 @@
     window.BitSound = {
         // fn returns the object you are flying (plane or pilot); sounds are heard from there.
         setListener: fn => (s.listener = fn),
-        gun, missile, flares, flaresAt, explosion,
+        gun, missile, flares, flaresAt, explosion, thunder,
         gunAt: (pos, type) => throttle("gun", 35) && playGun(type || "mg", pos, 0.6),
         missileAt: pos => missile({position: pos}),
         setMuted,

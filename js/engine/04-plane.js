@@ -60,7 +60,59 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
-    function P(M, j = !0, t) {
+    // Paint patterns: drawn over the plane's body, clipped to its outline.
+    // Body outline and nose (for decals) of each plane shape.
+    const BODY = {
+        jet: {d: "M1 12.5 L7.5 9.5 L30 9 L35 10.5 L35 13.5 L30 14.5 L7.5 14.5 Z", nose: [8, 13.2]},
+        prop: {d: "M4 10.2 Q6 8 11 8 L30 9.5 L34.5 11 L34.2 12.6 L28 14 L11 15.2 Q6 15.2 4 13.2 Z", nose: [6.5, 13]},
+        bomber: {d: "M1 13 Q5 10.3 9.5 9.6 Q12.5 6.6 16.5 7.4 Q20.5 8.2 23.5 9.9 L35 12.4 L33.5 13.9 Q19 15.6 6 14.9 Z", nose: [3.5, 13.3]},
+        "": {d: "M7,6 C9.6,6 12.1,6 14.5,6 C16.3,8.4 19,8.8 21,6 C24.1,9 26.9,8.4 29.4,4.1 C30.8,0.1 35,1.4 35,4.1 L35,9.5 C27.2,13.6 18.3,15.4 14.5,16 C12,16.2 9.5,15.9 7,15 L7,6 Z", nose: [8, 11.5]},
+    };
+    const PATTERNS = {
+        camo: `<pattern id="pt" width="10" height="8" patternUnits="userSpaceOnUse">
+            <path d="M0 2 Q2 0 4 1 Q6 3 4 4 Q2 5 0 4Z" fill="#000" opacity=".3"/>
+            <path d="M5 5 Q7 4 9 5.5 Q8 8 6 7.5 Q4 7 5 5Z" fill="#fff" opacity=".2"/>
+            <path d="M6 .5 Q8 0 9.5 1.5 Q8 3 6.5 2.5Z" fill="#000" opacity=".22"/></pattern>`,
+        tiger: `<pattern id="pt" width="4.5" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(25)">
+            <rect width="1.6" height="10" fill="#000" opacity=".6"/></pattern>`,
+        checkers: `<pattern id="pt" width="4" height="4" patternUnits="userSpaceOnUse">
+            <rect width="2" height="2" fill="#000" opacity=".4"/><rect x="2" y="2" width="2" height="2" fill="#000" opacity=".4"/>
+            <rect x="2" width="2" height="2" fill="#fff" opacity=".3"/><rect y="2" width="2" height="2" fill="#fff" opacity=".3"/></pattern>`,
+    };
+    const DECALS = {
+        shark: `<path d="M0 0 L6.5 -1.3 L5.5 1.7 Z" fill="#b3001b" stroke="#000" stroke-width=".4"/>
+            <path d="M.7 -.1 l.75 .9 l.75 -1 l.75 .9 l.75 -1 l.75 .9 l.75 -1" fill="none" stroke="#fff" stroke-width=".55"/>
+            <path d="M1 .9 l.8 -.7 l.8 .6 l.8 -.7 l.8 .6" fill="none" stroke="#fff" stroke-width=".5"/>
+            <circle cx="4.2" cy="-2.7" r=".9" fill="#000"/><circle cx="4.4" cy="-2.9" r=".3" fill="#fff"/>`,
+        flames: `<path d="M0 0 C3 -2.4 5 -.6 8.5 -2.8 C7 -.6 10.5 -.2 14 -1.6 C11 1.2 6 1.8 0 1.6 Z" fill="#ff5a00"/>
+            <path d="M.5 .3 C3 -1.2 4.5 0 7 -1.2 C6 .2 8.5 .4 10.5 -.3 C8 1 5 1.2 .5 1.2 Z" fill="#ffd23f"/>`,
+    };
+    const PATTERN_NAMES = ["camo", "tiger", "checkers", "shark", "flames"];
+
+    function withPattern(uri, skin, pat) {
+        const body = BODY[skin] || BODY[""];
+        if (!PATTERN_NAMES.includes(pat)) return uri;
+        let svg = atob(uri.split(",")[1]);
+        const clip = `<clipPath id="bd"><path d="${body.d}"/></clipPath>`;
+        const art = PATTERNS[pat]
+            ? `<path d="${body.d}" fill="url(#pt)" clip-path="url(#bd)"/>`
+            : `<g clip-path="url(#bd)"><g transform="translate(${body.nose[0]} ${body.nose[1]})">${DECALS[pat]}</g></g>`;
+        // Defs go first; the pattern goes right after the body so wings and cockpit stay on top.
+        svg = svg.replace(/(<svg[^>]*>)/, `$1<defs>${clip}${PATTERNS[pat] || ""}</defs>`);
+        let at = -1;
+        if (skin) {
+            const k = svg.indexOf(`d="${body.d}"`, svg.indexOf("</defs>"));
+            if (k >= 0) at = svg.indexOf("/>", k) + 2;
+        } else {
+            const k = svg.indexOf('id="Path-2"'); // the biplane's fuselage
+            if (k >= 0) at = svg.indexOf("</path>", k) + 7;
+        }
+        svg = at > 0 ? svg.slice(0, at) + art + svg.slice(at) : svg.replace("</svg>", art + "</svg>");
+        return "data:image/svg+xml;base64," + btoa(svg);
+    }
+
+    function P(M, j = !0, t, pat) {
+        if (pat) return withPattern(P(M, j, t), t || "", pat);
         if ("bomber" === t) return B(M, j);
         if ("jet" === t) return J(M, j);
         if ("prop" === t) return K(M, j);
@@ -72,11 +124,12 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
-    function N(M, j = !0, t) {
-        const i = new L.a(P(M, j, t), 36, 22);
-        return ((i.planeKey = [M, j ? 1 : 0, t || ""]), i);
+    function N(M, j = !0, t, pat) {
+        const i = new L.a(P(M, j, t, pat), 36, 22);
+        return ((i.planeKey = [M, j ? 1 : 0, t || "", pat || ""]), i);
     }
     window.bitPlaneImage = P;
+    window.bitPlanePatterns = PATTERN_NAMES;
     var i = t(13),
         u = t(1),
         e = t(0);
@@ -159,10 +212,10 @@ BitModules[4] = function (M, j, t) {
             ((this._player = void 0),
                 (this.thrust = 0),
                 (this.elevator = 0),
-                (this.sprite = N(this.color, !1, this.skin)));
+                (this.sprite = N(this.color, !1, this.skin, this.pattern)));
         }
-        setSkin(M, j) {
-            ((this.color = M), (this.skin = j), (this.sprite = N(M, !0, j)));
+        setSkin(M, j, pat) {
+            ((this.color = M), (this.skin = j), (this.pattern = pat || ""), (this.sprite = N(M, !0, j, pat)));
         }
     }
 };

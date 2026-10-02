@@ -57,8 +57,11 @@ window.BitMaps = (function () {
     function announce(map) {
         const log = document.querySelector(".log");
         if (!log || !map) return;
+        const W = window.BitWeather;
+        if (W) W.start(map);
         const div = document.createElement("div");
-        div.innerHTML = `<span class="message">🗺️ Map: ${map.name}</span>`;
+        const weather = W && W.current() !== "clear" ? ` · ${W.icon()} ${W.name()}` : "";
+        div.innerHTML = `<span class="message">🗺️ Map: ${map.name}${weather}</span>`;
         log.appendChild(div);
         setTimeout(() => div.classList.add("hide"), 6000);
         setTimeout(() => div.remove(), 6300);

@@ -7,21 +7,39 @@
 // special: shown with a black border in the Hangar.
 // exclusive: shown with a gold border in the Hangar.
 // smartMissiles: missiles lock on fast, turn hard and often ignore flares.
-// Computer pilots only fly planes that are neither special nor exclusive.
+// Computer pilots fly the regular planes plus special ones marked bots: true.
 window.BitCatalog = {
     planes: [
         {id: "classic", name: "Classic", price: 0, color: "#ff0015",
             desc: "Balanced starter plane.",
             thrust: 1, turn: 1, life: 0, ammo: 0, missiles: 0, reload: 1},
+        {id: "cub", name: "Piper Cub", price: 100, color: "#f2c230", skin: "prop",
+            desc: "Little yellow trainer. Slow but easy to fly.",
+            thrust: 0.95, turn: 1.15, life: 0, ammo: -2, missiles: 0, reload: 1},
+        {id: "tigermoth", name: "Tiger Moth", price: 150, color: "#c9a227",
+            desc: "Gentle old trainer biplane.",
+            thrust: 0.95, turn: 1.2, life: 0, ammo: 0, missiles: 0, reload: 1},
+        {id: "duster", name: "Crop Duster", price: 200, color: "#4f9a3a",
+            desc: "Farm plane with a sturdy frame.",
+            thrust: 0.9, turn: 1.0, life: 1, ammo: 0, missiles: 0, reload: 1},
         {id: "swift", name: "Swift", price: 300, color: "#f5b700",
             desc: "Fast and agile, but fragile.",
             thrust: 1.2, turn: 1.25, life: 0, ammo: -3, missiles: 0, reload: 1},
         {id: "gunship", name: "Gunship", price: 600, color: "#2e9e44",
             desc: "Big ammo belt and quick reload.",
             thrust: 1, turn: 0.95, life: 1, ammo: 10, missiles: 0, reload: 0.75},
+        {id: "fokker", name: "Fokker Dr.I", price: 450, color: "#c8102e",
+            desc: "The Red Baron's tight-turning dogfighter.",
+            thrust: 1.0, turn: 1.3, life: 0, ammo: 2, missiles: 0, reload: 0.95},
+        {id: "spad", name: "SPAD XIII", price: 750, color: "#8a9a5b",
+            desc: "Fast, strong WWI fighter.",
+            thrust: 1.15, turn: 1.1, life: 1, ammo: 4, missiles: 0, reload: 0.95},
         {id: "fortress", name: "Fortress", price: 1000, color: "#5b6b8c",
             desc: "Heavy armor and extra missiles. Slow.",
             thrust: 0.9, turn: 0.85, life: 3, ammo: 5, missiles: 2, reload: 1},
+        {id: "i16", name: "Polikarpov I-16", price: 1200, color: "#5d7a4a", skin: "prop",
+            desc: "Stubby, quick little monoplane.",
+            thrust: 1.15, turn: 1.25, life: 0, ammo: 4, missiles: 0, reload: 0.9},
         {id: "camel", name: "Sopwith Camel", price: 1500, color: "#8b6a3e",
             desc: "Old biplane that turns on a dime.",
             thrust: 0.95, turn: 1.4, life: 0, ammo: 3, missiles: 0, reload: 0.9},
@@ -60,19 +78,19 @@ window.BitCatalog = {
             thrust: 1.35, turn: 1.1, life: 2, ammo: 10, missiles: 1, reload: 0.8, bulletSpeed: 1.15},
 
         // Special jets: black border in the Hangar, flares (Q). None beats the F-22.
-        {id: "mig21", name: "MiG-21 Fishbed", price: 7000, color: "#9aa39a", skin: "jet", special: true,
+        {id: "mig21", name: "MiG-21 Fishbed", price: 7000, color: "#9aa39a", skin: "jet", special: true, bots: true,
             desc: "Cheap, fast jet with 2 flares.",
             thrust: 1.3, turn: 1.15, life: 0, ammo: 3, missiles: 1, reload: 0.9, bulletSpeed: 1.25, flares: 2},
-        {id: "f16", name: "F-16 Falcon", price: 9000, color: "#9aa7b4", skin: "jet", special: true,
+        {id: "f16", name: "F-16 Falcon", price: 9000, color: "#9aa7b4", skin: "jet", special: true, bots: true,
             desc: "Light jet fighter with a fast gun and flares.",
             thrust: 1.3, turn: 1.25, life: 1, ammo: 5, missiles: 0, reload: 0.85, bulletSpeed: 1.25, flares: 3},
-        {id: "mig29", name: "MiG-29 Fulcrum", price: 12000, color: "#5f7f94", skin: "jet", special: true,
+        {id: "mig29", name: "MiG-29 Fulcrum", price: 12000, color: "#5f7f94", skin: "jet", special: true, bots: true,
             desc: "Agile twin-engine jet.",
             thrust: 1.3, turn: 1.3, life: 1, ammo: 5, missiles: 1, reload: 0.85, bulletSpeed: 1.35, flares: 3},
-        {id: "a10", name: "A-10 Warthog", price: 15000, color: "#6b7a4b", skin: "jet", special: true,
+        {id: "a10", name: "A-10 Warthog", price: 15000, color: "#6b7a4b", skin: "jet", special: true, bots: true,
             desc: "Flying tank with a huge cannon belt and flares.",
             thrust: 1.05, turn: 0.95, life: 4, ammo: 20, missiles: 1, reload: 0.7, bulletSpeed: 1.2, flares: 3},
-        {id: "f15", name: "F-15 Eagle", price: 20000, color: "#8e99a3", skin: "jet", special: true,
+        {id: "f15", name: "F-15 Eagle", price: 20000, color: "#8e99a3", skin: "jet", special: true, bots: true,
             desc: "Powerful air superiority fighter.",
             thrust: 1.35, turn: 1.2, life: 2, ammo: 6, missiles: 1, reload: 0.85, bulletSpeed: 1.4, flares: 3},
         {id: "su27", name: "Su-27 Flanker", price: 24000, color: "#6d8fb3", skin: "jet", special: true,
@@ -105,6 +123,16 @@ window.BitCatalog = {
         {name: "Gold", color: "#d4a017"}, {name: "Sand", color: "#d8c08a"}, {name: "Mint", color: "#5fe0b0"},
         {name: "Forest", color: "#1f5a32"}, {name: "Cyan", color: "#18d4f0"}, {name: "Navy", color: "#14245c"},
         {name: "Indigo", color: "#3b2a8f"}, {name: "Lavender", color: "#b39ddb"}, {name: "Magenta", color: "#d61fbf"},
+    ],
+
+    // Paint patterns (free), drawn over the paint color.
+    patterns: [
+        {id: "", name: "None"},
+        {id: "camo", name: "Camo"},
+        {id: "tiger", name: "Tiger stripes"},
+        {id: "checkers", name: "Checkers"},
+        {id: "shark", name: "Shark mouth"},
+        {id: "flames", name: "Flames"},
     ],
 
     upgrades: [

@@ -26,7 +26,7 @@
     }
 
     function planeImage(p) {
-        return window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(p), true, p.skin) : "";
+        return window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(p), true, p.skin, shop.patternOf(p)) : "";
     }
 
     // ------------------------------------------------------------ open/close
@@ -82,7 +82,8 @@
             <div class="paint-swatches">${shop.paints.map(({name, color}) => `
                 <button type="button" class="paint-swatch${color === current ? " active" : ""}${color ? "" : " factory"}"
                     data-paint="${color || ""}" title="${name}" style="${color ? "background: " + color : ""}">${color ? "" : "✕"}</button>`).join("")}
-            </div>`;
+            </div>
+            ${window.BitPatternButtons ? window.BitPatternButtons(selected) : ""}`;
     }
 
     function choosePlane(id) {
@@ -91,16 +92,17 @@
         render();
     }
 
-    // Paint shows on your current plane right away (if it's the selected type).
-    function paint(color) {
-        shop.setPaint(color);
-        const selected = shop.selected(), newColor = shop.colorOf(selected);
+    // Paint and patterns show on your current plane right away (if it's the selected type).
+    function paint(color, pattern) {
+        if (color !== undefined) shop.setPaint(color);
+        if (pattern !== undefined) shop.setPattern(pattern);
+        const selected = shop.selected(), newColor = shop.colorOf(selected), newPattern = shop.patternOf(selected);
         const plane = currentPlane();
         if (plane && plane.setSkin && plane.planeId === selected.id) {
-            plane.setSkin(newColor, selected.skin);
+            plane.setSkin(newColor, selected.skin, newPattern);
             if (plane.player) plane.player.color = newColor;
         }
-        if (isGuest()) window.BitOnline.sendToHost({t: "paint", c: newColor});
+        if (isGuest()) window.BitOnline.sendToHost({t: "paint", c: newColor, p: newPattern});
         sendLoadout();
         render();
     }
@@ -126,6 +128,7 @@
             if (!btn) return;
             if (btn.dataset.plane) choosePlane(btn.dataset.plane);
             if (btn.dataset.paint !== undefined) paint(btn.dataset.paint || null);
+            if (btn.dataset.pattern !== undefined) paint(undefined, btn.dataset.pattern);
         });
         // Runs before the activity's own key handlers (window capture comes first).
         window.addEventListener("keydown", ev => {
