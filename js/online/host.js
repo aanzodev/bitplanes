@@ -357,7 +357,7 @@
             }
             const hud = mine && mine.constructor === engineClasses().Plane
                 ? [mine.ammo, mine.maxAmmo, mine.missiles, mine.maxMissiles, mine.thrust, mine.maxThrust || consts.k,
-                    mine.flares || 0, mine.maxFlares || 0, mine.landed ? 1 : 0]
+                    mine.flares || 0, mine.maxFlares || 0, mine.landed ? 1 : 0, mine.life, mine.maxLife || consts.h]
                 : null;
             const list = mine ? entries.filter((e, k) => !own(all[k])) : entries;
             client.conn.send({t: "s", ts: round(performance.now(), 1), o: list, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud});

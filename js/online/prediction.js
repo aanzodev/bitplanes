@@ -76,6 +76,8 @@
             // Missiles and flares are fired by the host; show its counts.
             [plane.missiles, plane.maxMissiles] = [hud[2], hud[3]];
             [plane.flares, plane.maxFlares] = [hud[6], hud[7]];
+            // Health comes from the host, which decides hits.
+            if (typeof hud[9] === "number") [plane.life, plane.maxLife] = [hud[9], hud[10]];
         }
     }
 

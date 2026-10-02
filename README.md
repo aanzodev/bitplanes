@@ -118,6 +118,9 @@ flames. Change both mid-flight from the Esc menu too.
 lightning and thunder (snow and blizzards on the Arctic map, a sandstorm in the
 Desert). Online, everyone gets the host's weather.
 
+**Health bar:** bottom right shows your plane and its armor, green, then
+yellow, then red (online it comes from the host).
+
 **Damage:** hit planes trail smoke, thicker the more damage they've taken, and
 badly damaged planes catch fire.
 
@@ -218,6 +221,7 @@ css/
 js/
   quality.js            Lowers render resolution when frames get slow
   pause.js              In-activity menu (Esc): resume, plane, paint, leave
+  health.js             Your plane's health bar
   console.js            Built-in console (Ctrl+Shift+K)
   maps.js               Maps (random each activity)
   weather.js            Rain, snow, fog, sandstorms and thunderstorms
