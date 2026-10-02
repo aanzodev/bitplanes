@@ -205,3 +205,52 @@
     font-size: 16px;
     cursor: pointer;
 }
+
+/* Your plane's health, bottom right. */
+.health-bar {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 190px;
+    padding: 6px 8px 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.health-bar[hidden] {
+    display: none;
+}
+
+.health-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.health-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+}
+
+.health-track {
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.25);
+    overflow: hidden;
+}
+
+.health-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 200ms ease-out, background-color 200ms;
+}
+
+.health-bar.good .health-fill { background: #3ccf4e; }
+.health-bar.ok .health-fill { background: #f5c400; }
+.health-bar.bad .health-fill { background: #e8202e; }
+.health-bar.god .health-fill { background: linear-gradient(90deg, #ffd66b, #ff9d00); }
