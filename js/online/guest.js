@@ -2,7 +2,7 @@
 // sends key presses back.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
 
     const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {}};
 
@@ -15,12 +15,29 @@
         }
         O.role = "guest";
         guest.code = code;
-        status("Connecting to room " + code + "…");
+        status("Contacting the matchmaking server…");
         const peer = new Peer(peerOptions());
+        // Give up (and let the player try again) instead of loading forever.
+        let failed = false;
+        const fail = text => {
+            if (guest.world || failed) return;
+            failed = true;
+            clearTimeout(guest.joinTimer);
+            O.role = null;
+            status(text);
+            peer.destroy();
+        };
+        guest.joinTimer = setTimeout(() => fail(
+            "Couldn't reach the host. The network is probably blocking player-to-player connections " +
+            "(common on school and office Wi-Fi). Try both computers on the same Wi-Fi or a phone hotspot, then join again."),
+        JOIN_TIMEOUT_MS);
         peer.on("open", () => {
+            status("Connecting to the host of room " + code + "… (up to 20 seconds)");
             const conn = peer.connect(PREFIX + code, {reliable: true, serialization: "json"});
             guest.conn = conn;
+            conn.on("error", err => fail("Connection to the host failed (" + (err && err.type || err) + "). Try joining again."));
             conn.on("open", () => {
+                status("Connected. Joining…");
                 conn.send({
                     t: "hello",
                     name: (document.getElementsByName("nickname")[0] || {}).value || "Guest",
@@ -28,21 +45,20 @@
                 });
             });
             conn.on("data", onGuestData);
-            conn.on("close", hostLeft);
+            conn.on("close", () => failed || hostLeft());
         });
         peer.on("error", err => {
             if (guest.world) return console.warn("PeerJS:", err);
-            O.role = null;
-            status(err.type === "peer-unavailable"
+            fail(err.type === "peer-unavailable"
                 ? "Room " + code + " not found. Check the code and try again."
-                : "Couldn't connect (" + err.type + ").");
-            peer.destroy();
+                : "Couldn't connect (" + err.type + "). Check your internet connection and try again.");
         });
     }
 
     function hostLeft() {
         if (guest.gone) return;
         if (!guest.world) {
+            clearTimeout(guest.joinTimer);
             O.role = null;
             status("The host closed the room.");
             return;
@@ -55,6 +71,7 @@
     function onGuestData(msg) {
         if (!msg || typeof msg !== "object") return;
         if (msg.t === "welcome") {
+            clearTimeout(guest.joinTimer);
             guest.last = performance.now();
             startGuestWorld(msg);
         }
