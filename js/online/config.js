@@ -5,4 +5,4 @@
 //   window.BitOnlineServer = "wss://bitplanes-relay.onrender.com";
 // Adding ?server=wss://... to the page URL overrides this; ?server=off uses
 // direct connections.
-window.BitOnlineServer = "";
+window.BitOnlineServer = "wss://bitplanes-relay.onrender.com";
