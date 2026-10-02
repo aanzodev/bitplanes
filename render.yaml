@@ -1,0 +1,11 @@
+# One-click deploy of the online relay server on Render (free plan).
+# render.com -> New -> Blueprint -> pick this repository.
+services:
+  - type: web
+    name: bitplanes-relay
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /

@@ -2,7 +2,7 @@
 // sends key presses back.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, KEYS, engine, peerOptions, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, KEYS, engine, newPeer, errorText, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
 
     const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {}};
 
@@ -15,8 +15,10 @@
         }
         O.role = "guest";
         guest.code = code;
-        status("Contacting the matchmaking server…");
-        const peer = new Peer(peerOptions());
+        const relay = !!O.serverUrl();
+        status(relay ? "Contacting the online server…" : "Contacting the matchmaking server…");
+        const peer = newPeer();
+        peer.on("waking", () => status("Waking up the online server… (can take up to a minute)"));
         // Give up (and let the player try again) instead of loading forever.
         let failed = false;
         const fail = text => {
@@ -27,11 +29,13 @@
             status(text);
             peer.destroy();
         };
-        guest.joinTimer = setTimeout(() => fail(
-            "Couldn't reach the host. The network is probably blocking player-to-player connections " +
-            "(common on school and office Wi-Fi). Try both computers on the same Wi-Fi or a phone hotspot, then join again."),
-        JOIN_TIMEOUT_MS);
         peer.on("open", () => {
+            // The clock starts once the server answers (a sleeping server can take a while).
+            guest.joinTimer = setTimeout(() => fail(relay
+                ? "The host didn't answer. Make sure the room is still open and try again."
+                : "Couldn't reach the host. The network is probably blocking player-to-player connections " +
+                  "(common on school and office Wi-Fi). Try both computers on the same Wi-Fi or a phone hotspot, then join again."),
+            JOIN_TIMEOUT_MS);
             status("Connecting to the host of room " + code + "… (up to 20 seconds)");
             const conn = peer.connect(PREFIX + code, {reliable: true, serialization: "json"});
             guest.conn = conn;
@@ -51,7 +55,7 @@
             if (guest.world) return console.warn("PeerJS:", err);
             fail(err.type === "peer-unavailable"
                 ? "Room " + code + " not found. Check the code and try again."
-                : "Couldn't connect (" + err.type + "). Check your internet connection and try again.");
+                : errorText(err.type));
         });
     }
 

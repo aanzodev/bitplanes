@@ -166,6 +166,12 @@ under 160 ms, red above. The host's browser runs the activity, so the host shoul
 connection. Each guest flies their own plane in their own browser, so turning,
 thrust and bullets react instantly; the host decides hits and deaths. If the host closes the page the room ends.
 
+**Playing on school or office Wi-Fi?** Those networks block direct
+connections between players. Deploy the free relay server in `server/` and put
+its address in `js/online/config.js` (steps in
+[server/README.md](server/README.md)); then everyone connects through it, on
+the same port as normal websites.
+
 **Stuck on "Connecting to the host…"?** After 20 seconds the join stops and
 says why. Usually the network blocks player-to-player connections (common on
 school and office Wi-Fi). The activity then tries free relay servers, including
@@ -209,6 +215,8 @@ js/
     guest.js            Joining a room
     prediction.js       Guests fly their own plane locally (no input lag)
     lobby.js            Host / Join buttons
+    config.js           Address of the relay server (empty = direct connections)
+    relay.js            Connecting through the relay server
   engine/               The activity itself, one module per file
     registry.js         Modules register here…
     00-vector.js …      …vector math, constants, sprites, plane, missile,
@@ -220,6 +228,8 @@ assets/
   sprites/              Activity sprites (units, effects, scenery, ui)
   icons/                HUD and logo icons
 docs/screenshots/       Images for this README
+server/                 Optional relay server for online play (Node.js)
+render.yaml             One-click deploy of the relay server on Render
 ```
 
 The engine files come from the original minified webpack build of
