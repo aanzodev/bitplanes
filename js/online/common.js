@@ -17,6 +17,7 @@
     // snapshots to blend between, even when one arrives a bit late.
     const RENDER_DELAY_MS = 60;
     const TIMEOUT_MS = 6000;
+    const JOIN_TIMEOUT_MS = 20000;
     const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     const GUEST_COLORS = ["#145ece", "#f36a20", "#70ba01", "#d23be7", "#34bbe6", "#dbaf02", "#ff0786"];
     const KEYS = {
@@ -34,19 +35,37 @@
         return window.BitEngine;
     }
 
+    // How two browsers find a way to each other. STUN servers tell each browser
+    // its public address; when a network blocks direct connections (school or
+    // office Wi-Fi, some home routers) the traffic goes through a TURN relay.
+    // Relays on port 443 (the same port as websites) get through most networks.
+    // Your own relay: ?turn=turn:example.com:3478&turnuser=name&turnpass=secret
+    function iceServers(q) {
+        const servers = [
+            {urls: ["stun:stun.l.google.com:19302", "stun:stun.cloudflare.com:3478"]},
+            {urls: ["turn:eu-0.turn.peerjs.com:3478", "turn:us-0.turn.peerjs.com:3478"], username: "peerjs", credential: "peerjsp"},
+            {
+                urls: ["turn:openrelay.metered.ca:80", "turn:openrelay.metered.ca:443?transport=tcp", "turns:openrelay.metered.ca:443?transport=tcp"],
+                username: "openrelayproject", credential: "openrelayproject",
+            },
+        ];
+        if (q.get("turn")) servers.unshift({urls: q.get("turn").split(","), username: q.get("turnuser") || "", credential: q.get("turnpass") || ""});
+        return servers;
+    }
+
     function peerOptions() {
         // ?peerhost=192.168.1.10&peerport=9000 uses your own PeerJS server,
         // e.g. one running on your local network. Default: the free PeerJS cloud.
         const q = new URLSearchParams(location.search);
+        const options = {debug: 1, config: {iceServers: iceServers(q)}};
         const host = q.get("peerhost");
-        if (!host) return {debug: 1};
-        return {
+        if (!host) return options;
+        return Object.assign(options, {
             host,
             port: Number(q.get("peerport") || 9000),
             path: q.get("peerpath") || "/",
             secure: q.get("peersecure") === "1",
-            debug: 1,
-        };
+        });
     }
 
     function makeCode() {
@@ -129,6 +148,6 @@
         setTimeout(() => div.remove(), 7300);
     }
 
-    Object.assign(O, {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
+    Object.assign(O, {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
     Object.assign(O, {engine, peerOptions, makeCode, cleanName, round, status, banner, pingMeter, safeHtml, addLog});
 })();

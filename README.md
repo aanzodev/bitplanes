@@ -166,6 +166,13 @@ under 160 ms, red above. The host's browser runs the activity, so the host shoul
 connection. Each guest flies their own plane in their own browser, so turning,
 thrust and bullets react instantly; the host decides hits and deaths. If the host closes the page the room ends.
 
+**Stuck on "Connecting to the host…"?** After 20 seconds the join stops and
+says why. Usually the network blocks player-to-player connections (common on
+school and office Wi-Fi). The activity then tries free relay servers, including
+some on port 443, but those can be blocked or busy too. Put both computers on
+the same Wi-Fi or a phone hotspot and join again. You can also use your own
+relay (TURN) server: `?turn=turn:example.com:3478&turnuser=name&turnpass=secret`.
+
 Players connect directly to each other (WebRTC via [PeerJS](https://peerjs.com)).
 The free PeerJS cloud server is only used to find each other. To use your own
 server instead (for example on a local network), run a
