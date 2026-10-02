@@ -171,7 +171,7 @@ BitModules[14] = function (M, j, t) {
                         j
                     );
                 })(j);
-                // F-22: smart missiles lock on fast, turn hard and resist flares.
+                // F-22: smart missiles lock on fast and turn hard (flares still fool them).
                 t.smart = !!j.smartMissiles;
                 (j.timeout(L.n, () => (t.justDeployed = !1)),
                     (function (M, j) {
@@ -204,7 +204,7 @@ BitModules[14] = function (M, j, t) {
                                         if (I instanceof u.a) {
                                             if (I === j.source) continue;
                                             // Burning flares hide the plane and lure the missile to them.
-                                            if (I.flareUntil > performance.now() && !j.smart) {
+                                            if (I.flareUntil > performance.now()) {
                                                 Object(N.q)(j.position, I.position) < 700 && (j.flared = !0);
                                                 continue;
                                             }
@@ -308,8 +308,6 @@ BitModules[14] = function (M, j, t) {
             t instanceof I.a &&
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
-                // Smart (F-22) missiles see through flares 60% of the time.
-                !(t.smart && Math.random() < 0.6) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
         // Release 8 flares in quick pairs. Like a real jet they are shot out
         // below and behind the plane in a fan, then arc down trailing smoke.

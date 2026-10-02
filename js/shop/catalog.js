@@ -6,7 +6,7 @@
 // skin: "" (biplane), "prop" (WWII fighter), "jet" or "bomber" (flying wing).
 // special: shown with a black border in the Hangar.
 // exclusive: shown with a gold border in the Hangar.
-// smartMissiles: missiles lock on fast, turn hard and often ignore flares.
+// smartMissiles: missiles lock on fast and turn hard (flares still fool them).
 // Computer pilots fly the regular planes plus special ones marked bots: true.
 window.BitCatalog = {
     planes: [

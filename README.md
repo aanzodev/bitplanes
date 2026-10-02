@@ -96,7 +96,7 @@ paint patterns, and bots in jets drop flares when a missile closes in.
 
 The F-22's **smart missiles** lock on as soon as they launch (any direction,
 twice the range), fly faster, turn harder, aim ahead of the target, explode
-when they pass close by and see through flares 60% of the time.
+when they pass close by. Flares still fool them, like any other missile.
 
 ◆ Exclusive planes have a gold border in the Hangar.
 
