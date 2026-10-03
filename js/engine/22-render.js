@@ -332,6 +332,10 @@ BitModules[22] = function (M, j, t) {
             }
             for (let t of M.bullets) {
                 for (let L of M.bodies)
+                    // Your own bullets never hit you or your missiles. (Online, a guest's
+                    // plane can jump forward into its fresh bullets when the connection lags.)
+                    L !== t.source &&
+                    !(L instanceof u.a && L.source === t.source) &&
                     x(t, L) &&
                         (L instanceof e.a &&
                             ((L.life -= 1),
