@@ -4,7 +4,10 @@
     const O = window.BitOnline;
     const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, KEYS, engine, newPeer, errorText, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
 
-    const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {}};
+    const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {},
+        lates: [], delay: RENDER_DELAY_MS};
+    const MAX_DELAY_MS = 260; // never draw more than this far in the past
+    const EXTRAPOLATE_MS = 120; // keep things moving this long when a snapshot is late
 
     function join(code) {
         if (O.role) return;
@@ -155,7 +158,7 @@
 
     // The host time the guest is currently drawing.
     function renderTime() {
-        return performance.now() - (guest.offset || 0) - RENDER_DELAY_MS;
+        return performance.now() - (guest.offset || 0) - guest.delay;
     }
 
     // Called by the render loop every frame: place every object where it was
@@ -172,8 +175,18 @@
             if (!h || !h.length) continue;
             let x, y, a;
             if (t <= h[0][0]) [, x, y, a] = h[0];
-            else if (t >= h[h.length - 1][0]) [, x, y, a] = h[h.length - 1];
-            else {
+            else if (t >= h[h.length - 1][0]) {
+                // The next snapshot is late: keep moving the way it was going for a
+                // moment instead of freezing, then hold still.
+                const [t1, x1, y1, a1] = h[h.length - 1];
+                const prev = h[h.length - 2];
+                if (prev && t1 > prev[0] && !o.goneAt) {
+                    const k = Math.min(t - t1, EXTRAPOLATE_MS) / (t1 - prev[0]);
+                    x = x1 + (x1 - prev[1]) * k;
+                    y = y1 + (y1 - prev[2]) * k;
+                    a = lerpAngle(prev[3], a1, 1 + k);
+                } else [x, y, a] = [x1, y1, a1];
+            } else {
                 let i = h.length - 2;
                 while (i > 0 && h[i][0] > t) i--;
                 const [t0, x0, y0, a0] = h[i], [t1, x1, y1, a1] = h[i + 1];
@@ -196,6 +209,21 @@
         guest.offsets.push(now - ts);
         if (guest.offsets.length > 90) guest.offsets.shift();
         guest.offset = Math.min(...guest.offsets);
+        adaptDelay(now - ts - guest.offset);
+    }
+
+    // How far in the past to draw: just enough that the next snapshot has
+    // (almost always) arrived. Smooth connections get a short delay (snappy),
+    // bumpy ones (busy Wi-Fi, the relay server) a longer one (no stutter).
+    function adaptDelay(late) {
+        guest.lates.push(late);
+        if (guest.lates.length > 90) guest.lates.shift();
+        if (guest.lates.length < 10) return;
+        const sorted = guest.lates.slice().sort((a, b) => a - b);
+        const p95 = sorted[Math.floor(sorted.length * 0.95)];
+        const target = Math.max(RENDER_DELAY_MS, Math.min(MAX_DELAY_MS, p95 + SNAPSHOT_MS + 10));
+        // Grow fast (stop stutter now), shrink slowly (don't jump around).
+        guest.delay += (target - guest.delay) * (target > guest.delay ? 0.25 : 0.02);
     }
 
     function createObject(world, [id, cls, look, radius]) {
@@ -286,7 +314,7 @@
             e.cockpit(plane);
         }
         // Particles are delayed like everything else so they line up with the planes.
-        if (msg.fx && msg.fx.length) setTimeout(() => msg.fx.forEach(p => spawnParticle(world, p)), RENDER_DELAY_MS);
+        if (msg.fx && msg.fx.length) setTimeout(() => msg.fx.forEach(p => spawnParticle(world, p)), guest.delay);
     }
 
     function bindGuestKeys() {

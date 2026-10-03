@@ -10,13 +10,21 @@
 //                     {op: "up", d}          guest -> host
 //                     {op: "kick", to}       host drops a guest
 //                     {op: "bye"}            host closes the room on purpose
-//   server -> client  {op: "hosted"}         room is open
+//   server -> client  {op: "hello", v}       on connect: server version (2 = light format below)
+//                     {op: "hosted"}         room is open
 //                     {op: "joined"}         joined the room
 //                     {op: "conn", from}     (host) a guest joined
 //                     {op: "data", from, d}  a message (from = guest id for the host)
 //                     {op: "gone", from}     (host) a guest left
 //                     {op: "closed"}         (guest) the host left
 //                     {op: "err", type}      "unavailable-id" | "peer-unavailable" | "bad-request" | "full"
+//
+// Activity data uses a lighter format the server forwards without decoding
+// (much less work for a small free server):
+//   host  -> server   "T<guestId>\n<json>"   to one guest
+//   guest -> server   "U<json>"               to the host
+//   server -> guest   "D<json>"
+//   server -> host    "D<guestId>\n<json>"
 const http = require("http");
 const {WebSocketServer} = require("ws");
 
@@ -45,6 +53,20 @@ function closeRoom(id) {
 }
 
 function onMessage(ws, text) {
+    // Fast path: forward activity data as is.
+    const kind = text[0];
+    if (kind === "T" || kind === "U") {
+        const room = ws.room && rooms.get(ws.room);
+        if (!room) return;
+        if (kind === "T" && ws.isHost) {
+            const nl = text.indexOf("\n");
+            const g = nl > 0 && room.guests.get(text.slice(1, nl));
+            if (g && g.readyState === g.OPEN) g.send("D" + text.slice(nl + 1));
+        } else if (kind === "U" && !ws.isHost && room.host && room.host.readyState === room.host.OPEN) {
+            room.host.send("D" + ws.gid + "\n" + text.slice(1));
+        }
+        return;
+    }
     let msg;
     try {
         msg = JSON.parse(text);
@@ -125,6 +147,8 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({server, maxPayload: 512 * 1024});
 wss.on("connection", ws => {
+    // Tells browsers this server understands the light "T"/"U" data format.
+    send(ws, {op: "hello", v: 2});
     ws.alive = true;
     ws.on("pong", () => (ws.alive = true));
     ws.on("message", data => onMessage(ws, data.toString()));

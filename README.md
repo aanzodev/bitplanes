@@ -191,8 +191,11 @@ thrust and bullets react instantly; the host decides hits and deaths. If the hos
 **Playing on school or office Wi-Fi?** Those networks block direct
 connections between players. Deploy the free relay server in `server/` and put
 its address in `js/online/config.js` (steps in
-[server/README.md](server/README.md)); then everyone connects through it, on
-the same port as normal websites.
+[server/README.md](server/README.md)). Players still try a direct connection
+first (fastest, e.g. on the same home Wi-Fi) and switch to the server after a
+few seconds if the network blocks it. The ping meter says which one you got:
+**Ping · direct** or **Ping · server**. Add `?direct=off` to the page address to
+always use the server.
 
 **Stuck on "Connecting to the host…"?** After 20 seconds the join stops and
 says why. Usually the network blocks player-to-player connections (common on
