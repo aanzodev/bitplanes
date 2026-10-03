@@ -24,6 +24,13 @@ activity, so the server does very little work.
 
 5. Commit. Everyone who loads the activity now goes through the server.
 
+Players connect directly when their network allows it and only use the
+server when it doesn't, so the server is only busy for players who need it.
+
+When you change `server/`, Render redeploys it by itself after the change is
+merged into `main` (a few minutes). Browsers work with both the old and the new
+server in the meantime.
+
 The free plan goes to sleep after about 15 minutes without players. The first
 room after that takes up to a minute while it wakes up (the page says so).
 

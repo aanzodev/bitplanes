@@ -75,10 +75,17 @@
         return q || window.BitOnlineServer || "";
     }
 
-    // A PeerJS peer, or a RelayPeer when a relay server is set. Pass an id to host.
+    // How to connect. Pass an id to host. With a relay server set: direct first,
+    // the server as backup (?direct=off: server only). Without one: direct only.
     function newPeer(id) {
         const url = serverUrl();
-        if (url) return new O.RelayPeer(url, id);
+        const direct = typeof Peer !== "undefined" && new URLSearchParams(location.search).get("direct") !== "off";
+        if (url && direct) return id ? new O.HybridHost(url, id) : new O.HybridGuest(url);
+        if (url) {
+            O.via = "server";
+            return new O.RelayPeer(url, id);
+        }
+        O.via = "direct";
         return id ? new Peer(id, peerOptions()) : new Peer(peerOptions());
     }
 
@@ -120,7 +127,7 @@
         el.innerHTML = rows.map(({name, ms}) => {
             const level = typeof ms !== "number" ? "waiting" : ms < 80 ? "good" : ms < 160 ? "ok" : "bad";
             const label = typeof ms !== "number" ? "…" : Math.round(ms) + " ms";
-            const who = name ? cleanName(name) : "Ping";
+            const who = name ? cleanName(name) : "Ping" + (O.via ? " · " + O.via : "");
             return `<span class="ping ${level}" title="Round trip time${name ? " to " + who : " to the host"}">` +
                 `<i class="bars"><i></i><i></i><i></i></i> ${who} <b>${label}</b></span>`;
         }).join("");
