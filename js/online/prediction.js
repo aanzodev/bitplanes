@@ -116,9 +116,10 @@
         p.hostId = 0;
     }
 
-    // Called every frame by the guest's render loop.
+    // Called every frame by the guest's render loop. Returns how far we are
+    // between the last physics step and the next (0..1), for smooth drawing.
     function step() {
-        if (!p.sim) return;
+        if (!p.sim) return 1;
         const e = engine(), now = performance.now();
         p.acc += Math.min(0.1, (now - p.last) / 1000);
         p.last = now;
@@ -143,13 +144,14 @@
         const plane = flying();
         if (wasFlying && !plane) report(wasFlying); // crashed locally: tell the host where
         else if (plane && now - p.sentAt >= SNAPSHOT_MS - 4) report(plane);
+        return p.acc / STEP;
     }
 
     function report(plane) {
         p.sentAt = performance.now();
         const r = v => Math.round(v * 100) / 100;
         p.send({t: "st", s: [p.hostId, r(plane.position.x), r(plane.position.y), r(plane.velocity.x), r(plane.velocity.y),
-            r(plane.angle), r(plane.thrust), plane.elevator, plane.landed ? 1 : 0]});
+            r(plane.angle), r(plane.thrust), plane.elevator, plane.landed ? 1 : 0, Math.round(p.sentAt * 10) / 10]});
     }
 
     O.prediction = {start, sync, step, setInput, plane: flying};

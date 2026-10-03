@@ -2,7 +2,7 @@
 // drives them with the guests' key presses and sends out snapshots.
 (function () {
     const O = window.BitOnline;
-    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, newPeer, errorText, makeCode, cleanName, round, status, banner, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
+    const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, newPeer, errorText, makeTimeline, makeCode, cleanName, round, status, banner, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
 
     const host = {peer: null, code: null, world: null, clients: new Map(), pending: [], nextId: 1, fx: new Set()};
 
@@ -59,6 +59,7 @@
         indexSprites();
         host.world = world;
         host.local = localPlayer;
+        world.onStep = placeGuestPlanes;
 
         const add = world.particles.add.bind(world.particles);
         // Remember new particles; they are sent (in their current state) with the next snapshot.
@@ -242,19 +243,78 @@
     // Mirrors the keyboard controls, but driven by the guest's key presses.
     // The guest flies its own plane and reports where it is; copy that onto
     // our plane. Hits, damage and crashes are still worked out here.
+    // A guest reports where its plane is. Older guests (no timestamp) are placed
+    // right away; newer ones are played back smoothly by placeGuestPlanes(), a
+    // little in the past, so their plane doesn't jump back and forth when
+    // reports arrive unevenly.
     function applyGuestPlane(client, s) {
         const plane = client.player.hasPlane(), world = host.world;
-        const [id, x, y, vx, vy, a, thrust, elevator, landed] = s.map(Number);
+        const [id, x, y, vx, vy, a, thrust, elevator, landed, ts] = s.map(Number);
         if (!plane || plane.netId !== id || ![x, y, vx, vy, a, thrust].every(Number.isFinite)) return;
         const max = plane.maxThrust || engine().consts.k;
+        const pos = {x: Math.min(world.width, Math.max(0, x)), y: Math.min(world.ground, Math.max(-5000, y))};
         plane.remoteDriven = true;
-        plane.previous = plane.position;
-        plane.position = {x: Math.min(world.width, Math.max(0, x)), y: Math.min(world.ground, Math.max(-5000, y))};
-        plane.velocity = {x: vx, y: vy};
-        plane.angle = a;
         plane.thrust = Math.min(max, Math.max(0, thrust));
         plane.elevator = Math.sign(elevator) || 0;
         plane.landed = !!landed;
+        if (!Number.isFinite(ts)) {
+            plane.previous = plane.position;
+            plane.position = pos;
+            plane.velocity = {x: vx, y: vy};
+            plane.angle = a;
+            return;
+        }
+        if (!client.track || client.track.planeId !== id) {
+            client.track = [];
+            client.track.planeId = id;
+            client.timeline = makeTimeline();
+            plane.position = plane.previous = pos;
+            plane.angle = a;
+        }
+        client.timeline.add(ts, performance.now());
+        client.track.push([ts, pos.x, pos.y, vx, vy, a]);
+        if (client.track.length > 20) client.track.shift();
+    }
+
+    function lerpAngle(a, b, t) {
+        const d = ((b - a + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
+        return a + d * t;
+    }
+
+    // Every frame: put each guest's plane where it was at the playback time.
+    function placeGuestPlanes() {
+        const now = performance.now();
+        for (const client of host.clients.values()) {
+            const h = client.track, plane = client.player && client.player.hasPlane();
+            if (!h || !h.length || !plane || plane.netId !== h.planeId) continue;
+            const t = client.timeline.time(now);
+            let x, y, vx, vy, a;
+            if (t <= h[0][0]) [, x, y, vx, vy, a] = h[0];
+            else if (t >= h[h.length - 1][0]) {
+                // Late report: keep going the way it was flying for a moment.
+                const [t1, x1, y1, vx1, vy1, a1] = h[h.length - 1];
+                const prev = h[h.length - 2];
+                const k = prev && t1 > prev[0] ? Math.min(t - t1, 60) / (t1 - prev[0]) : 0;
+                x = prev ? x1 + (x1 - prev[1]) * k : x1;
+                y = prev ? y1 + (y1 - prev[2]) * k : y1;
+                [vx, vy, a] = [vx1, vy1, a1];
+            } else {
+                let i = h.length - 2;
+                while (i > 0 && h[i][0] > t) i--;
+                const [t0, x0, y0, vx0, vy0, a0] = h[i], [t1, x1, y1, vx1, vy1, a1] = h[i + 1];
+                const k = t1 > t0 ? (t - t0) / (t1 - t0) : 1;
+                // Don't blend across the world's edge (wrap-around).
+                const wrap = Math.abs(x1 - x0) > host.world.width / 2;
+                x = wrap ? (k < 0.5 ? x0 : x1) : x0 + (x1 - x0) * k;
+                y = y0 + (y1 - y0) * k;
+                vx = vx0 + (vx1 - vx0) * k;
+                vy = vy0 + (vy1 - vy0) * k;
+                a = lerpAngle(a0, a1, k);
+            }
+            plane.position = plane.previous = {x, y};
+            plane.velocity = {x: vx, y: vy};
+            plane.angle = a;
+        }
     }
 
     function startRemoteControl(world, player, client) {

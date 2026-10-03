@@ -95,6 +95,36 @@
         return "Couldn't connect (" + type + "). Check your internet connection and try again.";
     }
 
+    // Plays back timestamped updates from another computer smoothly: estimates
+    // the clock difference, picks a delay that covers the usual lateness, and
+    // runs a clock that never steps backwards. Hosts use it for the planes
+    // guests fly (guest.js has the same logic for snapshots).
+    function makeTimeline(minDelay = 50, maxDelay = 250, interval = SNAPSHOT_MS) {
+        const tl = {offsets: [], lates: [], offset: 0, delay: minDelay, clock: undefined, clockAt: 0};
+        tl.add = (ts, now) => {
+            tl.offsets.push(now - ts);
+            if (tl.offsets.length > 90) tl.offsets.shift();
+            tl.offset = Math.min(...tl.offsets);
+            tl.lates.push(now - ts - tl.offset);
+            if (tl.lates.length > 90) tl.lates.shift();
+            if (tl.lates.length < 10) return;
+            const sorted = tl.lates.slice().sort((a, b) => a - b);
+            const target = Math.max(minDelay, Math.min(maxDelay, sorted[Math.floor(sorted.length * 0.95)] + interval + 10));
+            tl.delay += (target - tl.delay) * (target > tl.delay ? 0.25 : 0.02);
+        };
+        tl.time = now => {
+            const target = now - tl.offset - tl.delay;
+            if (tl.clock === undefined || Math.abs(target - tl.clock) > 500) tl.clock = target;
+            else {
+                const dt = now - tl.clockAt;
+                tl.clock += dt + Math.max(-dt * 0.5, Math.min(dt * 0.5, (target - tl.clock - dt) * 0.1));
+            }
+            tl.clockAt = now;
+            return tl.clock;
+        };
+        return tl;
+    }
+
     function makeCode() {
         let code = "";
         for (let i = 0; i < 5; i++) code += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
@@ -176,5 +206,5 @@
     }
 
     Object.assign(O, {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, CODE_CHARS, GUEST_COLORS, KEYS});
-    Object.assign(O, {engine, peerOptions, serverUrl, newPeer, errorText, makeCode, cleanName, round, status, banner, pingMeter, safeHtml, addLog});
+    Object.assign(O, {engine, peerOptions, serverUrl, newPeer, errorText, makeTimeline, makeCode, cleanName, round, status, banner, pingMeter, safeHtml, addLog});
 })();
