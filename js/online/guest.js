@@ -7,7 +7,7 @@
     const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {},
         lates: [], delay: RENDER_DELAY_MS};
     const MAX_DELAY_MS = 260; // never draw more than this far in the past
-    const EXTRAPOLATE_MS = 120; // keep things moving this long when a snapshot is late
+    const EXTRAPOLATE_MS = 60; // keep things moving this long when a snapshot is late
 
     function join(code) {
         if (O.role) return;
@@ -156,9 +156,22 @@
         return a + d * t;
     }
 
-    // The host time the guest is currently drawing.
+    // The host time the guest is currently drawing. It runs with the real clock
+    // and is only nudged gently toward its target, so it never steps backwards
+    // (which made everything twitch back and forth) when the clock estimate or
+    // the delay changes.
     function renderTime() {
-        return performance.now() - (guest.offset || 0) - guest.delay;
+        const now = performance.now();
+        const target = now - (guest.offset || 0) - guest.delay;
+        if (guest.clock === undefined || Math.abs(target - guest.clock) > 500) guest.clock = target;
+        else {
+            const dt = now - guest.clockAt;
+            const drift = target - (guest.clock + dt);
+            // Run between half and one and a half times real speed while catching up.
+            guest.clock += dt + Math.max(-dt * 0.5, Math.min(dt * 0.5, drift * 0.1));
+        }
+        guest.clockAt = now;
+        return guest.clock;
     }
 
     // Called by the render loop every frame: place every object where it was
@@ -199,8 +212,10 @@
             o.previous = o.position;
             o.angle = a;
         }
-        O.prediction.step();
-        return 1;
+        // Our own plane: blend between its last two physics steps so it moves
+        // evenly even when frames take uneven time (others are already placed).
+        guest.alpha = O.prediction.step();
+        return guest.alpha;
     }
 
     // Estimate (local clock - host clock) as the smallest recent difference,

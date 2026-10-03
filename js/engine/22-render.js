@@ -492,6 +492,8 @@ BitModules[22] = function (M, j, t) {
             let n = (A - g) / 1e3;
             for (n > 0.1 && (n = 0.1), g = A, I += n, t.remote || Object(L.c)(t, n); I >= y;)
                 (t.remote || O(t, y), (I -= y));
+            // Online hosts place the planes guests fly here (smooth playback).
+            t.onStep && t.onStep();
             return (Object(N.g)(t, y), n);
         }
         // Lets the activity keep running while the window is covered or hidden and
