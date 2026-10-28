@@ -165,7 +165,19 @@
                     : `Claimed today. Streak: ${st.streak} days (best ${st.best}). Come back tomorrow!`, "dim");
             },
         },
-        unlockall: {help: "Own every plane, max every upgrade", run: () => print(shop().unlockAll(), "ok")},
+        unlockall: {help: "Own every plane and skin, max every upgrade",
+            run: () => (window.BitSkins && window.BitSkins.unlockAll(), print(shop().unlockAll() + " (and every skin)", "ok"))},
+        skin: {
+            args: "<skin>", help: "Wear a skin you own (skins: list them)",
+            run(a) {
+                const S = window.BitSkins, q = String(a[0] || "").toLowerCase().replace(/[^a-z]/g, "");
+                const list = S.list.map(s => `${s.id}${S.state().owned.includes(s.id) ? " ✓" : ""}`).join(", ");
+                const s = S.list.find(x => x.id === q || x.name.toLowerCase().replace(/[^a-z]/g, "") === q);
+                if (!s) throw new Error("Skins: " + list);
+                if (!S.equip(s.id)) throw new Error(`You don't own ${s.name} yet (${s.price.toLocaleString()} coins in the Skins tab).`);
+                print(`Wearing ${s.name}.`, "ok");
+            },
+        },
         reset: {help: "Reset coins, planes and upgrades", run: () => print(shop().resetShop(), "ok")},
         heal: {
             help: "Repair your plane (single player)",

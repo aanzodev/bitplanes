@@ -164,6 +164,15 @@
         save();
     }
 
+    // Pay for something else (skins). False if there aren't enough coins.
+    function spend(amount) {
+        amount = Math.floor(Number(amount) || 0);
+        if (amount < 0 || state.coins < amount) return false;
+        state.coins -= amount;
+        save();
+        return true;
+    }
+
     function selectPlane(id) {
         if (!state.owned.includes(id)) return;
         state.selected = id;
@@ -242,7 +251,7 @@
     }
 
     window.BitShop = {
-        apply, reward, onKill, loadout, addCoins, setCoins,
+        apply, reward, onKill, loadout, addCoins, setCoins, spend,
         buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, setPattern, patternOf, level, upgradeCost, give, unlockAll, resetShop,
         planes: PLANES,
         upgrades: UPGRADES,

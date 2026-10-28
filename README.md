@@ -17,6 +17,27 @@ python3 -m http.server 8000
 
 It also works on GitHub Pages as is. There is no build step.
 
+### The lobby
+
+The start screen is a lobby, with the bots dogfighting behind it:
+
+- **Top bar:** Play · **Stats** · **Hangar** (planes, paint, upgrades) ·
+  **Skins** (pilot characters) · **Quests** (3 daily quests with coin
+  rewards; a yellow dot means one is ready to claim).
+- **Top right:** your coins (1.5K, 100K, 2.5M…) and your pilot's face.
+- **Middle:** your pilot on the pad. Click your name above them to change it.
+  The chip under the pad shows your plane (click for the Hangar).
+- **Bottom left:** the mode (Death match or Multiplayer; click to switch) and
+  **PLAY**. "Play with friends" hosts or joins a private room with a code.
+- **Bottom right:** **Controls** and **Servers** (Multiplayer server browser).
+
+While flying, a timer sits in the bottom left: the match countdown in
+Multiplayer, your time in the air otherwise.
+
+**Skins:** 11 pilots from Common to Legendary: Rookie (free), Ace, Red Baron,
+Night Owl, Arctic Fox, Desert Hawk, Moo Pilot, Top Gun, Neon Rider, Stealth
+and Golden Ace (25,000 coins).
+
 ### One-line version (loads from GitHub)
 
 `play.html` is a single line that runs the newest activity from this GitHub repo
@@ -159,6 +180,7 @@ themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</k
 | `unlockall`, `reset` | Own everything / start over |
 | `heal`, `refill`, `god` | Repair, reload, bullets can't shoot you down (single player) |
 | `match [skip]` | Multiplayer phase and time left / skip to the next phase (host) |
+| `skin <skin>` | Wear a skin you own (lists skins if not found) |
 | `stats`, `daily [reset]` | Your stats / daily reward status (reset: claim again) |
 | `maps`, `map <map>` | List maps / switch map now (single player) |
 | `weather <type>` | Change the weather now: clear, rain, fog, storm (single player) |
@@ -255,6 +277,9 @@ js/
   health.js             Your plane's health bar
   daily.js              Daily reward
   stats.js              Lifetime stats and the Stats page
+  quests.js             Daily quests
+  skins.js              Pilot skins (drawn in code) and the Skins tab
+  menu.js               The lobby: pilot, coins, mode card, pop-ups
   console.js            Built-in console (Ctrl+Shift+K)
   maps.js               Maps (random each activity)
   weather.js            Rain, snow, fog, sandstorms and thunderstorms
