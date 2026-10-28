@@ -1,115 +1,477 @@
-/* Start screen. */
+/* Lobby (start screen): the bots fly behind, your plane on its pad in the
+   middle, tabs on top, mode + PLAY bottom left, Controls / Servers bottom right. */
 
-main .welcome {
+main .lobby {
+    box-sizing: border-box; /* children inherit: widths include padding */
+    position: fixed;
+    inset: 0;
     overflow: hidden;
-    position: relative;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 40px 50px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(20, 70, 110, 0.18);
-}
-
-main .tagline {
-    margin: -12px 0 24px;
-    text-align: center;
-    color: #5b6b7a;
-    font-size: 15px;
-}
-
-main .logo {
-    display: inline-block;
-    width: 36px;
-    height: 22px;
-    background-size: contain;
-    background: url(../assets/icons/logo.svg) no-repeat;
-}
-
-main h1 {
+    color: #fff;
+    background: #0d2a4a;
     font-weight: 800;
-    font-size: 48px;
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-main h2 {
-    font-weight: 800;
-    font-size: 38px;
-}
-
-main form {
-    margin-top: 20px;
-}
-
-main input[type="text"] {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 20px;
-    outline: none;
-    padding: 5px;
-    border-radius: 5px;
-    border: none;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-}
-
-main input[type="text"]:focus {
-    transform: translateY(-5px);
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-}
-
-main .activity-modes {
-    font-size: 20px;
-}
-
-main .activity-modes input {
-    margin-right: 10px;
-}
-
-main form .action {
-    margin-top: 20px;
 }
 
 main .demo {
-    margin-top: 40px;
-}
-
-main .stats {
-    margin-top: 40px;
-}
-
-main em {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-weight: 700;
-    font-size: 14px;
-    font-style: normal;
-}
-
-main .demo {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: 300px;
+    height: 100%;
 }
 
-@media only screen and (max-width: 500px) {
-    body {
-        width: 100%;
-        min-height: 100vh;
+.lobby-shade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 50% 55%, rgba(10, 30, 60, 0) 30%, rgba(5, 15, 35, 0.55) 100%),
+        linear-gradient(180deg, rgba(5, 15, 35, 0.55) 0%, rgba(5, 15, 35, 0) 22%, rgba(5, 15, 35, 0) 70%, rgba(5, 15, 35, 0.6) 100%);
+}
+
+/* Top bar */
+.lobby-nav {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 10px;
+    background: rgba(10, 20, 40, 0.65);
+}
+
+.lobby-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px 0 6px;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.lobby-logo .logo {
+    display: inline-block;
+    width: 30px;
+    height: 18px;
+    background: url(../assets/icons/logo.svg) no-repeat center / contain;
+}
+
+.nav-tab {
+    position: relative;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 7px;
+    background: none;
+    color: #dfe9f5;
+    font: inherit;
+    font-size: 17px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
+
+.nav-tab:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-tab.active {
+    background: #fff;
+    color: #111;
+}
+
+.nav-dot {
+    position: absolute;
+    top: 8px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffe600;
+}
+
+.nav-dot[hidden] {
+    display: none;
+}
+
+/* Top right: coins and your plane in a circle */
+.lobby-profile {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lobby-coins {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(10, 20, 40, 0.65);
+    font-size: 20px;
+}
+
+.lobby-avatar {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, #6ec6ff, #1d5f9e);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.lobby-avatar::after {
+    content: "";
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #33d17a;
+    border: 2px solid #fff;
+}
+
+/* Middle: name, your plane, its pad */
+.lobby-center {
+    position: absolute;
+    left: 50%;
+    top: 14%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(560px, 90vw);
+}
+
+.lobby-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: text;
+}
+
+.name-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(#ffd84d, #f5a623);
+    color: #333;
+    font-style: normal;
+    font-size: 18px;
+}
+
+.name-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+main .lobby-name input[type="text"] {
+    width: 220px;
+    padding: 0;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    box-shadow: none;
+    color: #fff;
+    font: inherit;
+    font-size: 22px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    outline: none;
+}
+
+main .lobby-name input[type="text"]:hover,
+main .lobby-name input[type="text"]:focus {
+    border-bottom-color: #ffe600;
+}
+
+main .lobby-name input::placeholder {
+    color: #c8d6e5;
+}
+
+.lobby-ready {
+    color: #6dff8f;
+    font-size: 14px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.name-edit {
+    color: #c8d6e5;
+    font-style: normal;
+    font-size: 18px;
+}
+
+.lobby-pad {
+    width: min(420px, 64vw);
+    height: 46px;
+    margin-top: 2vh;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, #e9fbff 0%, #6fe3ff 35%, rgba(60, 170, 255, 0.35) 65%, rgba(60, 170, 255, 0) 72%);
+    box-shadow: 0 0 40px rgba(111, 227, 255, 0.6);
+}
+
+.badge-special,
+.badge-exclusive {
+    padding: 1px 7px;
+    border-radius: 8px;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.badge-special {
+    background: #000;
+    color: #ffd66b;
+}
+
+.badge-exclusive {
+    background: #d4a017;
+    color: #000;
+}
+
+/* Bottom left: mode card and PLAY */
+.lobby-mode {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    width: 330px;
+    padding: 20px 20px 14px;
+    border-radius: 10px;
+    background: rgba(25, 30, 45, 0.85);
+    text-align: center;
+}
+
+.mode-title {
+    margin: 0 0 14px;
+    font-size: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mode-switch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #d9dde3;
+    color: #111;
+    font: inherit;
+    cursor: pointer;
+}
+
+.mode-switch b {
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.mode-switch small {
+    font-size: 13px;
+    color: #444;
+}
+
+.mode-switch:hover {
+    background: #fff;
+}
+
+.lobby-mode .play-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f7f12a;
+    color: #111;
+    font-size: 40px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 0 #b9b300;
+}
+
+.lobby-mode .play-btn:hover {
+    background: #fffa5c;
+}
+
+.lobby-link {
+    margin-top: 10px;
+    border: none;
+    background: none;
+    color: #9fd3ff;
+    font: inherit;
+    font-size: 14px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.lobby-mode .online-status {
+    margin: 6px 0 0;
+    color: #dfe9f5;
+    font-size: 13px;
+}
+
+.lobby-mode .online-status:empty {
+    display: none;
+}
+
+/* Bottom right: Controls and Servers */
+.lobby-corner {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    display: flex;
+    gap: 10px;
+}
+
+.pill {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 24px;
+    background: rgba(220, 225, 232, 0.92);
+    color: #222;
+    font: inherit;
+    font-size: 18px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.pill:hover {
+    background: #fff;
+}
+
+/* Pop-ups opened from the lobby are normal light panels */
+main .panel-backdrop {
+    color: #111;
+    font-weight: 700;
+}
+
+.friends .online-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.controls-list td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+}
+
+.controls-list td:first-child {
+    white-space: nowrap;
+}
+
+@media only screen and (max-width: 760px) {
+    .lobby-logo {
+        display: none;
     }
 
-    main .welcome {
-        margin: 10px;
-        padding: 24px 18px;
+    .nav-tab {
+        padding: 8px 9px;
+        font-size: 14px;
     }
 
-    main h1 {
-        font-size: 38px;
+    .lobby-profile {
+        top: 70px;
     }
 
-    main .demo {
-        width: 100%;
-        height: 180px;
-        position: static;
-        margin-top: 24px;
+    .lobby-center {
+        top: 20%;
     }
+
+    .lobby-mode {
+        left: 10px;
+        right: 10px;
+        bottom: 70px;
+        width: auto;
+    }
+
+    .lobby-corner {
+        left: 10px;
+        right: 10px;
+        bottom: 12px;
+        justify-content: center;
+    }
+}
+
+/* Your pilot on the pad (replaces the plane) */
+.lobby-hero {
+    margin-top: 1vh;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transform-origin: 50% 100%;
+    animation: lobby-idle 3.6s ease-in-out infinite;
+}
+
+.lobby-hero img {
+    height: min(46vh, 420px);
+    width: auto;
+    aspect-ratio: 120 / 220;
+    filter: drop-shadow(0 14px 14px rgba(0, 0, 0, 0.45));
+}
+
+@keyframes lobby-idle {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1.012, 0.988); }
+}
+
+.lobby-center .lobby-pad {
+    margin-top: -3.5vh;
+    position: relative;
+    z-index: -1;
+}
+
+.lobby-hero-name {
+    margin-top: 8px;
+    font-size: 22px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.badge-rarity {
+    padding: 2px 8px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.lobby-plane-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 4px 12px 4px 6px;
+    border: none;
+    border-radius: 16px;
+    background: rgba(10, 20, 40, 0.65);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.lobby-plane-chip img {
+    width: 42px;
+    height: 26px;
+}
+
+.lobby-plane-chip:hover {
+    background: rgba(10, 20, 40, 0.85);
+}
+
+.lobby-avatar img {
+    width: 56px;
+    height: 56px;
+    margin: -1px 0 0 -1px;
 }

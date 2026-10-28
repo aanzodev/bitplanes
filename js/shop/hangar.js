@@ -86,7 +86,9 @@
 
     function render() {
         const state = shop.state();
-        document.querySelectorAll(".coin-count").forEach(el => el.textContent = state.coins.toLocaleString());
+        // Full number in the Hangar; short (2.5M) in the in-flight display.
+        document.querySelectorAll(".coin-count").forEach(el => el.textContent =
+            el.closest(".ui") && window.BitMenu ? window.BitMenu.short(state.coins) : state.coins.toLocaleString());
         const planes = document.querySelector(".shop-planes");
         if (planes) planes.innerHTML = shop.planes.map(p => planeCard(p, state)).join("");
         const paint = document.querySelector(".shop-paint");
@@ -97,12 +99,13 @@
 
     function init() {
         const panel = document.querySelector(".shop");
-        const open = document.querySelector(".open-shop");
-        const close = document.querySelector(".close-shop");
-        if (open && panel) open.addEventListener("click", () => {
+        // Several buttons open the Hangar (lobby tab, your plane, your profile).
+        const opens = document.querySelectorAll(".open-shop");
+        const close = panel && panel.querySelector(".close-shop");
+        if (panel) opens.forEach(open => open.addEventListener("click", () => {
             render();
             panel.hidden = false;
-        });
+        }));
         if (close && panel) close.addEventListener("click", () => panel.hidden = true);
         if (panel) panel.addEventListener("click", e => {
             if (e.target === panel) return panel.hidden = true;

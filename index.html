@@ -17,66 +17,100 @@
 </head>
 <body>
 <main>
-    <section class="welcome">
-        <h1>
-            <i class="logo"></i>
-            Bit Planes
-            <i class="logo"></i>
-        </h1>
-        <p class="tagline">Dogfight biplanes and jets, earn coins, and fly with friends online.</p>
-        <p>
-            <strong>Controls:</strong><br>
-        </p>
-        <ul>
-            <li>Arrows <kbd>↑</kbd><kbd>↓</kbd> — thrust level.</li>
-            <li>Arrows <kbd>←</kbd><kbd>→</kbd> — elevator controls.</li>
-            <li><kbd>Space</kbd> — fire a gun. <kbd>X</kbd> — deploy a missile.</li>
-            <li><kbd>C</kbd> — catapult / parachute and get new plane at the barn.</li>
-            <li><kbd>Q</kbd> — drop flares to shake off missiles (F-16, A-10 and F-22).</li>
-            <li><kbd>M</kbd> — sound on / off. <kbd>Esc</kbd> — menu: pause, change plane or paint, leave.</li>
-        </ul>
-        <p>Every kill earns <strong>50</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
+    <section class="lobby">
+        <!-- The bots' dogfight flies behind the lobby. -->
+        <canvas class="demo"></canvas>
+        <div class="lobby-shade"></div>
+
+        <nav class="lobby-nav">
+            <span class="lobby-logo"><i class="logo"></i> Bit Planes</span>
+            <button type="button" class="nav-tab active">Play</button>
+            <button type="button" class="nav-tab open-stats">Stats</button>
+            <button type="button" class="nav-tab open-shop">Hangar</button>
+            <button type="button" class="nav-tab open-skins">Skins</button>
+            <button type="button" class="nav-tab open-quests"><i class="nav-dot" hidden></i>Quests</button>
+        </nav>
+
+        <div class="lobby-profile">
+            <span class="lobby-coins" title="Coins"><i class="coin"></i> <span class="coin-short">0</span></span>
+            <button type="button" class="lobby-avatar open-skins" title="Your pilot (Skins)"><img alt="Your pilot"></button>
+        </div>
 
         <form id="activity">
-            <label>
-                <input type="text" name="nickname" placeholder="Nickname">
-            </label>
-            <p>
-                <strong>Activity mode:</strong>
-            </p>
-            <div class="activity-modes">
-                <div>
-                    <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked autofocus> Death match</label>
-                </div>
-                <div>
-                    <label title="Play with real people online: 10 minute matches, top 5 leaderboard."><input type="radio" name="mode" value="multiplayer"> Multiplayer <small>(real players online)</small></label>
+            <div class="lobby-center">
+                <label class="lobby-name" title="Click to change your name">
+                    <i class="name-badge">✈</i>
+                    <span class="name-text">
+                        <input type="text" name="nickname" placeholder="Your name" maxlength="16" autocomplete="off" spellcheck="false">
+                        <small class="lobby-ready">Ready</small>
+                    </span>
+                    <i class="name-edit" aria-hidden="true">✎</i>
+                </label>
+                <button type="button" class="lobby-hero open-skins" title="Change your skin"><img alt="Your pilot"></button>
+                <div class="lobby-pad"></div>
+                <div class="lobby-hero-name"></div>
+                <button type="button" class="lobby-plane-chip open-shop" title="Change your plane in the Hangar"><img alt=""><span></span></button>
+            </div>
+
+            <div class="lobby-mode">
+                <h2 class="mode-title">Death match</h2>
+                <button type="button" class="mode-switch" title="Change mode">
+                    <b>Mode: <span class="mode-name">Death match</span> ▸</b>
+                    <small class="mode-desc">Everyone against everyone</small>
+                </button>
+                <button class="btn play-btn">Play</button>
+                <button type="button" class="lobby-link open-friends">Play with friends (room code)</button>
+                <p class="online-status"></p>
+                <div class="activity-modes" hidden>
+                    <div>
+                        <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked> Death match</label>
+                    </div>
+                    <div>
+                        <label title="Play with real people online: 10 minute matches, top 5 leaderboard."><input type="radio" name="mode" value="multiplayer"> Multiplayer</label>
+                    </div>
                 </div>
             </div>
-            <div class="action">
-                <button class="btn">‣ Start</button>
-                <button type="button" class="btn shop-open-btn open-shop">Hangar</button>
-                <button type="button" class="btn open-stats">Stats</button>
-                <button type="button" class="btn open-servers" title="Multiplayer servers: pick by ping or find your friends">Servers</button>
-                <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
+
+            <div class="lobby-corner">
+                <button type="button" class="pill open-controls">Controls</button>
+                <button type="button" class="pill open-servers" title="Multiplayer servers: pick by ping or find your friends">Servers</button>
             </div>
-            <div class="online">
-                <p>
-                    <strong>Play online with friends:</strong>
-                </p>
-                <div class="online-row">
-                    <button type="button" class="btn host-activity">Host a room</button>
-                    <span class="online-or">or</span>
-                    <label>
-                        <input type="text" class="room-code" placeholder="Room code" maxlength="5" autocomplete="off" spellcheck="false">
-                    </label>
-                    <button type="button" class="btn join-activity">Join</button>
+
+            <!-- Private rooms with a code -->
+            <div class="friends panel-backdrop" hidden>
+                <div class="panel" role="dialog" aria-label="Play with friends">
+                    <div class="shop-header"><h2>Play with friends</h2><button type="button" class="close-shop close-panel" aria-label="Close">×</button></div>
+                    <p class="shop-note">Host a private room and share its code, or type a friend's code. No [PLAYER] tags or timer here.</p>
+                    <div class="online-row">
+                        <button type="button" class="btn host-activity">Host a room</button>
+                        <span class="online-or">or</span>
+                        <label>
+                            <input type="text" class="room-code" placeholder="Room code" maxlength="5" autocomplete="off" spellcheck="false">
+                        </label>
+                        <button type="button" class="btn join-activity">Join</button>
+                    </div>
                 </div>
-                <p class="online-status">Host a room to get a code, then share it with your friends.</p>
             </div>
         </form>
 
-        <div class="stats"></div>
-        <canvas class="demo"></canvas>
+        <div class="controls-pop panel-backdrop" hidden>
+            <div class="panel" role="dialog" aria-label="Controls">
+                <div class="shop-header"><h2>Controls</h2><button type="button" class="close-shop close-panel" aria-label="Close">×</button></div>
+                <table class="controls-list">
+                    <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Thrust up / down</td></tr>
+                    <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Pitch (elevator)</td></tr>
+                    <tr><td><kbd>Space</kbd></td><td>Fire the gun</td></tr>
+                    <tr><td><kbd>X</kbd></td><td>Fire a missile</td></tr>
+                    <tr><td><kbd>Q</kbd></td><td>Drop flares (jets, B-2, or any plane with the Flare pod)</td></tr>
+                    <tr><td><kbd>C</kbd></td><td>Eject / parachute. Land at the barn for a new plane</td></tr>
+                    <tr><td><kbd>M</kbd></td><td>Sound on / off</td></tr>
+                    <tr><td><kbd>Esc</kbd></td><td>Menu: resume, change plane or paint, leave</td></tr>
+                </table>
+                <p class="shop-note">Every kill earns <strong>50</strong> <i class="coin"></i> coins. Spend them in the Hangar.</p>
+            </div>
+        </div>
+
+        <div class="stats" hidden></div>
     </section>
 
     <div class="shop" hidden>
@@ -162,6 +196,8 @@
 <script src="js/shop/hangar.js"></script>
 <script src="js/stats.js"></script>
 <script src="js/daily.js"></script>
+<script src="js/quests.js"></script>
+<script src="js/skins.js"></script>
 <script src="js/console.js"></script>
 <script src="js/pause.js"></script>
 <script src="js/health.js"></script>
@@ -174,6 +210,7 @@
 <script src="js/online/guest.js"></script>
 <script src="js/online/match.js"></script>
 <script src="js/online/lobby.js"></script>
+<script src="js/menu.js"></script>
 <!-- Activity engine: each file registers a module, boot.js starts the activity -->
 <script src="js/engine/registry.js"></script>
 <script src="js/engine/00-vector.js"></script>

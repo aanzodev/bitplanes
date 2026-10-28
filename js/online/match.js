@@ -443,7 +443,19 @@
 
     function render() {
         const ui = document.querySelector(".ui");
-        const on = !!m.phase && ui && ui.style.display === "block";
+        const playing = !!ui && ui.style.display === "block";
+        // Bottom left timer: Multiplayer counts the match down; other modes
+        // show how long you've been flying.
+        if (playing && !m.phase) {
+            if (!m.localStart) m.localStart = performance.now();
+            const t = Math.floor((performance.now() - m.localStart) / 1000);
+            timerEl.hidden = false;
+            timerEl.classList.remove("ending");
+            timerEl.textContent = `⏱ ${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+            overlayEl.hidden = true;
+            return;
+        }
+        const on = !!m.phase && playing;
         timerEl.hidden = !on || m.phase !== "playing";
         overlayEl.hidden = !on || m.phase === "playing";
         if (!on) return;
