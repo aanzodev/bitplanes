@@ -35,7 +35,7 @@
             <li><kbd>Q</kbd> — drop flares to shake off missiles (F-16, A-10 and F-22).</li>
             <li><kbd>M</kbd> — sound on / off. <kbd>Esc</kbd> — menu: pause, change plane or paint, leave.</li>
         </ul>
-        <p>Every kill earns <strong>10</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
+        <p>Every kill earns <strong>50</strong> <i class="coin"></i> coins. Spend them in the hangar on new planes and upgrades.</p>
 
         <form id="activity">
             <label>
@@ -48,11 +48,15 @@
                 <div>
                     <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked autofocus> Death match</label>
                 </div>
+                <div>
+                    <label title="Play with real people online: 10 minute matches, top 5 leaderboard."><input type="radio" name="mode" value="multiplayer"> Multiplayer <small>(real players online)</small></label>
+                </div>
             </div>
             <div class="action">
                 <button class="btn">‣ Start</button>
                 <button type="button" class="btn shop-open-btn open-shop">Hangar</button>
                 <button type="button" class="btn open-stats">Stats</button>
+                <button type="button" class="btn open-servers" title="Multiplayer servers: pick by ping or find your friends">Servers</button>
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
             </div>
             <div class="online">
@@ -168,6 +172,7 @@
 <script src="js/online/prediction.js"></script>
 <script src="js/online/host.js"></script>
 <script src="js/online/guest.js"></script>
+<script src="js/online/match.js"></script>
 <script src="js/online/lobby.js"></script>
 <!-- Activity engine: each file registers a module, boot.js starts the activity -->
 <script src="js/engine/registry.js"></script>

@@ -51,7 +51,7 @@ back to jsDelivr's copy of `main`.
 
 ## Hangar
 
-Every kill earns **10 coins**. Spend them in the **Hangar** on the start screen.
+Every kill earns **50 coins**. Spend them in the **Hangar** on the start screen.
 
 ![Hangar](docs/screenshots/hangar.png)
 
@@ -158,6 +158,7 @@ themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</k
 | `paint <color>` | Paint your plane (`red`, `blue`, `factory`…) |
 | `unlockall`, `reset` | Own everything / start over |
 | `heal`, `refill`, `god` | Repair, reload, bullets can't shoot you down (single player) |
+| `match [skip]` | Multiplayer phase and time left / skip to the next phase (host) |
 | `stats`, `daily [reset]` | Your stats / daily reward status (reset: claim again) |
 | `maps`, `map <map>` | List maps / switch map now (single player) |
 | `weather <type>` | Change the weather now: clear, rain, fog, storm (single player) |
@@ -178,6 +179,26 @@ Open the browser console (F12) on the activity page:
 | `resetShop()` | Back to 0 coins and the Classic plane |
 
 Or add `?coins=10000` to the page URL to add coins once.
+
+## Multiplayer
+
+Pick **Multiplayer** on the start screen and press **Start**: no room code
+needed. You join the public match with the lowest ping that still has room, or
+start a new one if every match is full. Or press **Servers** to see every
+match (name, map, time left, real players, estimated ping), search for a
+friend's name and join their match.
+
+- Up to **10 real players** per match. Every match always has 10 planes: bots
+  fill the empty spots, each person who joins takes a bot's place, and a bot
+  comes back when someone leaves. A new match only starts when all are full.
+- Real people are tagged **[PLAYER]** and bots **[BOTS]** (Multiplayer only).
+- Matches loop: a **15 second lobby** (everyone parked, new map and weather) →
+  a **10 minute match** with a timer → the **top 5 leaderboard** with everyone's
+  planes → the next lobby.
+- One player's browser runs each match. If they leave, everyone else is moved
+  to another match automatically.
+- Multiplayer needs the relay server (see below). Console: `match`, `match skip`
+  (host only).
 
 ## Online play
 
@@ -251,6 +272,7 @@ js/
     guest.js            Joining a room
     prediction.js       Guests fly their own plane locally (no input lag)
     lobby.js            Host / Join buttons
+    match.js            Multiplayer: matchmaking, server browser, lobby, timer, top 5
     config.js           Address of the relay server (empty = direct connections)
     relay.js            Connecting through the relay server
   engine/               The activity itself, one module per file

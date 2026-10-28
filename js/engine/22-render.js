@@ -489,7 +489,8 @@ BitModules[22] = function (M, j, t) {
         function step() {
             const A = Object(D.g)();
             // Paused (single player menu): freeze the world but keep drawing it.
-            if (window.bitPaused) return ((g = A), 0);
+            // Frozen: Multiplayer's lobby and results screens.
+            if (window.bitPaused || t.frozen) return ((g = A), 0);
             let n = (A - g) / 1e3;
             for (n > 0.1 && (n = 0.1), g = A, I += n, t.remote || Object(L.c)(t, n); I >= y;)
                 (t.remote || O(t, y), (I -= y));

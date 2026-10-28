@@ -13,8 +13,10 @@
             if (joinBtn) joinBtn.disabled = true;
             return;
         }
-        hostBtn && hostBtn.addEventListener("click", O.startHost);
-        joinBtn && joinBtn.addEventListener("click", () => O.join(codeInput.value));
+        // Rooms with friends are private: no Multiplayer tags, timer or lobby.
+        const privateRoom = () => ((O.mode = null), (O.publicRoom = false));
+        hostBtn && hostBtn.addEventListener("click", () => (privateRoom(), O.startHost()));
+        joinBtn && joinBtn.addEventListener("click", () => (privateRoom(), O.join(codeInput.value)));
         codeInput && codeInput.addEventListener("keydown", ev => {
             if (ev.key === "Enter") {
                 ev.preventDefault();

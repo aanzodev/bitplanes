@@ -3,7 +3,7 @@
 // cows) and adds hits, kill streaks, time flown per plane, matches and coins.
 // Online guests count kills and deaths from the host's scoreboard.
 window.BitStats = (function () {
-    const COINS_PER_KILL = 10;
+    const COINS_PER_KILL = 50;
     let el, lastKilled = null, lastDeaths = null, uiShown = false;
 
     // The engine's saved stats object (written to localStorage every second).

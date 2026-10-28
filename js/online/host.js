@@ -20,7 +20,7 @@
         peer.on("waking", () => status("Waking up the online server… (the first room of the day can take up to a minute)"));
         peer.on("open", () => {
             host.code = code;
-            status("Room " + code + " is open.");
+            status(O.mode === "multiplayer" ? "Multiplayer match ready." : "Room " + code + " is open.");
             const dm = document.querySelector('input[name="mode"][value="death-match"]');
             if (dm) dm.checked = true;
             document.getElementById("activity").requestSubmit();
@@ -60,6 +60,7 @@
         host.world = world;
         host.local = localPlayer;
         world.onStep = placeGuestPlanes;
+        O.match && O.match.onHostWorld(world);
 
         const add = world.particles.add.bind(world.particles);
         // Remember new particles; they are sent (in their current state) with the next snapshot.
@@ -109,7 +110,9 @@
 
     function updateHostBanner() {
         const n = [...host.clients.values()].filter(c => c.player).length;
-        banner(`Room code: ${host.code} · ${n} friend${n === 1 ? "" : "s"} connected`);
+        // Multiplayer needs no code: anyone who picks Multiplayer is matched in.
+        if (O.mode === "multiplayer") banner(`🌐 Multiplayer · ${n + 1} real player${n ? "s" : ""}`);
+        else banner(`Room code: ${host.code} · ${n} friend${n === 1 ? "" : "s"} connected`);
     }
 
     function hostLog(html) {
@@ -227,6 +230,7 @@
         player.control(plane);
         world.players.push(player);
         world.add(plane);
+        if (O.mode === "multiplayer" && O.match) O.match.tag(player);
         client.player = player;
         client.control = startRemoteControl(world, player, client);
 
@@ -238,6 +242,8 @@
         });
         updateHostBanner();
         hostLog(`<span class="message">${player.html()} joined</span>`);
+        // Multiplayer: the newcomer takes a bot's place.
+        if (O.mode === "multiplayer" && O.match) O.match.fitBots();
     }
 
     // Mirrors the keyboard controls, but driven by the guest's key presses.
@@ -362,6 +368,8 @@
             const index = world.players.indexOf(player);
             if (index >= 0) world.players.splice(index, 1);
             hostLog(`<span class="message">${player.html()} left</span>`);
+            // Multiplayer: a bot takes the empty spot.
+            if (O.mode === "multiplayer" && O.match) O.match.fitBots();
         }
         updateHostBanner();
     }
@@ -420,9 +428,10 @@
                     mine.flares || 0, mine.maxFlares || 0, mine.landed ? 1 : 0, mine.life, mine.maxLife || consts.h]
                 : null;
             const list = mine ? entries.filter((e, k) => !own(all[k])) : entries;
-            client.conn.send({t: "s", ts: round(performance.now(), 1), o: list, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud});
+            client.conn.send({t: "s", ts: round(performance.now(), 1), o: list, d: defs, k: looks, p: players, fx, me: mine && mine.netId || 0, h: hud,
+                m: O.match ? O.match.wire() : undefined});
         }
     }
 
-    Object.assign(O, {startHost, onWorld, rewardRemote, hostState: host});
+    Object.assign(O, {startHost, onWorld, rewardRemote, hostState: host, hostBroadcast: broadcast, hostLog});
 })();

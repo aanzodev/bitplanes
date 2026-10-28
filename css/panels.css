@@ -173,3 +173,88 @@
         grid-template-columns: repeat(4, 1fr);
     }
 }
+
+/* Multiplayer server browser */
+.srv-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 12px;
+}
+
+.srv-search {
+    flex: 1 1 200px;
+    padding: 6px 10px;
+    font: inherit;
+    font-size: 15px;
+}
+
+.srv-sort {
+    font: inherit;
+    font-size: 15px;
+}
+
+.srv-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.srv-row.full {
+    opacity: 0.55;
+}
+
+.srv-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.srv-main small {
+    color: #666;
+    font-size: 13px;
+}
+
+.srv-names {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.srv-friend {
+    background: #fff1a8;
+    font-weight: 800;
+}
+
+.srv-count,
+.srv-ping {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.srv-count small,
+.srv-ping small {
+    color: #888;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.srv-ping.good { color: #1f9d3a; }
+.srv-ping.ok { color: #c99a00; }
+.srv-ping.bad { color: #c62828; }
+
+@media only screen and (max-width: 560px) {
+    .srv-row {
+        grid-template-columns: 1fr auto auto;
+    }
+
+    .srv-ping {
+        display: none;
+    }
+}

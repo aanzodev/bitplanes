@@ -116,3 +116,121 @@ main input.room-code {
 .ping.bad .bars > i:nth-child(1) { background: #e0453a; }
 
 .ping.waiting { color: #5b6b7a; }
+
+/* Multiplayer: match timer, lobby and top 5 */
+.match-timer {
+    position: absolute;
+    top: 110px; /* below the room code and ping */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 3px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+
+.match-timer.ending {
+    background: rgba(179, 38, 30, 0.8);
+}
+
+.match-timer[hidden],
+.match-overlay[hidden] {
+    display: none;
+}
+
+.match-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+.match-box {
+    min-width: 320px;
+    max-width: 92vw;
+    max-height: 86vh;
+    overflow: auto;
+    padding: 18px 24px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.match-box h2 {
+    margin: 0 0 4px;
+    font-size: 30px;
+}
+
+.match-sub {
+    margin: 4px 0 10px;
+    color: #555;
+    font-size: 15px;
+}
+
+.match-players {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 4px 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+    font-size: 15px;
+}
+
+.tag {
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.tag-player {
+    color: #1f7a2e;
+}
+
+.tag-bots {
+    color: #8a8a8a;
+}
+
+.match-top {
+    margin: 6px auto 4px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.match-top td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.match-top tr.first {
+    background: #fff7e0;
+}
+
+.match-top .rank {
+    font-size: 22px;
+    text-align: center;
+}
+
+.match-top img {
+    width: 64px;
+    height: 39px;
+}
+
+.match-top small {
+    display: block;
+    color: #888;
+    font-size: 12px;
+}
+
+.match-top .score b {
+    font-size: 20px;
+}

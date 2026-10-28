@@ -15,7 +15,7 @@
     const SNAPSHOT_MS = 33; // ~30 snapshots per second
     // Guests draw the world this far in the past so there are always two
     // snapshots to blend between, even when one arrives a bit late.
-    const RENDER_DELAY_MS = 60;
+    const RENDER_DELAY_MS = 45; // minimum; grows on bumpy connections
     const TIMEOUT_MS = 6000;
     const JOIN_TIMEOUT_MS = 20000;
     const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -91,7 +91,7 @@
 
     function errorText(type) {
         if (type === "server-error") return "Couldn't reach the online server. Check your internet connection and try again.";
-        if (type === "full") return "The online server is full right now. Try again in a bit.";
+        if (type === "full") return "That match is full (10 players). Pick another server or press Start for a new one.";
         return "Couldn't connect (" + type + "). Check your internet connection and try again.";
     }
 
@@ -99,7 +99,7 @@
     // the clock difference, picks a delay that covers the usual lateness, and
     // runs a clock that never steps backwards. Hosts use it for the planes
     // guests fly (guest.js has the same logic for snapshots).
-    function makeTimeline(minDelay = 50, maxDelay = 250, interval = SNAPSHOT_MS) {
+    function makeTimeline(minDelay = 40, maxDelay = 250, interval = SNAPSHOT_MS) {
         const tl = {offsets: [], lates: [], offset: 0, delay: minDelay, clock: undefined, clockAt: 0};
         tl.add = (ts, now) => {
             tl.offsets.push(now - ts);
@@ -132,7 +132,7 @@
     }
 
     function cleanName(name) {
-        return String(name || "").replace(/[<>&"'`\\]/g, "").trim().slice(0, 16) || "Guest";
+        return String(name || "").replace(/[<>&"'`\\]/g, "").trim().slice(0, 26) || "Guest"; // room for a [PLAYER] tag + 16 letters
     }
 
     function round(v, digits) {

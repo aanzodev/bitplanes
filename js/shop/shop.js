@@ -2,7 +2,7 @@
 // chosen plane to the player's aircraft in activity.
 (function () {
     const STORAGE_KEY = "shop";
-    const COINS_PER_KILL = 10;
+    const COINS_PER_KILL = 50;
     const BASE_THRUST = 17;
     const {planes: PLANES, upgrades: UPGRADES, paints: PAINTS, patterns: PATTERNS} = window.BitCatalog;
 

@@ -24,6 +24,9 @@ activity, so the server does very little work.
 
 5. Commit. Everyone who loads the activity now goes through the server.
 
+It also runs **Multiplayer** matchmaking and the server list (public matches,
+up to 10 real players each).
+
 Players connect directly when their network allows it and only use the
 server when it doesn't, so the server is only busy for players who need it.
 
