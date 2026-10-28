@@ -338,7 +338,8 @@ BitModules[22] = function (M, j, t) {
                     !(L instanceof u.a && L.source === t.source) &&
                     x(t, L) &&
                         (L instanceof e.a &&
-                            ((L.life -= 1),
+                            (t.source.player && t.source.player.isHuman && (o.c.hits = (o.c.hits || 0) + 1),
+                            (L.life -= 1),
                             0 == L.life &&
                                 (r(M, L),
                                 t.source.player && L.player && Object(S.d)(t.source.player, L.player)),

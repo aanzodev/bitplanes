@@ -139,7 +139,7 @@ BitModules[9] = function (M, j, t) {
                 ? M.kills--
                 : (M.kills++, window.BitShop && window.BitShop.onKill(M)),
             j.deaths++,
-            M.isHuman && i.c.killed++,
+            M.isHuman && M !== j && !(j.team && j.team == M.team) && i.c.killed++,
             j.isHuman && i.c.deaths++);
     }
 

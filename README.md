@@ -118,6 +118,12 @@ flames. Change both mid-flight from the Esc menu too.
 lightning and thunder (snow and blizzards on the Arctic map, a sandstorm in the
 Desert). Online, everyone gets the host's weather.
 
+**Daily reward:** open the activity once a day for free coins: 100, 150, 200,
+300, 400, 500, then 1,000 on day 7 of a streak. Missing a day starts over.
+
+**Stats:** the Stats button on the start screen shows kills, deaths, K/D, best
+kill streak, accuracy, matches, time flying, your favorite planes and more.
+
 **Health bar:** bottom right shows your plane and its armor, green, then
 yellow, then red (online it comes from the host).
 
@@ -152,6 +158,7 @@ themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</k
 | `paint <color>` | Paint your plane (`red`, `blue`, `factory`…) |
 | `unlockall`, `reset` | Own everything / start over |
 | `heal`, `refill`, `god` | Repair, reload, bullets can't shoot you down (single player) |
+| `stats`, `daily [reset]` | Your stats / daily reward status (reset: claim again) |
 | `maps`, `map <map>` | List maps / switch map now (single player) |
 | `weather <type>` | Change the weather now: clear, rain, fog, storm (single player) |
 | `pattern <name>` | Paint pattern: camo, tiger, checkers, shark, flames, none |
@@ -225,6 +232,8 @@ js/
   quality.js            Lowers render resolution when frames get slow
   pause.js              In-activity menu (Esc): resume, plane, paint, leave
   health.js             Your plane's health bar
+  daily.js              Daily reward
+  stats.js              Lifetime stats and the Stats page
   console.js            Built-in console (Ctrl+Shift+K)
   maps.js               Maps (random each activity)
   weather.js            Rain, snow, fog, sandstorms and thunderstorms

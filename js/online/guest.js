@@ -108,6 +108,7 @@
         e.decorate(world);
         world.remote = {alpha: guestAlpha};
         guest.world = world;
+        window.BitStats && window.BitStats.resetGuest();
         O.prediction.start(world, m => guest.conn && guest.conn.open && guest.conn.send(m));
 
         const me = {
@@ -320,6 +321,10 @@
                 return guest.objects.has(objectId);
             },
         }));
+
+        // Our row on the host's scoreboard: count our kills and deaths in the stats.
+        const row = guest.me && (msg.p || []).find(r => r[4] === guest.me);
+        if (row && window.BitStats) window.BitStats.guestScore(row[2], row[3]);
 
         O.prediction.sync(guest.objects.get(guest.me), msg.h);
         const plane = guest.objects.get(guest.me);

@@ -131,6 +131,28 @@
                 print(`Weather: ${W.name()}.`, "ok");
             },
         },
+        stats: {
+            help: "Your lifetime stats (or open the Stats page)",
+            run() {
+                const s = window.BitStats.get();
+                if (!s) throw new Error("Stats aren't ready yet.");
+                print(`Kills ${s.killed} · Deaths ${s.deaths} · Best streak ${s.bestStreak} · Hits ${s.hits}/${s.bullets} shots · Matches ${s.matches}`, "dim");
+            },
+        },
+        daily: {
+            args: "[reset]", help: "Daily reward status (reset: claim again, for testing)",
+            run(a) {
+                const D = window.BitDaily;
+                if (String(a[0] || "").toLowerCase() === "reset") {
+                    D.reset();
+                    D.offer();
+                    return print("Today's daily reward can be claimed again.", "ok");
+                }
+                const st = D.status();
+                print(st.next ? `Waiting: day ${st.next.day} reward, ${st.next.coins} coins (streak ${st.next.streak}).`
+                    : `Claimed today. Streak: ${st.streak} days (best ${st.best}). Come back tomorrow!`, "dim");
+            },
+        },
         unlockall: {help: "Own every plane, max every upgrade", run: () => print(shop().unlockAll(), "ok")},
         reset: {help: "Reset coins, planes and upgrades", run: () => print(shop().resetShop(), "ok")},
         heal: {
