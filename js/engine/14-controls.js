@@ -128,6 +128,7 @@ BitModules[14] = function (M, j, t) {
     }
 
     function c(M, j) {
+        if (M.frozen) return; // no shooting in Multiplayer's lobby
         if (M.has(j)) {
             if (j.ammo > 0) {
                 (j.ammo--, window.BitSound && window.BitSound.gun(j));
@@ -157,6 +158,7 @@ BitModules[14] = function (M, j, t) {
     }
 
     function o(M, j) {
+        if (M.frozen) return;
         if (M.has(j)) {
             if (j.missiles > 0) {
                 (j.missiles--, window.BitSound && window.BitSound.missile(j));

@@ -84,7 +84,8 @@
                 clearTimeout(wake);
                 clearTimeout(giveUp);
                 this.disconnected = false;
-                if (this.isHost) this._send({op: "host", id: this.id});
+                // pub: list this room for Multiplayer matchmaking.
+                if (this.isHost) this._send({op: "host", id: this.id, pub: !!O.publicRoom});
                 else this.emit("open", this.id);
             };
             ws.onmessage = ev => {
@@ -126,6 +127,13 @@
         _onMessage(msg) {
             if (msg.op === "hello") {
                 this.fast = msg.v >= 2;
+                // Hosts measure their ping to the server for the server browser.
+                if (this.isHost && msg.v >= 4 && !this.pinger) {
+                    this.pinger = setInterval(() => this.destroyed ? clearInterval(this.pinger) : this._send({op: "ping", t: performance.now()}), 5000);
+                    this._send({op: "ping", t: performance.now()});
+                }
+            } else if (msg.op === "pong") {
+                if (typeof msg.t === "number") this.rtt = Math.round(performance.now() - msg.t);
             } else if (msg.op === "hosted") {
                 if (!this.hosted) this.emit("open", this.id);
                 this.hosted = true;
@@ -169,6 +177,11 @@
 
         _sendRaw(text) {
             if (this.ws && this.ws.readyState === WebSocket.OPEN) this.ws.send(text);
+        }
+
+        // Hosts: room info shown in the Multiplayer server browser.
+        setMeta(d) {
+            this._send({op: "meta", d});
         }
 
         // Guests: join the room with this id.
@@ -251,6 +264,14 @@
         }
 
         reconnect() {}
+
+        setMeta(d) {
+            this.relay.setMeta(d);
+        }
+
+        get rtt() {
+            return this.relay.rtt;
+        }
 
         destroy() {
             if (this.destroyed) return;

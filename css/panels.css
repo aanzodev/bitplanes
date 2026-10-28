@@ -1,0 +1,260 @@
+/* Daily reward and Stats windows (same look as the Hangar). */
+.panel-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 12;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px 16px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.panel-backdrop[hidden] {
+    display: none;
+}
+
+.panel {
+    width: 100%;
+    max-width: 760px;
+    padding: 24px 30px 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+
+.panel h3 {
+    font-weight: 800;
+    font-size: 22px;
+    margin: 18px 0 8px;
+}
+
+/* Daily reward */
+.daily-panel {
+    max-width: 620px;
+    margin-top: 10vh;
+    text-align: center;
+}
+
+.daily-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin: 16px 0 20px;
+}
+
+.daily-day {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 2px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.daily-day small {
+    color: #888;
+    font-size: 11px;
+}
+
+.daily-day.done {
+    opacity: 0.5;
+}
+
+.daily-day.done span {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    color: #0a0;
+}
+
+.daily-day.today {
+    border-color: #f5a623;
+    background: #fff7e6;
+    box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.35);
+    transform: scale(1.06);
+}
+
+.daily-day:last-child b {
+    color: #d4a017;
+}
+
+/* Stats */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+}
+
+.stat-card b {
+    font-size: 26px;
+}
+
+.stat-card span {
+    color: #555;
+    font-size: 14px;
+}
+
+.stat-card small {
+    color: #999;
+    font-size: 12px;
+}
+
+.stat-fav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.stat-fav img {
+    width: 108px;
+    height: 66px;
+}
+
+.stat-fav div {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-fav span {
+    color: #666;
+    font-size: 14px;
+}
+
+.stat-planes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.stat-planes th {
+    text-align: left;
+    color: #888;
+    font-size: 13px;
+}
+
+.stat-planes td,
+.stat-planes th {
+    padding: 4px 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-planes img {
+    width: 48px;
+    height: 29px;
+}
+
+.stats-reset {
+    margin-top: 14px;
+    border: none;
+    background: none;
+    color: #b3261e;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+@media only screen and (max-width: 560px) {
+    .daily-days {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Multiplayer server browser */
+.srv-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 12px;
+}
+
+.srv-search {
+    flex: 1 1 200px;
+    padding: 6px 10px;
+    font: inherit;
+    font-size: 15px;
+}
+
+.srv-sort {
+    font: inherit;
+    font-size: 15px;
+}
+
+.srv-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.srv-row.full {
+    opacity: 0.55;
+}
+
+.srv-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.srv-main small {
+    color: #666;
+    font-size: 13px;
+}
+
+.srv-names {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.srv-friend {
+    background: #fff1a8;
+    font-weight: 800;
+}
+
+.srv-count,
+.srv-ping {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.srv-count small,
+.srv-ping small {
+    color: #888;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.srv-ping.good { color: #1f9d3a; }
+.srv-ping.ok { color: #c99a00; }
+.srv-ping.bad { color: #c62828; }
+
+@media only screen and (max-width: 560px) {
+    .srv-row {
+        grid-template-columns: 1fr auto auto;
+    }
+
+    .srv-ping {
+        display: none;
+    }
+}

@@ -121,6 +121,12 @@
     function step() {
         if (!p.sim) return 1;
         const e = engine(), now = performance.now();
+        // Multiplayer lobby and results: everyone waits, nobody flies.
+        if (O.match && O.match.frozen()) {
+            p.last = now;
+            p.acc = 0;
+            return 1;
+        }
         p.acc += Math.min(0.1, (now - p.last) / 1000);
         p.last = now;
         const wasFlying = flying();

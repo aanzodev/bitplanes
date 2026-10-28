@@ -10,6 +10,11 @@
 //                     {op: "up", d}          guest -> host
 //                     {op: "kick", to}       host drops a guest
 //                     {op: "bye"}            host closes the room on purpose
+//                     {op: "find"}           Multiplayer: which public match to join?
+//                     {op: "list"}           Multiplayer server browser: all public matches
+//                     {op: "meta", d}        host: room info for the browser (name, players, ping…)
+//                     {op: "ping", t}        latency check, answered with {op: "pong", t}
+//   (a host can add pub: true to "host" to list its room for Multiplayer)
 //   server -> client  {op: "hello", v}       on connect: server version (2 = light format below)
 //                     {op: "hosted"}         room is open
 //                     {op: "joined"}         joined the room
@@ -17,6 +22,9 @@
 //                     {op: "data", from, d}  a message (from = guest id for the host)
 //                     {op: "gone", from}     (host) a guest left
 //                     {op: "closed"}         (guest) the host left
+//                     {op: "list", rooms}    answer to "list": [{id, players, meta}]
+//                     {op: "found", id}      answer to "find": a public room id, or null =
+//                                            host a new one (retry: ms = ask again soon)
 //                     {op: "err", type}      "unavailable-id" | "peer-unavailable" | "bad-request" | "full"
 //
 // Activity data uses a lighter format the server forwards without decoding
@@ -33,6 +41,8 @@ const MAX_ROOMS = 1000;
 const MAX_GUESTS = 16;
 const HOST_GRACE_MS = 15000; // keep a room this long while its host reconnects
 const ID = /^[A-Za-z0-9_-]{1,64}$/;
+const MAX_PUBLIC_PLAYERS = 10; // real people (host + guests) in one Multiplayer match
+let lastHostOffer = 0; // when we last told someone to host a new public match
 
 const rooms = new Map(); // id -> {host, guests: Map<guestId, socket>, nextId, timer}
 
@@ -75,6 +85,38 @@ function onMessage(ws, text) {
     }
     if (!msg || typeof msg !== "object") return;
 
+    if (msg.op === "ping") return send(ws, {op: "pong", t: msg.t});
+
+    if (msg.op === "list") {
+        const list = [];
+        for (const [id, room] of rooms) {
+            if (room.public && room.host) list.push({id, players: room.guests.size + 1, max: MAX_PUBLIC_PLAYERS, meta: room.meta || {}});
+        }
+        return send(ws, {op: "list", rooms: list.slice(0, 100)});
+    }
+
+    if (msg.op === "meta") {
+        const room = ws.isHost && rooms.get(ws.room);
+        // Only small, plain room info is kept.
+        if (room && msg.d && typeof msg.d === "object" && JSON.stringify(msg.d).length < 2000) room.meta = msg.d;
+        return;
+    }
+
+    if (msg.op === "find") {
+        // The fullest public match that still has room.
+        let best = null;
+        for (const [id, room] of rooms) {
+            if (!room.public || !room.host || room.guests.size + 1 >= MAX_PUBLIC_PLAYERS) continue;
+            if (!best || room.guests.size > best.room.guests.size) best = {id, room};
+        }
+        if (best) return send(ws, {op: "found", id: best.id});
+        // Nobody hosting yet. If someone was just told to host, wait for them
+        // instead of starting a second empty match.
+        if (Date.now() - lastHostOffer < 6000) return send(ws, {op: "found", id: null, retry: 1500});
+        lastHostOffer = Date.now();
+        return send(ws, {op: "found", id: null});
+    }
+
     if (msg.op === "host") {
         if (ws.room || !ID.test(msg.id)) return send(ws, {op: "err", type: "bad-request"});
         let room = rooms.get(msg.id);
@@ -85,8 +127,9 @@ function onMessage(ws, text) {
             room.host = ws;
         } else {
             if (rooms.size >= MAX_ROOMS) return send(ws, {op: "err", type: "full"});
-            room = {host: ws, guests: new Map(), nextId: 1, timer: null};
+            room = {host: ws, guests: new Map(), nextId: 1, timer: null, public: !!msg.pub};
             rooms.set(msg.id, room);
+            if (room.public) lastHostOffer = 0;
         }
         ws.room = msg.id;
         ws.isHost = true;
@@ -99,7 +142,7 @@ function onMessage(ws, text) {
         if (ws.room || !ID.test(msg.id)) return send(ws, {op: "err", type: "bad-request"});
         const room = rooms.get(msg.id);
         if (!room || !room.host) return send(ws, {op: "err", type: "peer-unavailable"});
-        if (room.guests.size >= MAX_GUESTS) return send(ws, {op: "err", type: "full"});
+        if (room.guests.size >= MAX_GUESTS || (room.public && room.guests.size + 1 >= MAX_PUBLIC_PLAYERS)) return send(ws, {op: "err", type: "full"});
         const gid = "g" + room.nextId++;
         room.guests.set(gid, ws);
         ws.room = msg.id;
@@ -142,13 +185,14 @@ function onClose(ws) {
 const server = http.createServer((req, res) => {
     // Health check page (Render and you can open it to see the server is up).
     res.writeHead(200, {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"});
-    res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size}\n`);
+    const pub = [...rooms.values()].filter(r => r.public).length;
+    res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size} (${pub} Multiplayer)\n`);
 });
 
 const wss = new WebSocketServer({server, maxPayload: 512 * 1024});
 wss.on("connection", ws => {
     // Tells browsers this server understands the light "T"/"U" data format.
-    send(ws, {op: "hello", v: 2});
+    send(ws, {op: "hello", v: 4}); // 3 = Multiplayer matchmaking, 4 = server browser
     ws.alive = true;
     ws.on("pong", () => (ws.alive = true));
     ws.on("message", data => onMessage(ws, data.toString()));
