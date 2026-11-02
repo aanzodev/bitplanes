@@ -74,6 +74,19 @@
         showMode();
     }
 
+    // The Controls pop-up lists your current keys (change them in Settings).
+    function renderControls() {
+        const S = window.BitSettings, table = document.querySelector(".controls-list");
+        if (!S || !table) return;
+        const keys = (set, id) => S.keys(set)[id].filter(Boolean).map(k => `<kbd>${S.keyName(k)}</kbd>`).join(" ") || "–";
+        const rows = (set, list) => list.map(a => `<tr><td>${keys(set, a.id)}</td><td>${a.name}</td></tr>`).join("");
+        table.innerHTML = `<tr><th colspan="2">Bit Planes</th></tr>${rows("keys2d", S.actions2d)}
+            <tr><td><kbd>M</kbd></td><td>Sound on / off</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Menu: resume, change plane or paint, settings, leave</td></tr>
+            <tr><th colspan="2">Dogfights (3D)</th></tr>${rows("keysDf", S.actionsDf)}
+            <tr><td>Mouse</td><td>${S.get("dfMouse") ? "Pitch and roll (click the screen first)" : "Mouse flying is off (Settings)"}</td></tr>`;
+    }
+
     function popup(sel, show) {
         const el = document.querySelector(sel);
         if (el) el.hidden = !show;
@@ -89,7 +102,11 @@
         setInterval(showMode, 500);
 
         document.querySelector(".mode-switch").addEventListener("click", nextMode);
-        document.querySelector(".open-controls").addEventListener("click", () => popup(".controls-pop", true));
+        document.querySelector(".open-controls").addEventListener("click", () => {
+            renderControls();
+            popup(".controls-pop", true);
+        });
+        if (window.BitSettings) window.BitSettings.onChange(renderControls);
         document.querySelector(".open-friends").addEventListener("click", () => popup(".friends", true));
         document.querySelectorAll(".controls-pop, .friends").forEach(el => el.addEventListener("click", ev => {
             if (ev.target === el || ev.target.closest(".close-panel")) el.hidden = true;
