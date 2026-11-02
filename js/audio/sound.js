@@ -84,9 +84,9 @@
 
     // Output for a one-shot sound at a world position (or right here if pos is null).
     // Returns null when the sound is too far away or we are not in an activity.
-    function output(pos, volume) {
+    function output(pos, volume, muffle) {
         if (!s.listener || !ctx() || s.muted) return null;
-        let v = volume, pan = 0;
+        let v = volume, pan = 0, dist = 0;
         if (pos) {
             const me = listenerObject();
             if (!me) return null;
@@ -95,14 +95,18 @@
             if (d > HEAR_DISTANCE) return null;
             v *= (1 - d / HEAR_DISTANCE) ** 1.5;
             pan = Math.max(-1, Math.min(1, dx / 900));
+            dist = d / HEAR_DISTANCE;
         }
         if (v < 0.01) return null;
         const g = gain(v);
+        let last = g;
+        // muffle: far sounds lose their high end, like real distant gunfire.
+        if (muffle && dist > 0) last = chain(g, filter("lowpass", 600 + 9000 * (1 - dist) ** 2, 0.7));
         if (s.ctx.createStereoPanner) {
             const p = s.ctx.createStereoPanner();
             p.pan.value = pan;
-            chain(g, p, s.master);
-        } else g.connect(s.master);
+            chain(last, p, s.master);
+        } else last.connect(s.master);
         return g;
     }
 
@@ -139,6 +143,40 @@
 
     // ------------------------------------------------------------------ guns
 
+    // Real aircraft guns, each built from a few parts:
+    //   crack  [Hz, Q]   the sharp supersonic snap of the muzzle blast
+    //   body   Hz        how bright the blast's roar is (low-pass cutoff)
+    //   thump  [Hz, Hz]  the low punch of the shot (falls from the first to the second)
+    //   buzz   Hz        rotary cannons: barrels spinning (= rounds per second)
+    //   click            light machine guns: the bolt cycling
+    //   dur, vol         length of one shot and loudness
+    const GUNS = {
+        // WWI rifle-caliber machine guns: light, fast and rattly.
+        vickers: {name: "Vickers .303", crack: [2600, 1.6], body: 3200, thump: [200, 90], dur: 0.07, vol: 0.5, click: true},
+        lewis: {name: "Lewis gun", crack: [2900, 1.8], body: 3600, thump: [230, 110], dur: 0.06, vol: 0.42, click: true},
+        spandau: {name: "LMG 08/15 Spandau", crack: [2300, 1.5], body: 2800, thump: [180, 85], dur: 0.075, vol: 0.52, click: true},
+        // WWII
+        shkas: {name: "ShKAS 7.62 mm", crack: [3200, 1.4], body: 3800, thump: [240, 120], dur: 0.045, vol: 0.4, click: true},
+        browning303: {name: "Browning .303", crack: [2400, 1.3], body: 3000, thump: [190, 85], dur: 0.06, vol: 0.48, click: true},
+        m2: {name: "Browning M2 .50 cal", crack: [1500, 1.4], body: 2000, thump: [130, 55], dur: 0.12, vol: 0.7},
+        mg151: {name: "MG 151/20 20 mm", crack: [950, 1.2], body: 1500, thump: [95, 42], dur: 0.17, vol: 0.8},
+        type99: {name: "Type 99 20 mm", crack: [1050, 1.2], body: 1600, thump: [100, 45], dur: 0.16, vol: 0.78},
+        shvak: {name: "ShVAK 20 mm", crack: [1000, 1.2], body: 1550, thump: [98, 44], dur: 0.15, vol: 0.76},
+        hispano: {name: "Hispano 20 mm", crack: [900, 1.1], body: 1450, thump: [90, 40], dur: 0.18, vol: 0.82},
+        // Jets
+        gsh23: {name: "GSh-23 23 mm", crack: [850, 1.1], body: 1400, thump: [85, 40], dur: 0.12, vol: 0.75, buzz: 57},
+        gsh301: {name: "GSh-30-1 30 mm", crack: [700, 1.0], body: 1200, thump: [70, 32], dur: 0.2, vol: 0.9},
+        m61: {name: "M61 Vulcan 20 mm", crack: [1300, 0.9], body: 2200, thump: [110, 60], dur: 0.09, vol: 0.55, buzz: 100},
+        gau22: {name: "GAU-22/A 25 mm", crack: [1100, 0.9], body: 1800, thump: [95, 50], dur: 0.1, vol: 0.6, buzz: 55},
+        gau8: {name: "GAU-8 Avenger 30 mm", crack: [600, 0.8], body: 900, thump: [65, 35], dur: 0.13, vol: 0.62, buzz: 65},
+    };
+    // Older names still used by some code paths.
+    GUNS.mg = GUNS.vickers;
+    GUNS.cannon = GUNS.m61;
+    GUNS.brrt = GUNS.gau8;
+    // The gun a plane shape usually carries (for planes we only know the shape of).
+    const SHAPE_GUN = {"": "vickers", prop: "m2", jet: "m61", bomber: "m61"};
+
     function gun(plane) {
         const mine = isMine(plane);
         if (!mine && !throttle("gun", 35)) return;
@@ -146,34 +184,54 @@
     }
 
     function playGun(type, pos, volume) {
-        const out = output(pos, volume);
+        const g = GUNS[type] || GUNS.vickers;
+        // Far-away guns are quieter and duller (the air soaks up the crack).
+        const out = output(pos, volume, true);
         if (!out) return;
-        if (type === "brrt") {
-            // GAU-8: a deep, very fast buzz.
-            const dur = 0.11, saw = osc("sawtooth", 64), n = noise(), g = gain(0);
-            chain(saw, filter("lowpass", 700), g);
-            chain(n, filter("bandpass", 350, 0.8), g);
-            chain(g, out);
-            envelope(g, 0.55, 0.004, dur);
-            startStop([saw, n], dur);
-        } else if (type === "cannon") {
-            // M61 Vulcan: a quick tearing burst.
-            const dur = 0.09, n = noise(), am = gain(0.5), lfo = osc("square", 95), depth = gain(0.5), g = gain(0);
-            chain(lfo, depth);
-            depth.connect(am.gain);
-            chain(n, filter("bandpass", 1100, 0.9), am, g, out);
-            envelope(g, 0.45, 0.003, dur);
-            startStop([n, lfo], dur);
-        } else {
-            // Machine gun: a short sharp pop.
-            const dur = 0.06, n = noise(), g = gain(0), thump = osc("triangle", 180), tg = gain(0);
-            chain(n, filter("bandpass", 1700, 1.2), g, out);
-            chain(thump, tg, out);
-            envelope(g, 0.5, 0.002, dur);
-            envelope(tg, 0.25, 0.002, dur);
-            thump.frequency.exponentialRampToValueAtTime(60, s.ctx.currentTime + dur);
-            startStop([n, thump], dur);
+        const t = s.ctx.currentTime;
+        const vary = 0.9 + Math.random() * 0.2; // no two shots sound exactly alike
+        const dur = g.dur * vary, v = g.vol * vary;
+        const nodes = [];
+
+        // Crack: a short, bright snap.
+        const n1 = noise(), cg = gain(0);
+        chain(n1, filter("bandpass", g.crack[0] * vary, g.crack[1]), cg, out);
+        envelope(cg, v * 0.9, 0.001, dur * 0.35);
+        nodes.push(n1);
+
+        // Body: the roar of the blast.
+        const n2 = noise(), bg = gain(0);
+        chain(n2, filter("lowpass", g.body, 0.7), bg, out);
+        envelope(bg, v * 0.6, 0.002, dur);
+        nodes.push(n2);
+
+        // Thump: the punch you feel.
+        const th = osc("sine", g.thump[0] * vary), tg = gain(0);
+        chain(th, tg, out);
+        th.frequency.exponentialRampToValueAtTime(g.thump[1], t + dur * 0.8);
+        envelope(tg, v * 0.7, 0.002, dur * 0.85);
+        nodes.push(th);
+
+        // Rotary cannons: the barrels spinning, a tearing buzz.
+        if (g.buzz) {
+            const saw = osc("sawtooth", g.buzz * vary), sub = osc("square", g.buzz / 2), zg = gain(0);
+            chain(saw, filter("lowpass", g.body * 0.8, 1.2), zg, out);
+            chain(sub, filter("lowpass", 300), zg);
+            envelope(zg, v * 0.55, 0.004, dur * 1.3);
+            nodes.push(saw, sub);
         }
+
+        // Light machine guns: the bolt clacking back.
+        if (g.click) {
+            const n3 = noise(), kg = gain(0);
+            chain(n3, filter("highpass", 4500), kg, out);
+            kg.gain.setValueAtTime(0.0001, t);
+            kg.gain.setValueAtTime(0.0001, t + dur * 0.55);
+            kg.gain.exponentialRampToValueAtTime(v * 0.25, t + dur * 0.56);
+            kg.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.56 + 0.012);
+            nodes.push(n3);
+        }
+        startStop(nodes, dur * 1.4);
     }
 
     // --------------------------------------------------- missiles and flares
@@ -383,6 +441,11 @@
         setListener: fn => (s.listener = fn),
         gun, missile, flares, flaresAt, explosion, thunder,
         gunAt: (pos, type) => throttle("gun", 35) && playGun(type || "mg", pos, 0.6),
+        // Online guests only know the shooter's plane shape.
+        gunForShape: shape => SHAPE_GUN[shape || ""] || "vickers",
+        // A gun sound right here (no position), e.g. for the 3D Dogfights beta.
+        playGun: (type, volume = 1) => playGun(type, null, volume),
+        guns: GUNS,
         missileAt: pos => missile({position: pos}),
         setMuted,
         isMuted: () => s.muted,

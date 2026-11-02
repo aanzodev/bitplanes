@@ -269,7 +269,7 @@
         // Sounds for things the host fired (our own bullets are simulated locally).
         const S = window.BitSound;
         if (S && guest.started) {
-            if (cls === 2) S.gunAt(o.position);
+            if (cls === 2) S.gunAt(o.position, gunNear(o.position));
             if (cls === 1) S.missileAt(o.position);
         }
     }
@@ -279,6 +279,19 @@
         world.bullets.delete(o);
         world.pilots.delete(o);
         world.barns.delete(o);
+    }
+
+    // The gun of the plane that just fired this bullet (the closest plane).
+    function gunNear(pos) {
+        const Plane = engineClasses().Plane;
+        let best = null, bestD = 90;
+        for (const o of guest.objects.values()) {
+            if (o.constructor !== Plane || !o.position) continue;
+            const d = Math.hypot(o.position.x - pos.x, o.position.y - pos.y);
+            if (d < bestD) [best, bestD] = [o, d];
+        }
+        const key = best && best.sprite && best.sprite.planeKey;
+        return window.BitSound.gunForShape(key ? key[2] : "");
     }
 
     function applySnapshot(msg) {
