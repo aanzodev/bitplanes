@@ -28,6 +28,12 @@
         return s.ctx;
     }
 
+    // Engine and gun levels from Settings (0..1, 1 = the loudest).
+    function mix(k) {
+        const v = window.BitSettings && window.BitSettings.get(k);
+        return typeof v === "number" ? v : 0.6;
+    }
+
     // Master level: off when muted, otherwise the Settings volume.
     function level() {
         return s.muted ? 0 : 0.875 * s.volume;
@@ -328,7 +334,7 @@
         const mine = isMine(plane);
         if (!mine && !throttle("gun", 35)) return;
         const prof = profileOf(plane);
-        volley(Object.assign({id: plane.planeId}, prof), mine ? null : plane.position, mine ? 1 : 0.6, undefined, 0.08);
+        volley(Object.assign({id: plane.planeId}, prof), mine ? null : plane.position, (mine ? 0.75 : 0.45) * mix("gunVolume"), undefined, 0.08);
     }
 
     // --------------------------------------------------- missiles and flares
@@ -415,7 +421,7 @@
 
     // Your plane's engine, modelled on its real engine (audio/engines.js).
     function buildEngine(profile) {
-        const out = gain(0.42);
+        const out = gain(0);
         out.connect(s.master);
         return {profile, out, eng: window.BitEngines.create(s.ctx, out, profile, s.noise)};
     }
@@ -443,7 +449,7 @@
         }
         const e = s.engine;
         const t = Math.max(0, Math.min(1, plane.thrust / (plane.maxThrust || 17)));
-        e.out.gain.setTargetAtTime(profile.kind === "jet" ? 0.5 : 0.42, s.ctx.currentTime, 0.1);
+        e.out.gain.setTargetAtTime((profile.kind === "jet" ? 0.28 : 0.24) * mix("engineVolume"), s.ctx.currentTime, 0.1);
         // Jets light the afterburner at full throttle.
         e.eng.set(t, {boost: profile.kind === "jet" && t > 0.85, speed: t, level: profile.idleSilent && t === 0 ? 0 : 1});
     }
@@ -488,10 +494,11 @@
         // A gun sound right here (no position), e.g. for the 3D Dogfights beta.
         playGun: (type, volume = 1) => playGun(type, null, volume),
         // A gun sound into a node of your own (3D Dogfights), dist 0..1 for distance.
-        playGunInto: (type, node, volume = 1, dist = 0) => playGun(type, null, volume, {node, dist}),
+        playGunInto: (type, node, volume = 1, dist = 0) => playGun(type, null, volume * mix("gunVolume"), {node, dist}),
         // A plane's whole gun loadout for one firing interval, into a node of your own (3D Dogfights).
         volleyInto: (planeId, node, volume = 1, dist = 0, interval = 0.08) =>
-            volley(Object.assign({id: planeId}, PROFILES[planeId] || PROFILES.classic), null, volume, {node, dist}, interval),
+            volley(Object.assign({id: planeId}, PROFILES[planeId] || PROFILES.classic), null, volume * mix("gunVolume"), {node, dist}, interval),
+        mix,
         profileGuns: planeId => (PROFILES[planeId] || {}).guns || null,
         // The shared audio context and master output (null until sound is allowed).
         context: () => ctx(),
