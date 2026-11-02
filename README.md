@@ -226,6 +226,37 @@ Open the browser console (F12) on the activity page:
 
 Or add `?coins=10000` to the page URL to add coins once.
 
+## Dogfights (3D beta)
+
+Pick **Dogfights** on the mode card and press **PLAY** for a 3D dogfight over
+real terrain: hills, valleys, snowy mountains, lakes, forests and the sea, under
+day, sunset or overcast skies (new terrain every flight). You fly your Hangar
+plane (its shape, paint, speed, agility, armor and real gun sound) against 7
+computer pilots who chase, lead their shots, break when you're on their tail,
+fire missiles and fight each other too. Each kill pays 50 coins and counts in
+your stats and quests.
+
+| Key | Action |
+|---|---|
+| <kbd>↑</kbd> <kbd>↓</kbd> | Pitch: nose up / down |
+| <kbd>←</kbd> <kbd>→</kbd> | Roll (bank, then pull <kbd>↑</kbd> to turn) |
+| <kbd>A</kbd> <kbd>D</kbd> | Rudder |
+| <kbd>W</kbd> <kbd>S</kbd> | Throttle |
+| <kbd>Space</kbd> | Guns |
+| <kbd>X</kbd> | Missile (homes on the enemy in the yellow LOCK box) |
+| <kbd>Q</kbd> | Flares (planes that carry them) |
+| <kbd>Esc</kbd> | Pause / controls / leave |
+
+The display shows a gunsight, boxes around enemies with their distance,
+arrows to enemies off screen, a radar, speed, altitude, throttle, ammo,
+missiles, flares, health, a kill feed, PULL UP and MISSILE warnings, and the
+timer bottom left. Climbing costs speed, diving gains it, and flying too slowly
+stalls the plane.
+
+It uses [three.js](https://threejs.org) (MIT license, in `js/vendor/`), which
+only loads when you start Dogfights. It needs a browser with WebGL (any
+recent one).
+
 ## Multiplayer
 
 Pick **Multiplayer** on the start screen and press **Start**: no room code
@@ -330,7 +361,9 @@ js/
     87-main.js          controls, physics, rendering, AI, activity modes…
     assets.js           Sprite file paths
     boot.js             …and boot.js starts the activity
-  vendor/peerjs.min.js
+  dogfight/             Dogfights (3D beta): world.js (terrain), aircraft.js (models,
+                        flight), combat.js, ai.js, hud.js, mode.js
+  vendor/peerjs.min.js, three.min.js
 assets/
   sprites/              Activity sprites (units, effects, scenery, ui)
   icons/                HUD and logo icons

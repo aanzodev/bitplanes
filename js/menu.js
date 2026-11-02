@@ -4,6 +4,7 @@
     const MODES = {
         "death-match": {name: "Death match", desc: "Everyone against everyone"},
         "multiplayer": {name: "Multiplayer", desc: "Real players online · 10 min matches"},
+        "dogfights": {name: "Dogfights", desc: "BETA · 3D dogfights over real terrain", beta: true},
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
 
@@ -62,7 +63,7 @@
         const r = radios().find(x => x.checked) || radios()[0];
         if (!r) return;
         const m = MODES[r.value] || {name: r.value, desc: ""};
-        document.querySelector(".mode-title").textContent = m.name;
+        document.querySelector(".mode-title").innerHTML = m.name + (m.beta ? ' <span class="beta-tag">Beta</span>' : "");
         document.querySelector(".mode-name").textContent = m.name;
         document.querySelector(".mode-desc").textContent = m.desc;
     }
