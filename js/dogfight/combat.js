@@ -237,12 +237,14 @@
             for (let k = 0; k < 6; k++) smoke.add(m.position, {color: 0xdddddd, size: 3, grow: 14, life: 1.5, vx: rnd(10), vy: rnd(10), vz: rnd(10), alpha: 0.7});
         }
 
+        // 16 flares fired in pairs over about a second and a half, each burning
+        // for about 6 seconds.
         function dropFlares(plane, chance = 0.85) {
-            for (let k = 0; k < 8; k++) {
+            for (let k = 0; k < 16; k++) {
                 // Shot out behind, below and to the sides.
-                const out = plane.forward.clone().multiplyScalar(-55).addScaledVector(plane.up, -30).addScaledVector(plane.right, (k % 2 ? 1 : -1) * (25 + Math.random() * 30))
-                    .add(V().set(rnd(20), rnd(10), rnd(20)));
-                flares.push({pos: plane.pos.clone().addScaledVector(plane.forward, -8), vel: plane.velocity.multiplyScalar(0.55).add(out), life: 3.4, owner: plane, delay: k * 0.07});
+                const out = plane.forward.clone().multiplyScalar(-55).addScaledVector(plane.up, -30).addScaledVector(plane.right, (k % 2 ? 1 : -1) * (25 + Math.random() * 35))
+                    .add(V().set(rnd(20), rnd(12), rnd(20)));
+                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.17 + (k % 2) * 0.035});
             }
             // Missiles chasing this plane go for the flares instead (most of the time).
             let fooled = 0;
@@ -261,16 +263,23 @@
         function updateMissiles(dt, planes) {
             for (let i = flares.length - 1; i >= 0; i--) {
                 const f = flares[i];
-                f.life -= dt;
                 if (f.delay > 0) {
                     f.delay -= dt;
                     continue;
                 }
+                // Leaves the plane when its turn comes (from where the plane is then).
+                if (!f.pos) {
+                    const p = f.owner;
+                    f.pos = p.pos.clone().addScaledVector(p.forward, -8);
+                    f.vel = p.velocity.multiplyScalar(0.55).add(f.vel);
+                }
+                f.life -= dt;
                 f.vel.y -= 30 * dt;
                 f.vel.multiplyScalar(1 - 0.9 * dt);
                 f.pos.addScaledVector(f.vel, dt);
-                glow.add(f.pos, {color: 0xffffff, to: 0xffd070, size: 7, grow: 3, life: 0.08});
-                smoke.add(f.pos, {color: 0xf2f2f2, to: 0xcccccc, size: 2, grow: 10, life: 1.6, alpha: 0.55});
+                const fade = Math.min(1, f.life / 1.5); // dims as it burns out
+                glow.add(f.pos, {color: 0xffffff, to: 0xffd070, size: 8 * fade + 2, grow: 3, life: 0.08});
+                smoke.add(f.pos, {color: 0xf2f2f2, to: 0xcccccc, size: 2, grow: 12, life: 2.6, alpha: 0.55 * fade});
                 if (f.life <= 0) flares.splice(i, 1);
             }
             for (let i = missiles.length - 1; i >= 0; i--) {
@@ -281,7 +290,7 @@
                 let speed = m.vel.length();
                 speed = m.burn > 0 ? Math.min(m.max, speed + 320 * dt) : speed * (1 - 0.18 * dt);
                 const dir = tmpV.copy(m.vel).normalize();
-                const alive = t && (t.alive !== false) && (t.life === undefined || t.life > 0);
+                const alive = t && t.pos && (t.alive !== false) && (t.life === undefined || t.life > 0);
                 if (alive) {
                     // Lead pursuit: aim where the target will be.
                     const tgo = Math.min(2, t.pos.distanceTo(mp) / Math.max(200, speed));
