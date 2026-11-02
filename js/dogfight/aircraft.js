@@ -269,7 +269,7 @@
             this.maxAmmo = Math.max(150, 260 + (opts.stats.ammo || 0) * 10);
             this.maxMissiles = 2 + (opts.stats.missiles || 0);
             // Everyone has some countermeasures in 3D; planes that carry flares have more.
-            this.maxFlares = 2 + (opts.stats.flares || 0);
+            this.maxFlares = 3 + (opts.stats.flares || 0);
             this.maxBoost = 4 * (1 + 0.25 * (opts.stats.boost || 0));
             const model = buildModel(opts);
             this.mesh = model.group;

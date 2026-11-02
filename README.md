@@ -158,7 +158,9 @@ when they pass close by. Flares still fool them, like any other missile.
 ◆ Exclusive planes have a gold border in the Hangar.
 
 ★ Special jets have a black border in the Hangar and carry flares: press
-<kbd>Q</kbd> and missiles chasing you turn toward the flares and explode on them.
+<kbd>Q</kbd> and missiles chasing you turn toward the flares and explode on them. Each press fires 16 flares in pairs over about a second, and
+they burn for 4 to 5 seconds (about 6 in Dogfights), so missiles stay fooled
+longer.
 
 ## Maps
 
@@ -218,27 +220,43 @@ Guns, missiles, flares and explosions from other planes get quieter and pan
 with distance. Tweak any plane's sound in `js/audio/profiles.js` (the
 `engine` entry is its real engine).
 
-**Guns:** every plane fires the gun it really carried, each synthesized from
-its muzzle crack, the blast's roar, the thump of the shot, the bolt clacking
-on light machine guns and the spinning barrels on rotary cannons:
+**Guns:** every plane fires its **real gun loadout**, and no two planes sound
+the same. Each round is synthesized from its muzzle crack, the blast's roar,
+the thump of the shot, the bolt clacking on light machine guns and the
+spinning barrels on rotary cannons. Mixed loadouts fire together at their
+real rates of fire (a Spitfire's two 20 mm Hispanos thud under four rattling
+.303s; eight .50 cals on a P-47 chatter densely; WWI guns fire slower,
+synchronized through the propeller; rotary cannons tear continuously). Where
+the guns sit changes the sound too: nose guns thump harder, wing guns spread
+left and right, the F-22 and F-35's guns are muffled behind their doors, and
+every airframe rings at its own resonance.
 
-| Gun | Planes |
+| Plane | Guns |
 |---|---|
-| Vickers .303 | Classic, SPAD XIII, Sopwith Camel, Crop Duster |
-| Lewis gun | Piper Cub, Tiger Moth |
-| LMG 08/15 Spandau | Fokker Dr.I |
-| ShKAS 7.62 mm | Polikarpov I-16 |
-| Browning .303 | Spitfire, Hurricane, Swift |
-| Browning M2 .50 cal | P-51, P-47, F4U Corsair, Gunship, Fortress |
-| MG 151/20 20 mm | Bf 109, Fw 190 |
-| Type 99 20 mm | A6M Zero |
-| ShVAK 20 mm | Yak-3 |
-| Hispano 20 mm | P-38, Phantom |
-| GSh-23 23 mm | MiG-21 |
-| GSh-30-1 30 mm | MiG-29, Su-27 |
-| M61 Vulcan 20 mm | F-16, F-15, F-22, B-2 |
-| GAU-22/A 25 mm | F-35 |
-| GAU-8 Avenger 30 mm | A-10 |
+| Classic, Crop Duster | 1 Vickers .303 (synchronized) |
+| Sopwith Camel, SPAD XIII | 2 Vickers .303 (synchronized) |
+| Fokker Dr.I | 2 LMG 08/15 Spandau (synchronized) |
+| Piper Cub, Tiger Moth | 1 Lewis gun |
+| Swift | 2 Browning .303 |
+| Gunship | 2 Browning M2 .50 cal + a Lewis gun |
+| Fortress | 2 Browning M2 .50 cal |
+| Phantom | 2 Hispano 20 mm |
+| Polikarpov I-16 | 4 ShKAS 7.62 mm |
+| Hurricane | 8 Browning .303 |
+| Spitfire | 2 Hispano 20 mm + 4 Browning .303 |
+| A6M Zero | 2 Type 99 20 mm + 2 Type 97 7.7 mm |
+| Bf 109 | 1 MG 151/20 (through the spinner) + 2 MG 131 13 mm |
+| Fw 190 | 4 MG 151/20 + 2 MG 131 13 mm |
+| Yak-3 | 1 ShVAK 20 mm + 2 Berezin UBS 12.7 mm |
+| P-51 Mustang, F4U Corsair | 6 Browning M2 .50 cal |
+| P-47 Thunderbolt | 8 Browning M2 .50 cal |
+| P-38 Lightning | 1 Hispano 20 mm + 4 Browning M2 .50 cal |
+| MiG-21 | GSh-23 23 mm |
+| MiG-29, Su-27 | GSh-30-1 30 mm |
+| F-16, F-15 | M61 Vulcan 20 mm |
+| F-22, B-2 | M61 Vulcan 20 mm (internal, behind doors) |
+| F-35 | GAU-22/A 25 mm (internal) |
+| A-10 | GAU-8 Avenger 30 mm |
 
 Distant gunfire is quieter and duller, like the real thing.
 

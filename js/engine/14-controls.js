@@ -306,21 +306,22 @@ BitModules[14] = function (M, j, t) {
     function F(M, j) {
         if (!M.has(j) || !(j.maxFlares > 0) || !(j.flares > 0)) return;
         (j.flares--, window.BitSound && window.BitSound.flares(j));
-        j.flareUntil = performance.now() + 1500;
+        j.flareUntil = performance.now() + 3500;
         for (let t of M.bodies)
             t instanceof I.a &&
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
-        // Release 8 flares in quick pairs. Like a real jet they are shot out
-        // below and behind the plane in a fan, then arc down trailing smoke.
-        for (let k = 0; k < 8; k++)
+        // Release 16 flares in pairs over about a second. Like a real jet they
+        // are shot out below and behind the plane in a fan, then arc down
+        // trailing smoke, burning for 4 to 5 seconds.
+        for (let k = 0; k < 16; k++)
             setTimeout(
                 () => {
                     if (!M.has(j)) return;
                     const t = new P.c(Q.b.flare),
-                        fan = (k % 2 ? 0.55 : 0) + (0.45 * Math.floor(k / 2)) / 3 + 0.1 * Math.random();
-                    (t.duration = 1800 + 700 * Math.random()),
+                        fan = (k % 2 ? 0.55 : 0) + (0.45 * (Math.floor(k / 2) % 4)) / 3 + 0.1 * Math.random();
+                    (t.duration = 4000 + 1000 * Math.random()),
                         (t.position = Object(N.a)(j.position, Object(N.e)(j.forward, -10), Object(N.e)(j.normal, -4))),
                         (t.velocity = Object(N.a)(
                             Object(N.e)(j.velocity, 0.55),
@@ -331,7 +332,7 @@ BitModules[14] = function (M, j, t) {
                         M.particles.add(t),
                         X(M, t);
                 },
-                90 * Math.floor(k / 2),
+                140 * Math.floor(k / 2),
             );
         0 !== j.flares ||
             j.flareReloading ||

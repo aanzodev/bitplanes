@@ -642,11 +642,11 @@
         plane.ammo--;
         if (plane.ammo <= 0) plane.reloadAt = g.time + 3 * (plane.stats.reload || 1);
         if (plane === g.player) {
-            g.audio.gun(plane.gun, plane.pos, true);
+            g.audio.gun(plane, true, null, plane.gunT);
             g.shake = Math.max(g.shake, 0.06);
             const st = stats();
             if (st) st.bullets++;
-        } else g.audio.gun(plane.gun, plane.pos, false, g.camera.position);
+        } else g.audio.gun(plane, false, g.camera.position, plane.gunT);
     }
 
     // ------------------------------------------------------------- match

@@ -215,14 +215,17 @@
         // ------------------------------------------------------------- guns
 
         let lastOther = 0;
-        function gun(type, pos, mine, listenerPos) {
+        // A plane's whole gun loadout (its real guns, see profiles.js) for one
+        // firing interval, from where it is.
+        function gun(plane, mine, listenerPos, interval = 0.07) {
             if (muted()) return;
-            if (mine) return S.playGunInto(type, own, 0.75, 0);
-            const t = now(), d = pos.distanceTo(listenerPos);
+            const vol = S.volleyInto ? (id, node, v, d) => S.volleyInto(id, node, v, d, interval) : (id, node, v, d) => S.playGunInto(plane.gun, node, v, d);
+            if (mine) return vol(plane.planeId, own, 0.75, 0);
+            const t = now(), d = plane.pos.distanceTo(listenerPos);
             if (d > 4000 || t - lastOther < 0.05) return;
             lastOther = t;
-            const p = panner(pos);
-            S.playGunInto(type, p, 1.6, Math.min(1, d / 4000));
+            const p = panner(plane.pos);
+            vol(plane.planeId, p, 1.6, Math.min(1, d / 4000));
             setTimeout(() => p.disconnect(), 1500);
         }
 
@@ -283,8 +286,9 @@
 
         function flares(pos, mine) {
             const out = mine ? own : panner(pos);
-            for (let k = 0; k < 6; k++) {
-                const t = now() + k * 0.07, o = osc("sine", 900), g = gain(0);
+            // A long string of pops as the flares are fired in pairs.
+            for (let k = 0; k < 16; k++) {
+                const t = now() + Math.floor(k / 2) * 0.17 + (k % 2) * 0.035, o = osc("sine", 900), g = gain(0);
                 chain(o, g, out);
                 o.frequency.setValueAtTime(900, t);
                 o.frequency.exponentialRampToValueAtTime(180, t + 0.08);
@@ -294,8 +298,8 @@
             }
             const n = noise(false), g = gain(0);
             chain(n, filt("highpass", 3000), g, out);
-            env(g, 0.12, 0.05, 1.2);
-            shot([n], 1.3);
+            env(g, 0.12, 0.05, 2.6);
+            shot([n], 2.7);
         }
 
         // ------------------------------------------------- tones and warnings
