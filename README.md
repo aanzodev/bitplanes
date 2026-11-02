@@ -83,7 +83,8 @@ online server (see `server/README.md`).
 
 ## Settings
 
-**⚙ Settings** (lobby, and both pause menus): volume, every key for Bit Planes
+**⚙ Settings** (lobby, and both pause menus): volume, separate **Engines**
+and **Guns** volume sliders, every key for Bit Planes
 and for Dogfights (two keys per action; Dogfights also takes mouse buttons),
 and the Dogfights options: graphics quality, starting camera, field of view,
 enemy skill, flying with the mouse, mouse sensitivity, inverted mouse or

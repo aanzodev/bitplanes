@@ -143,7 +143,8 @@
                 enginePlane = p.planeId;
             }
             // Louder and bassier from the seat; a damaged engine misfires.
-            engineBus.gain.setTargetAtTime((cockpit ? 0.62 : 0.4) * (p.burning && Math.random() < 0.25 ? 0.35 : 1), t, 0.05);
+            const ev = S.mix ? S.mix("engineVolume") : 0.6;
+            engineBus.gain.setTargetAtTime((cockpit ? 0.42 : 0.28) * ev * (p.burning && Math.random() < 0.25 ? 0.35 : 1), t, 0.05);
             engine.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed});
             const windLevel = Math.min(1, (p.speed / 260) ** 2);
             windF.frequency.setTargetAtTime(300 + p.speed * 6, t, k);
@@ -192,7 +193,7 @@
                 const vl = listenerVel ? -(listenerVel.x * dir.x + listenerVel.y * dir.y + listenerVel.z * dir.z) : 0;
                 const dop = Math.max(0.5, Math.min(2.2, (C + vl) / Math.max(60, C - vs)));
                 v.eng.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed, pitch: dop});
-                v.bus.gain.setTargetAtTime(jet ? 1.1 : 1.3, t, 0.1);
+                v.bus.gain.setTargetAtTime((jet ? 0.7 : 0.8) * (S.mix ? S.mix("engineVolume") : 0.6), t, 0.1);
                 // A close pass: a whoosh as it goes by.
                 if (v.plane === p && o.d < 160 && (!p._whooshAt || t - p._whooshAt > 2.5) && vs - vl < -40) {
                     p._whooshAt = t;
@@ -220,12 +221,12 @@
         function gun(plane, mine, listenerPos, interval = 0.07) {
             if (muted()) return;
             const vol = S.volleyInto ? (id, node, v, d) => S.volleyInto(id, node, v, d, interval) : (id, node, v, d) => S.playGunInto(plane.gun, node, v, d);
-            if (mine) return vol(plane.planeId, own, 0.75, 0);
+            if (mine) return vol(plane.planeId, own, 0.55, 0);
             const t = now(), d = plane.pos.distanceTo(listenerPos);
             if (d > 4000 || t - lastOther < 0.05) return;
             lastOther = t;
             const p = panner(plane.pos);
-            vol(plane.planeId, p, 1.6, Math.min(1, d / 4000));
+            vol(plane.planeId, p, 1.1, Math.min(1, d / 4000));
             setTimeout(() => p.disconnect(), 1500);
         }
 

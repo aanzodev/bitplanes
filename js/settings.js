@@ -42,6 +42,8 @@ window.BitSettings = (function () {
 
     const DEFAULTS = {
         volume: 0.8,
+        engineVolume: 0.6,      // plane engines, on top of the main volume
+        gunVolume: 0.6,         // gunfire, on top of the main volume
         dfQuality: "high",     // low | medium | high
         dfView: "chase",       // chase | cockpit
         dfFov: 72,
@@ -197,6 +199,8 @@ window.BitSettings = (function () {
             body.innerHTML = `
                 <h3>Sound</h3>
                 ${slider("volume", "Volume", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
+                ${slider("engineVolume", "Engines", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
+                ${slider("gunVolume", "Guns", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
                 <p class="shop-note"><kbd>M</kbd> turns the sound on and off at any time.</p>
                 <h3>Dogfights (3D)</h3>
                 ${option("dfQuality", "Graphics", [["low", "Low (fastest)"], ["medium", "Medium"], ["high", "High (shadows, reflections, cinematic look)"], ["ultra", "Ultra (strong graphics card)"]])}
@@ -306,7 +310,7 @@ window.BitSettings = (function () {
             const v = ev.target.type === "checkbox" ? ev.target.checked : ev.target.type === "range" ? Number(ev.target.value) : ev.target.value;
             state[k] = v;
             const out = ev.target.parentElement.querySelector("output");
-            if (out) out.textContent = k === "volume" ? Math.round(v * 100) + "%" : k === "dfFov" ? v + "°" : Number(v).toFixed(2) + "×";
+            if (out) out.textContent = /olume$/.test(k) ? Math.round(v * 100) + "%" : k === "dfFov" ? v + "°" : Number(v).toFixed(2) + "×";
             save();
         });
         el.addEventListener("contextmenu", ev => capturing && ev.preventDefault());
