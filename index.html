@@ -14,6 +14,7 @@
     <link href="css/pause.css" rel="stylesheet">
     <link href="css/console.css" rel="stylesheet">
     <link href="css/panels.css" rel="stylesheet">
+    <link href="css/dogfight.css" rel="stylesheet">
 </head>
 <body>
 <main>
@@ -67,6 +68,9 @@
                     </div>
                     <div>
                         <label title="Play with real people online: 10 minute matches, top 5 leaderboard."><input type="radio" name="mode" value="multiplayer"> Multiplayer</label>
+                    </div>
+                    <div>
+                        <label title="3D dogfights over real terrain (beta)."><input type="radio" name="mode" value="dogfights"> Dogfights (Beta)</label>
                     </div>
                 </div>
             </div>
@@ -211,6 +215,13 @@
 <script src="js/online/match.js"></script>
 <script src="js/online/lobby.js"></script>
 <script src="js/menu.js"></script>
+<!-- Dogfights (3D beta): three.js itself loads only when you start it -->
+<script src="js/dogfight/world.js"></script>
+<script src="js/dogfight/aircraft.js"></script>
+<script src="js/dogfight/combat.js"></script>
+<script src="js/dogfight/ai.js"></script>
+<script src="js/dogfight/hud.js"></script>
+<script src="js/dogfight/mode.js"></script>
 <!-- Activity engine: each file registers a module, boot.js starts the activity -->
 <script src="js/engine/registry.js"></script>
 <script src="js/engine/00-vector.js"></script>
