@@ -22,8 +22,24 @@
         return new D.THREE.Color(hex).multiplyScalar(f);
     }
 
+    // Paint: physically based with sky reflections on High/Ultra (D.pbr),
+    // simple flat shading otherwise.
     function lambert(color) {
+        if (D.pbr) return new D.THREE.MeshStandardMaterial({color, roughness: 0.5, metalness: 0.28});
         return new D.THREE.MeshLambertMaterial({color, flatShading: true});
+    }
+
+    // Unlit glowing things (flames, lights) are extra bright on High/Ultra so they bloom.
+    function glowColor(hex, k = 1) {
+        return new D.THREE.Color(hex).multiplyScalar(1 + ((D.glow || 1) - 1) * k);
+    }
+
+    // A smooth body of revolution along the plane's length: [[z, radius], ...].
+    function lathe(profile, mat, segments = 18) {
+        const T = D.THREE;
+        const g = new T.LatheGeometry(profile.map(([z, r]) => new T.Vector2(r, -z)), segments);
+        g.rotateX(-Math.PI / 2);
+        return new T.Mesh(g, mat);
     }
 
     // A flat shape in the x/z plane (points as [x, z]), given some thickness.
@@ -43,7 +59,7 @@
     }
 
     function light(color, x, y, z, size = 0.35) {
-        const m = new D.THREE.Mesh(new D.THREE.SphereGeometry(size, 6, 4), new D.THREE.MeshBasicMaterial({color}));
+        const m = new D.THREE.Mesh(new D.THREE.SphereGeometry(size, 6, 4), new D.THREE.MeshBasicMaterial({color: glowColor(color, 1.5)}));
         m.position.set(x, y, z);
         return m;
     }
@@ -51,7 +67,9 @@
     // Forward is -Z, up is +Y, right is +X.
     function buildModel(shape, color, planeId) {
         const T = D.THREE, g = new T.Group();
-        const body = lambert(color), dark = lambert(shade(color, 0.6)), glass = new T.MeshPhongMaterial({color: 0x6fa8c8, shininess: 90, transparent: true, opacity: 0.75});
+        const body = lambert(color), dark = lambert(shade(color, 0.6)), glass = D.pbr
+            ? new T.MeshStandardMaterial({color: 0x24384a, roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.85, envMapIntensity: 1.8})
+            : new T.MeshPhongMaterial({color: 0x6fa8c8, shininess: 90, transparent: true, opacity: 0.75});
         const metal = lambert(0x3a3a3a), under = lambert(shade(color, 0.85));
         let prop = null, burners = [], canopy = null, tips = [[-8, 0, 2], [8, 0, 2]], tail = [0, 2, 7];
         const propeller = (z, blades, r = 3.5) => {
@@ -69,7 +87,7 @@
             g.add(prop);
         };
         const flame = (x, y, z) => {
-            const f = new T.Mesh(new T.ConeGeometry(0.75, 3, 8), new T.MeshBasicMaterial({color: 0xffa040, transparent: true, opacity: 0.85, depthWrite: false}));
+            const f = new T.Mesh(new T.ConeGeometry(0.75, 3, 8), new T.MeshBasicMaterial({color: glowColor(0xffa040), transparent: true, opacity: 0.85, depthWrite: false}));
             f.rotation.x = -Math.PI / 2;
             f.position.set(x, y, z);
             f.userData.z = z;
@@ -103,13 +121,19 @@
             tail = [0, 3.2, 7.6];
         } else if (shape === "jet") {
             const twin = TWIN_TAIL.includes(planeId);
-            const fus = new T.Mesh(new T.CylinderGeometry(1.35, 1.0, 14, 10), body);
-            fus.rotation.x = Math.PI / 2;
-            g.add(fus);
-            const nose = new T.Mesh(new T.ConeGeometry(1.0, 5, 10), body);
-            nose.rotation.x = -Math.PI / 2;
-            nose.position.z = -9.5;
-            g.add(nose);
+            if (D.pbr) {
+                // One smooth fuselage from the pointed nose to the jet pipes.
+                g.add(lathe([[-12.2, 0], [-11.4, 0.28], [-10, 0.6], [-8, 0.95], [-5.5, 1.22], [-2.5, 1.38], [2, 1.38], [5.5, 1.2], [7.6, 1.0], [7.9, 0.85]], body));
+                g.add(lathe([[7.6, 0.95], [8.6, 0.9], [8.6, 0.55]], dark, 14));
+            } else {
+                const fus = new T.Mesh(new T.CylinderGeometry(1.35, 1.0, 14, 10), body);
+                fus.rotation.x = Math.PI / 2;
+                g.add(fus);
+                const nose = new T.Mesh(new T.ConeGeometry(1.0, 5, 10), body);
+                nose.rotation.x = -Math.PI / 2;
+                nose.position.z = -9.5;
+                g.add(nose);
+            }
             // Intakes on the sides.
             [-1.5, 1.5].forEach(x => g.add(box(0.9, 1.2, 4.5, dark, x, -0.3, -2.5)));
             g.add(new T.Mesh(slab([[-1, -3], [-8.6, 3.2], [-8.6, 4.6], [8.6, 4.6], [8.6, 3.2], [1, -3]], 0.35), body));
@@ -144,10 +168,16 @@
             tips = [[-18, 0, 4], [18, 0, 4]];
             tail = [0, 0.9, 4];
         } else if (shape === "prop") {
-            const fus = new T.Mesh(new T.CylinderGeometry(1.4, 0.6, 12, 10), body);
-            fus.rotation.x = Math.PI / 2;
-            fus.position.z = 0.5;
-            g.add(fus);
+            if (D.pbr) {
+                g.add(lathe([[-6.4, 1.3], [-5, 1.45], [-2, 1.42], [1, 1.25], [4, 0.85], [6.5, 0.45], [6.9, 0]], body));
+                const spinner = lathe([[-7.6, 0], [-7.2, 0.35], [-6.6, 0.6], [-6.3, 0.62]], dark, 12);
+                g.add(spinner);
+            } else {
+                const fus = new T.Mesh(new T.CylinderGeometry(1.4, 0.6, 12, 10), body);
+                fus.rotation.x = Math.PI / 2;
+                fus.position.z = 0.5;
+                g.add(fus);
+            }
             const cowl = new T.Mesh(new T.CylinderGeometry(1.5, 1.5, 2.2, 10), dark);
             cowl.rotation.x = Math.PI / 2;
             cowl.position.z = -5.4;
@@ -193,10 +223,20 @@
             tips = [[-8.5, 2.2, -1.2], [8.5, 2.2, -1.2]];
             tail = [0, 2.5, 6];
         }
+        // The pilot's helmet under the canopy.
+        let helmet = null;
+        if (canopy && shape !== "bomber") {
+            helmet = new T.Mesh(new T.SphereGeometry(0.42, 10, 8), lambert(0x333333));
+            helmet.position.copy(canopy.position).add(new T.Vector3(0, shape === "" ? 0.35 : -0.05, shape === "" ? 1.3 : 0.4));
+            g.add(helmet);
+        }
         // Navigation lights: red left, green right, white tail.
         const navs = [light(0xff2a2a, ...tips[0]), light(0x2aff5a, ...tips[1]), light(0xffffff, ...tail, 0.3)];
         navs.forEach(l => g.add(l));
-        return {group: g, prop, burners, canopy, tips, navs};
+        if (D.shadows) g.traverse(o => {
+            if (o.isMesh && !(o.material && o.material.isMeshBasicMaterial)) o.castShadow = o.receiveShadow = true;
+        });
+        return {group: g, prop, burners, canopy, tips, navs, helmet};
     }
 
     // ------------------------------------------------------------- cockpit
@@ -211,6 +251,7 @@
         canvas.width = 512;
         canvas.height = 200;
         const tex = new T.CanvasTexture(canvas);
+        tex.encoding = T.sRGBEncoding;
         const panelW = shape === "" ? 1.5 : 2.2, panelH = 0.62;
         const panel = new T.Mesh(new T.PlaneGeometry(panelW, panelH), new T.MeshBasicMaterial({map: tex, color: 0xdddddd}));
         panel.position.set(ex, ey - (shape === "jet" || shape === "bomber" ? 0.5 : 0.62), ez - 1.0);
@@ -392,6 +433,7 @@
             this.prop = model.prop;
             this.burners = model.burners;
             this.canopy = model.canopy;
+            this.helmet = model.helmet;
             this.tips = model.tips.map(t => new T.Vector3(...t));
             this.navs = model.navs;
             this.scale = opts.shape === "bomber" ? 1.2 : 1;
@@ -424,7 +466,14 @@
             return this._cockpit;
         }
 
+        // The helmet in the canopy takes the pilot skin's color.
+        setPilot(skin) {
+            this.skin = skin;
+            if (this.helmet && skin && skin.capColor) this.helmet.material.color.set(skin.capColor);
+        }
+
         setCockpit(on) {
+            if (this.helmet) this.helmet.visible = !on;
             if (on) this.cockpit();
             if (this._cockpit) this._cockpit.group.visible = on;
             if (this.canopy) this.canopy.visible = !on;
@@ -542,7 +591,7 @@
                 const s = (this.boosting ? 1.5 : 0.35 + this.throttle * 0.5) + Math.random() * 0.15;
                 b.scale.set(this.boosting ? 1.2 : 1, s, this.boosting ? 1.2 : 1);
                 b.position.z = b.userData.z + 1.5 * s;
-                b.material.color.setHex(this.boosting ? 0x7fb6ff : 0xffa040);
+                b.material.color.set(glowColor(this.boosting ? 0x7fb6ff : 0xffa040, this.boosting ? 1.6 : 1));
             }
             // The white tail light blinks.
             this.navT += dt;

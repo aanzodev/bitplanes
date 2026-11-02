@@ -337,11 +337,22 @@ when locked, warning beeps tell you someone is locking or has fired, and far
 explosions arrive late (sound travels 343 m/s) and duller. In the cockpit the
 outside is muffled.
 
+**Graphics** (Settings → Graphics):
+
+| Level | What you get |
+|---|---|
+| Low | Fastest: lower resolution, fewer trees and effects |
+| Medium | Smooth edges, more trees and effects |
+| High | The cinematic look: real-time shadows (planes, mountains, trees, buildings), metal paint and glass reflecting the sky, smooth plane bodies, detailed ground, soft lit clouds, and an HDR picture with bloom (the sun, afterburners, tracers, fire and explosions glow), filmic tone mapping, color grading, vignette and film grain |
+| Ultra | High plus full screen sharpness, twice the terrain detail, more trees and clouds, a longer view, sharper and wider shadows, and 8x anti-aliasing. For a strong graphics card |
+
 Graphics use [three.js](https://threejs.org) (MIT license, in `js/vendor/`,
-only loaded when you start Dogfights) plus small GLSL shaders for the sky,
-water, city windows and the fire, smoke and spark particles. It needs a
-browser with WebGL (any recent one). On slow computers pick **Low** graphics in
-Settings.
+only loaded when you start Dogfights) plus GLSL shaders for the sky, water,
+clouds, ground detail, city windows, particles and the post-processing
+(`post.js`). It needs a browser with WebGL; High and Ultra's glow and film
+look need WebGL 2 (every recent browser). For the best picture, make sure
+your browser uses your graphics card (Chrome/Edge: Settings → System → "Use
+graphics acceleration when available").
 
 ## Multiplayer
 
@@ -454,7 +465,8 @@ js/
     boot.js             …and boot.js starts the activity
   dogfight/             Dogfights (3D beta):
     maps.js             The six maps and the times of day
-    world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds
+    world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
+    post.js             Bloom, filmic tone mapping and color grading (High/Ultra)
     aircraft.js         Plane models, cockpits with instruments, flight model
     combat.js           Guns, missiles, flares, GLSL particle effects, debris
     ai.js               Computer pilots
