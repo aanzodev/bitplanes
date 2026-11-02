@@ -145,6 +145,7 @@
             ammo: Math.round(n(l.ammo, -10, 40, 0)),
             missiles: Math.round(n(l.missiles, 0, 6, 0)),
             flares: Math.round(n(l.flares, 0, 8, 0)),
+            pilotSkin: typeof l.pilotSkin === "string" && /^[a-z0-9]{1,20}$/.test(l.pilotSkin) ? l.pilotSkin : "",
         };
     }
 

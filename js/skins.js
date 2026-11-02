@@ -108,6 +108,42 @@ window.BitSkins = (function () {
         return "data:image/svg+xml;base64," + btoa(svg);
     }
 
+    // The tiny pilot you see after ejecting in Bit Planes (about 9 x 13 pixels
+    // on screen, drawn bigger so it stays sharp).
+    function pilotImage(skin) {
+        const s = skin || selected(), o = 'stroke="#111" stroke-width="0.8"';
+        const head = s.cap === "jet"
+            ? `<path d="M4.6 5.6 Q4.4 1.2 8 1.2 Q11.6 1.2 11.4 5.6 Z" fill="${s.capColor}" ${o}/><rect x="5.2" y="3.6" width="5.6" height="1.9" rx=".9" fill="${s.visor}"/>`
+            : `<path d="M4.8 5.4 Q4.6 1.6 8 1.6 Q11.4 1.6 11.2 5.4 Z" fill="${s.capColor}" ${o}/><circle cx="6.5" cy="4" r="1" fill="${s.lens}"/><circle cx="9.5" cy="4" r="1" fill="${s.lens}"/>`;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 16 22">
+            <path d="M5.6 15 L5.2 21 M10.4 15 L10.8 21" stroke="${s.pants}" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M5 8.4 L3 13 M11 8.4 L13 13" stroke="${s.jacket}" stroke-width="2" stroke-linecap="round"/>
+            <rect x="4.6" y="7.6" width="6.8" height="7.8" rx="1.6" fill="${s.jacket}" ${o}/>
+            <path d="M5.4 8 Q8 9.4 10.6 8 L10.8 9.2 Q8 10.6 5.2 9.2 Z" fill="${s.scarf}"/>
+            <circle cx="3" cy="13.2" r="1.1" fill="${s.gloves}"/><circle cx="13" cy="13.2" r="1.1" fill="${s.gloves}"/>
+            <ellipse cx="8" cy="5" rx="3" ry="3.1" fill="${s.skin}" ${o}/>${head}</svg>`;
+        return "data:image/svg+xml;base64," + btoa(svg);
+    }
+
+    // The ejected pilot's sprite in Bit Planes. who: a player (you, or an
+    // online player who sent their skin) or a skin id. Bots keep the old pilot.
+    const pilotSprites = {};
+    window.bitPilotSprite = function (who) {
+        let id = typeof who === "string" ? who : null;
+        if (who && typeof who === "object") {
+            if (who.loadout) id = who.loadout.pilotSkin;
+            else if (who.isHuman) id = selected().id;
+        }
+        const skin = id && SKINS.find(s => s.id === id);
+        const E = window.BitEngine;
+        if (!skin || !E || !E.Sprite) return null;
+        if (!pilotSprites[id]) {
+            pilotSprites[id] = new E.Sprite(pilotImage(skin), 10, 14);
+            pilotSprites[id].pilotKey = id;
+        }
+        return pilotSprites[id];
+    };
+
     // --------------------------------------------------------------- shop
 
     function buy(id) {
@@ -160,7 +196,7 @@ window.BitSkins = (function () {
             <div class="shop-header"><h2>Skins</h2>
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
                 <button type="button" class="close-shop skins-close" aria-label="Close">×</button></div>
-            <p class="shop-note">Your pilot in the lobby. Rarer skins cost more coins.</p>
+            <p class="shop-note">Your pilot in the lobby, and the pilot who bails out when you eject (in Bit Planes and Dogfights). Rarer skins cost more coins.</p>
             <div class="skin-grid"></div>
         </div>`;
         document.body.appendChild(el);
@@ -181,7 +217,9 @@ window.BitSkins = (function () {
     else init();
 
     return {
-        list: SKINS, rarity: RARITY, image, buy, equip, selected, open,
+        list: SKINS, rarity: RARITY, image, pilotImage, buy, equip, selected, open,
+        get: id => SKINS.find(s => s.id === id) || null,
+        ownedCount: () => state.owned.length,
         state: () => state,
         onChange: fn => listeners.push(fn),
         unlockAll: () => {

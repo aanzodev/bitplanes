@@ -46,11 +46,17 @@
     function spriteKey(sprite) {
         if (!sprite) return null;
         if (sprite.planeKey) return "plane|" + sprite.planeKey.join("|");
+        if (sprite.pilotKey) return "pilot|" + sprite.pilotKey;
         return spriteKeys.get(sprite) || null;
     }
 
     function spriteFromKey(key) {
         if (spritesByKey.has(key)) return spritesByKey.get(key);
+        if (typeof key === "string" && key.startsWith("pilot|")) {
+            const sprite = window.bitPilotSprite && window.bitPilotSprite(key.slice(6));
+            if (sprite) spritesByKey.set(key, sprite);
+            return sprite || null;
+        }
         if (typeof key === "string" && key.startsWith("plane|")) {
             const [, color, pilot, skin, pattern] = key.split("|");
             if (!/^#[0-9a-f]{3,8}$/i.test(color)) return null;

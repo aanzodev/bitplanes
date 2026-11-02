@@ -14,6 +14,13 @@
 //                     {op: "list"}           Multiplayer server browser: all public matches
 //                     {op: "meta", d}        host: room info for the browser (name, players, ping…)
 //                     {op: "ping", t}        latency check, answered with {op: "pong", t}
+//   Friends and the global leaderboard (version 5, see social.js):
+//                     {op: "hi", uid, name, level, xp, kills, ...}  who you are (uid is secret)
+//                     {op: "where", room, mode}                      the room you are in now
+//                     {op: "friends", codes}                         your friends' status
+//                     {op: "fadd" | "faccept" | "fdecline" | "fremove", code}
+//                     {op: "invite", code}                            invite a friend to your room
+//                     {op: "lb", by}                                  top 50 by xp | kills | dfKills | streak
 //   (a host can add pub: true to "host" to list its room for Multiplayer)
 //   server -> client  {op: "hello", v}       on connect: server version (2 = light format below)
 //                     {op: "hosted"}         room is open
@@ -34,6 +41,7 @@
 //   server -> guest   "D<json>"
 //   server -> host    "D<guestId>\n<json>"
 const http = require("http");
+const social = require("./social");
 const {WebSocketServer} = require("ws");
 
 const PORT = Number(process.env.PORT) || 8787;
@@ -86,6 +94,7 @@ function onMessage(ws, text) {
     if (!msg || typeof msg !== "object") return;
 
     if (msg.op === "ping") return send(ws, {op: "pong", t: msg.t});
+    if (social.handle(ws, msg, send)) return;
 
     if (msg.op === "list") {
         const list = [];
@@ -170,6 +179,7 @@ function onMessage(ws, text) {
 }
 
 function onClose(ws) {
+    social.closed(ws);
     const room = ws.room && rooms.get(ws.room);
     if (!room) return;
     if (ws.isHost) {
@@ -186,13 +196,13 @@ const server = http.createServer((req, res) => {
     // Health check page (Render and you can open it to see the server is up).
     res.writeHead(200, {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"});
     const pub = [...rooms.values()].filter(r => r.public).length;
-    res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size} (${pub} Multiplayer)\n`);
+    res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size} (${pub} Multiplayer). ${social.summary()}\n`);
 });
 
 const wss = new WebSocketServer({server, maxPayload: 512 * 1024});
 wss.on("connection", ws => {
     // Tells browsers this server understands the light "T"/"U" data format.
-    send(ws, {op: "hello", v: 4}); // 3 = Multiplayer matchmaking, 4 = server browser
+    send(ws, {op: "hello", v: 5}); // 3 = Multiplayer matchmaking, 4 = server browser, 5 = friends + leaderboard
     ws.alive = true;
     ws.on("pong", () => (ws.alive = true));
     ws.on("message", data => onMessage(ws, data.toString()));
@@ -211,5 +221,10 @@ setInterval(() => {
         ws.ping();
     }
 }, 25000);
+
+process.on("SIGTERM", () => {
+    social.saveNow();
+    process.exit(0);
+});
 
 server.listen(PORT, () => console.log(`Bit Planes relay server on port ${PORT}`));

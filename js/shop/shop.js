@@ -24,6 +24,11 @@
         return state.upgrades[id] || 0;
     }
 
+    // Top level of an upgrade: higher at player levels 10, 25 and 50.
+    function maxOf(u) {
+        return u.max + (u.df || !window.BitProgress ? 0 : window.BitProgress.upgradeBonus());
+    }
+
     function upgradeCost(u) {
         return u.base * (level(u.id) + 1);
     }
@@ -73,7 +78,8 @@
     // The selected plane with your upgrades. Sent to the host in online activities.
     function loadout() {
         const p = selectedPlane();
-        return Object.assign(statsOf(p, colorOf(p), level), {pattern: patternOf(p)});
+        return Object.assign(statsOf(p, colorOf(p), level), {pattern: patternOf(p),
+            pilotSkin: window.BitSkins ? window.BitSkins.selected().id : ""});
     }
 
     // Computer pilots in single player fly a random plane (never a special or
@@ -181,7 +187,7 @@
 
     function buyUpgrade(id) {
         const u = UPGRADES.find(u => u.id === id);
-        if (!u || level(id) >= u.max) return;
+        if (!u || level(id) >= maxOf(u)) return;
         const cost = upgradeCost(u);
         if (state.coins < cost) return;
         state.coins -= cost;
@@ -228,7 +234,7 @@
 
     function unlockAll() {
         state.owned = PLANES.map(p => p.id);
-        UPGRADES.forEach(u => state.upgrades[u.id] = u.max);
+        UPGRADES.forEach(u => state.upgrades[u.id] = maxOf(u));
         save();
         return "Everything unlocked";
     }
@@ -252,7 +258,7 @@
 
     window.BitShop = {
         apply, reward, onKill, loadout, addCoins, setCoins, spend,
-        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, setPattern, patternOf, level, upgradeCost, give, unlockAll, resetShop,
+        buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, setPattern, patternOf, level, upgradeCost, maxOf, give, unlockAll, resetShop,
         planes: PLANES,
         upgrades: UPGRADES,
         paints: PAINTS,

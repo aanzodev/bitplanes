@@ -5,7 +5,7 @@
 (function () {
     const PROFILES = window.BitSoundProfiles;
     const HEAR_DISTANCE = 2200;
-    const s = {ctx: null, master: null, noise: null, muted: false, listener: null, engine: null, last: {}};
+    const s = {ctx: null, master: null, noise: null, muted: false, volume: 0.8, listener: null, engine: null, last: {}};
     try {
         s.muted = localStorage.getItem("muted") === "1";
     } catch (e) {}
@@ -20,12 +20,17 @@
             const comp = s.ctx.createDynamicsCompressor();
             comp.connect(s.ctx.destination);
             s.master = s.ctx.createGain();
-            s.master.gain.value = s.muted ? 0 : 0.7;
+            s.master.gain.value = level();
             s.master.connect(comp);
             s.noise = noiseBuffer();
         }
         if (s.ctx.state === "suspended") s.ctx.resume();
         return s.ctx;
+    }
+
+    // Master level: off when muted, otherwise the Settings volume.
+    function level() {
+        return s.muted ? 0 : 0.875 * s.volume;
     }
 
     // Browsers only allow sound after the player clicks or presses a key.
@@ -84,7 +89,16 @@
 
     // Output for a one-shot sound at a world position (or right here if pos is null).
     // Returns null when the sound is too far away or we are not in an activity.
-    function output(pos, volume, muffle) {
+    // dest: {node, dist} plays into that node instead (the 3D Dogfights mode
+    // places sounds itself); dist 0..1 makes it duller with distance.
+    function output(pos, volume, muffle, dest) {
+        if (dest) {
+            if (!ctx() || s.muted || volume < 0.01) return null;
+            const g = gain(volume);
+            if (muffle && dest.dist > 0) chain(g, filter("lowpass", 600 + 9000 * (1 - Math.min(1, dest.dist)) ** 2, 0.7), dest.node);
+            else g.connect(dest.node);
+            return g;
+        }
         if (!s.listener || !ctx() || s.muted) return null;
         let v = volume, pan = 0, dist = 0;
         if (pos) {
@@ -183,10 +197,10 @@
         playGun(profileOf(plane).gun, mine ? null : plane.position, mine ? 1 : 0.6);
     }
 
-    function playGun(type, pos, volume) {
+    function playGun(type, pos, volume, dest) {
         const g = GUNS[type] || GUNS.vickers;
         // Far-away guns are quieter and duller (the air soaks up the crack).
-        const out = output(pos, volume, true);
+        const out = output(pos, volume, true, dest);
         if (!out) return;
         const t = s.ctx.currentTime;
         const vary = 0.9 + Math.random() * 0.2; // no two shots sound exactly alike
@@ -415,7 +429,7 @@
         try {
             localStorage.setItem("muted", muted ? "1" : "0");
         } catch (e) {}
-        if (s.master) s.master.gain.setTargetAtTime(muted ? 0 : 0.7, s.ctx.currentTime, 0.05);
+        if (s.master) s.master.gain.setTargetAtTime(level(), s.ctx.currentTime, 0.05);
         document.querySelectorAll(".sound-toggle").forEach(b => {
             b.textContent = muted ? "🔇" : "🔊";
             b.title = muted ? "Sound off (M)" : "Sound on (M)";
@@ -445,6 +459,16 @@
         gunForShape: shape => SHAPE_GUN[shape || ""] || "vickers",
         // A gun sound right here (no position), e.g. for the 3D Dogfights beta.
         playGun: (type, volume = 1) => playGun(type, null, volume),
+        // A gun sound into a node of your own (3D Dogfights), dist 0..1 for distance.
+        playGunInto: (type, node, volume = 1, dist = 0) => playGun(type, null, volume, {node, dist}),
+        // The shared audio context and master output (null until sound is allowed).
+        context: () => ctx(),
+        master: () => (ctx(), s.master),
+        noiseBuffer: () => (ctx(), s.noise),
+        setVolume(v) {
+            s.volume = Math.max(0, Math.min(1, Number(v) || 0));
+            if (s.master) s.master.gain.setTargetAtTime(level(), s.ctx.currentTime, 0.05);
+        },
         guns: GUNS,
         missileAt: pos => missile({position: pos}),
         setMuted,

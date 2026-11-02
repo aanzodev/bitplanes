@@ -146,5 +146,10 @@ window.BitCatalog = {
         {id: "loader", name: "Missile loader", desc: "-12% missile reload time", max: 4, base: 60},
         {id: "flares", name: "Flare pod", desc: "+1 flare (Q), any plane", max: 3, base: 120},
         {id: "repair", name: "Repair kit", desc: "Fixes 1 hit point every 25s / 20s / 15s", max: 3, base: 150},
+        // Dogfights (3D) only. These don't get extra levels from your player level.
+        {id: "boost", name: "Afterburner", desc: "Dogfights: +25% boost time", max: 3, base: 150, df: true},
+        {id: "seeker", name: "Missile seeker", desc: "Dogfights: missiles lock on 15% faster", max: 3, base: 150, df: true},
+        {id: "radar", name: "Radar", desc: "Dogfights: +20% radar and lock range", max: 3, base: 120, df: true},
+        {id: "airframe", name: "Reinforced airframe", desc: "Dogfights: +10% health", max: 3, base: 160, df: true},
     ],
 };

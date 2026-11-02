@@ -1,0 +1,623 @@
+/* Settings, levels, achievements, friends, leaderboard and pop-up notices. */
+
+/* ---- Panels opened from anywhere (also over Dogfights and the pause menu) */
+.settings,
+.achievements,
+.friends-list,
+.leaderboard {
+    z-index: 60;
+    color: #111;
+    font-weight: 600;
+}
+
+.settings .panel,
+.friends-list .panel {
+    max-width: 680px;
+}
+
+.set-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0 12px;
+    border-bottom: 2px solid #eee;
+}
+
+.set-tab {
+    position: relative;
+    padding: 8px 14px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    background: none;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    color: #667;
+    cursor: pointer;
+}
+
+.set-tab.active {
+    color: #111;
+    border-bottom-color: #f5a623;
+}
+
+.set-tab .nav-dot {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+}
+
+.set-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 16px;
+}
+
+.set-row > span {
+    flex: 1;
+}
+
+.set-row select,
+.set-row input[type="range"] {
+    width: 220px;
+    max-width: 45vw;
+    font: inherit;
+    font-size: 15px;
+}
+
+.set-row input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+}
+
+.set-row output {
+    width: 52px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.key-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.key-table th {
+    text-align: left;
+    color: #888;
+    font-size: 13px;
+    padding: 4px;
+}
+
+.key-table td {
+    padding: 4px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.key-bind {
+    min-width: 110px;
+    padding: 6px 10px;
+    border: 2px solid #dde;
+    border-radius: 6px;
+    background: #f7f8fa;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.key-bind:hover {
+    border-color: #3aa7f0;
+}
+
+.key-bind.listening {
+    border-color: #f5a623;
+    background: #fff7e6;
+    animation: key-blink 0.8s infinite alternate;
+}
+
+@keyframes key-blink {
+    to {
+        background: #ffe2a8;
+    }
+}
+
+.set-reset {
+    margin-top: 14px;
+    font-size: 14px;
+}
+
+.controls-list th {
+    padding-top: 10px;
+    text-align: left;
+    font-size: 15px;
+    color: #f5a623;
+}
+
+/* ---- Lobby: friends, settings, level */
+.lobby-icon {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(10, 20, 40, 0.65);
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.lobby-icon:hover {
+    background: rgba(30, 60, 110, 0.85);
+}
+
+.lobby-icon .nav-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+
+.lobby-level {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(10, 20, 40, 0.65);
+    color: #ffd23f;
+    font: inherit;
+    cursor: pointer;
+}
+
+.lobby-level small {
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.lobby-level b {
+    font-size: 20px;
+}
+
+.lobby-level .level-track {
+    width: 56px;
+}
+
+.level-track {
+    display: block;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    overflow: hidden;
+}
+
+.level-fill,
+.level-track > span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #f5a623, #ffd23f);
+}
+
+.stat-level {
+    margin: 4px 0 14px;
+}
+
+.stat-level b {
+    font-size: 22px;
+}
+
+.stat-level .level-track {
+    height: 12px;
+    margin: 6px 0;
+    background: #eee;
+}
+
+.stat-level small {
+    color: #667;
+}
+
+.pip.tier {
+    outline: 2px solid #e5a50a;
+    outline-offset: 1px;
+}
+
+@media (max-width: 900px) {
+    .lobby-level .level-track {
+        display: none;
+    }
+
+    .lobby-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* ---- Achievements */
+.ach-count {
+    margin-right: 8px;
+    color: #667;
+}
+
+.ach-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+}
+
+.ach {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    filter: grayscale(0.6);
+}
+
+.ach.done {
+    border-color: #e5a50a;
+    background: #fffaf0;
+    filter: none;
+}
+
+.ach-icon {
+    font-size: 30px;
+}
+
+.ach > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.ach b,
+.ach small,
+.ach em {
+    display: block;
+}
+
+.ach small {
+    color: #667;
+    font-size: 13px;
+}
+
+.ach em {
+    color: #2e9e44;
+    font-style: normal;
+    font-size: 13px;
+}
+
+.ach-reward {
+    font-size: 13px;
+    text-align: right;
+    color: #a07000;
+}
+
+/* ---- Friends */
+.social-note {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #fff7e6;
+    font-size: 15px;
+}
+
+.friend-me {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f4f7fb;
+}
+
+.friend-me small {
+    display: block;
+    color: #667;
+}
+
+.my-code {
+    font-size: 28px;
+    letter-spacing: 3px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+
+.friend-me .copy-code {
+    font-size: 14px;
+    padding: 6px 14px;
+}
+
+.net-on {
+    margin-left: auto;
+    color: #2e9e44;
+}
+
+.net-off {
+    margin-left: auto;
+    color: #999;
+}
+
+.friend-add {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.friend-add input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    border: 2px solid #dde;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.friend-add .btn {
+    font-size: 18px;
+}
+
+.friend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.friend-row img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, #6ec6ff, #1d5f9e);
+    filter: grayscale(0.7);
+}
+
+.friend-row.on img {
+    filter: none;
+    box-shadow: 0 0 0 3px #33d17a;
+}
+
+.friend-row > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-row small {
+    display: block;
+    color: #667;
+    font-size: 13px;
+}
+
+.friend-row.on small {
+    color: #2e9e44;
+}
+
+.friend-row .btn {
+    font-size: 16px;
+    padding: 4px 14px;
+}
+
+.friend-row .pill {
+    font-size: 13px;
+    padding: 6px 12px;
+}
+
+.friend-lv {
+    font-size: 12px;
+    color: #a07000;
+}
+
+.friend-remove {
+    border: none;
+    background: none;
+    color: #aaa;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.friend-remove:hover {
+    color: #d00;
+}
+
+.panel h3 small {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ---- Leaderboard */
+.board-me {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f4f7fb;
+}
+
+.board-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.board-table th {
+    text-align: left;
+    font-size: 13px;
+    color: #888;
+    padding: 4px 6px;
+}
+
+.board-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.board-table img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, #6ec6ff, #1d5f9e);
+}
+
+.board-table tr.me {
+    background: #fff7e6;
+}
+
+.board-table tr.friend {
+    background: #effaf2;
+}
+
+.board-table em {
+    color: #888;
+    font-size: 13px;
+}
+
+.board-table .rank {
+    width: 36px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.rank-1 {
+    color: #e5a50a;
+}
+
+.rank-2 {
+    color: #8f969c;
+}
+
+.rank-3 {
+    color: #b87333;
+}
+
+/* ---- Pop-up notices */
+.toasts {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(460px, 92vw);
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: rgba(12, 22, 40, 0.88);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+    animation: toast-in 0.35s cubic-bezier(.2, 1.4, .4, 1);
+    pointer-events: auto;
+}
+
+.toast.out {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.5s;
+}
+
+.toast small {
+    display: block;
+    color: #ffd23f;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.toast b {
+    display: block;
+    font-size: 17px;
+}
+
+.toast.xp {
+    padding: 6px 14px;
+    font-size: 14px;
+}
+
+.toast.xp b {
+    display: inline;
+    color: #7dffa0;
+    font-size: 15px;
+}
+
+.toast.level {
+    flex-direction: column;
+    gap: 2px;
+    border: 2px solid #ffd23f;
+    text-align: center;
+}
+
+.toast-big {
+    font-size: 30px;
+    font-weight: 900;
+    color: #ffd23f;
+    letter-spacing: 2px;
+}
+
+.toast.ach {
+    border-left: 5px solid #e5a50a;
+}
+
+.toast.friend {
+    border-left: 5px solid #33d17a;
+}
+
+.toast-icon {
+    font-size: 30px;
+}
+
+.toast-join {
+    margin-top: 6px;
+    font-size: 16px;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+    }
+}
+
+.lobby-corner .pill {
+    position: relative;
+}
+
+.lobby-corner .nav-dot {
+    top: 4px;
+    left: 8px;
+}
+
+/* The long top bar: smaller tabs, and the profile drops below it on narrower screens. */
+@media (max-width: 1500px) {
+    .nav-tab {
+        padding: 9px 11px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 1240px) {
+    .lobby-profile {
+        top: 74px;
+    }
+}
+
+@media (max-width: 760px) {
+    .lobby-profile {
+        top: 116px;
+    }
+
+    .lobby-nav {
+        right: 10px;
+        flex-wrap: wrap;
+    }
+}

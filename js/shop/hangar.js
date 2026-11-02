@@ -70,11 +70,13 @@
 
     function upgradeRow(u, state) {
         const lvl = shop.level(u.id);
-        const maxed = lvl >= u.max;
+        const max = shop.maxOf ? shop.maxOf(u) : u.max;
+        const maxed = lvl >= max;
         const cost = shop.upgradeCost(u);
-        const pips = Array.from({length: u.max}, (_, i) => `<i class="pip${i < lvl ? " on" : ""}"></i>`).join("");
+        const pips = Array.from({length: max}, (_, i) => `<i class="pip${i < lvl ? " on" : ""}${i >= u.max ? " tier" : ""}"></i>`).join("");
+        const P = window.BitProgress, next = !u.df && P && P.nextTier();
         const action = maxed
-            ? `<button type="button" class="shop-btn equipped" disabled>Max</button>`
+            ? `<button type="button" class="shop-btn equipped" disabled title="${next ? `One more level at player level ${next}` : ""}">${next ? `Lv ${next}` : "Max"}</button>`
             : `<button type="button" class="shop-btn buy" data-buy-upgrade="${u.id}" ${state.coins < cost ? "disabled" : ""}>${cost} <i class="coin"></i></button>`;
         return `
             <div class="shop-upgrade">

@@ -261,6 +261,7 @@ BitModules[14] = function (M, j, t) {
             let L = new D.b(t);
             ((L.color = j.color),
                 (L.player = j),
+                window.bitPilotSprite && (L.sprite = window.bitPilotSprite(j) || L.sprite),
                 L.move(Object(N.a)(t.position, Object(N.e)(t.normal, 5))),
                 (L.velocity = Object(N.a)(t.velocity, Object(N.p)(Object(N.e)(t.normal, 20), N.m))),
                 M.add(L),
