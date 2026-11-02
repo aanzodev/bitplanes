@@ -68,13 +68,13 @@
                 return h + rim(x, z, 0.8, 1900);
             },
             color(h, slope, n, x, z) {
-                const snowLine = 1350 + n.fbm(x / 800, z / 800, 2) * 350;
-                if (h < 8) return 0xcbbf94;
-                if (slope > 0.9 && h > 120) return h > snowLine ? 0xcfd6dd : 0x7d776c;
-                if (h > snowLine) return 0xf3f6f8;
-                if (h > snowLine - 250) return 0x9a9488;
-                if (h < 500) return n.fbm(x / 600, z / 600, 2) > 0.5 ? 0x5c9a3c : 0x6aa646;
-                return 0x3f7433;
+                const snowLine = 1550 + n.fbm(x / 800, z / 800, 2) * 350;
+                if (h < 8) return 0xb8ad8a;
+                if (slope > 0.9 && h > 120) return h > snowLine ? 0xc9cfd4 : 0x6f6a61;
+                if (h > snowLine) return 0xeef1f3;
+                if (h > snowLine - 250) return 0x847e73;
+                if (h < 500) return n.fbm(x / 600, z / 600, 2) > 0.5 ? 0x56703a : 0x63793f;
+                return 0x3c5a2e;
             },
         },
         {
@@ -100,7 +100,7 @@
             },
         },
         {
-            id: "islands", name: "Pacific Islands", icon: "🏝", desc: "Tropical islands and a volcano in an endless ocean.",
+            id: "islands", name: "Pacific Islands", icon: "🏝", desc: "Tropical islands and a volcano in an endless ocean.", shallow: 0x2fd0c0,
             sky: "day", water: 0, cloudHeight: 2200, cloudAmount: 1.2, trees: {kind: "palm", count: 5000, min: 6, max: 500},
             carrier: {x: 4200, z: 5200, rot: 0.6},
             height(n, x, z) {
@@ -114,16 +114,16 @@
                 return h;
             },
             color(h, slope, n, x, z) {
-                if (h < 0) return 0x3b8f9a;
-                if (h < 18) return 0xf0dfa8;
-                if (slope > 0.8) return 0x5a4a3c;
-                if (h > 1000) return 0x4a3d36;
-                if (h > 650) return 0x6b8a3a;
-                return n.fbm(x / 400, z / 400, 2) > 0.5 ? 0x2f8f3a : 0x3fa246;
+                if (h < 0) return 0x6f8f82;
+                if (h < 18) return 0xe6d6a6;
+                if (slope > 0.8) return 0x5a4e44;
+                if (h > 1000) return 0x4e4540;
+                if (h > 650) return 0x5f7a3c;
+                return n.fbm(x / 400, z / 400, 2) > 0.5 ? 0x3d7a34 : 0x4a8a3c;
             },
         },
         {
-            id: "fjords", name: "Arctic Fjords", icon: "🧊", desc: "Icy cliffs, narrow fjords and icebergs.",
+            id: "fjords", name: "Arctic Fjords", icon: "🧊", desc: "Icy cliffs, narrow fjords and icebergs.", shallow: 0x3f7f86,
             sky: "overcast", water: 0, cloudHeight: 1900, cloudAmount: 1.4, trees: {kind: "snowpine", count: 3000, min: 30, max: 500},
             icebergs: 70,
             height(n, x, z) {
@@ -141,7 +141,7 @@
             },
         },
         {
-            id: "harbor", name: "Harbor City", icon: "🏙", desc: "Fly between skyscrapers over a busy harbor.",
+            id: "harbor", name: "Harbor City", icon: "🏙", desc: "Fly between skyscrapers over a busy harbor.", shallow: 0x3f8f8a, erosion: 0.6,
             sky: "dusk", water: 0, cloudHeight: 2500, trees: {kind: "broad", count: 3500, min: 10, max: 800},
             city: {x0: -3400, x1: 3400, cell: 150}, carrier: {x: -2600, z: 5600, rot: -0.3},
             coast(n, x) {
@@ -162,11 +162,11 @@
                 if (h < 14) return 0x6f7176;
                 if (slope > 0.8) return 0x6d665c;
                 if (h > 900) return 0x8a8578;
-                return n.fbm(x / 500, z / 500, 2) > 0.5 ? 0x4f8a3a : 0x5e9a44;
+                return n.fbm(x / 500, z / 500, 2) > 0.5 ? 0x4c6e38 : 0x587a40;
             },
         },
         {
-            id: "farmlands", name: "Farmlands", icon: "🌾", desc: "Rolling fields, red barns and a river (cows too).",
+            id: "farmlands", name: "Farmlands", icon: "🌾", desc: "Rolling fields, red barns and a river (cows too).", shallow: 0x4f8f6a, erosion: 0.6,
             sky: "dawn", water: 0, cloudHeight: 2100, trees: {kind: "broad", count: 7000, min: 5, max: 900},
             barns: 140,
             height(n, x, z) {
@@ -183,7 +183,7 @@
                 const fx = x / 340 - cx, fz = z / 260 - cz;
                 if (fx < 0.03 || fz < 0.04) return 0x9b8a62;
                 const k = n.hash(cx, cz);
-                return [0xd8c25a, 0x7fb34a, 0x8a6a45, 0x5f9e3c, 0xc9b264, 0x9ccb5a][Math.floor(k * 6)];
+                return [0xc4ae62, 0x6e8f42, 0x7a5f42, 0x58803a, 0xb59f60, 0x7f9a4c][Math.floor(k * 6)];
             },
         },
     ];

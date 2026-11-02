@@ -264,6 +264,11 @@ Or add `?coins=10000` to the page URL to add coins once.
 
 ## Dogfights (3D beta)
 
+**Unlocking:** Dogfights opens at **player level 10**, or as soon as you own
+a **special plane** (the black or gold bordered ones in the Hangar: the jets
+and the B-2). Until then the mode card says 🔒 Locked and shows how far you
+are.
+
 Pick **Dogfights** on the mode card and press **PLAY**. The deploy screen picks
 the **map**, **time of day**, **team dogfight** (blue vs red, 4v4 to 8v8, first
 team to the kill goal or the most kills in 10 minutes) or **free for all**,
@@ -282,6 +287,16 @@ Hangar plane with its paint, speed, armor, real gun sound and upgrades.
 | 🌾 Farmlands | Patchwork fields, red barns and silos, and a river |
 
 Each comes in Day, Dawn, Sunset, Overcast, Dusk or Night (stars and moon).
+
+**Terrain:** every map is worn down by simulated rain before you fly
+(hydraulic erosion: thousands of raindrops carve gullies and ravines into the
+slopes and lay sediment in the valleys), written in C and compiled to
+WebAssembly (`native/erosion.c`), with a JavaScript fallback. On High/Ultra
+the ground is shaded per pixel: rock with strata and cracks on steep slopes,
+soil and grass patches, snow settling on flat ground up high, wet sand at the
+waterline, and fine bumps that catch the light. Water is turquoise in the
+shallows and deep blue further out, with foam where waves break on the shore.
+Boulders lie on the slopes, and every tree has its own shade.
 
 **Fighting, Battlefield style:**
 
@@ -307,8 +322,13 @@ stealth shape, canted tails and flat nozzles, the Su-27 and MiG-29's engine
 pods and twin tails, the F-15, F-16, F-35, MiG-21 (nose intake and delta
 wing), A-10 (engines on the back), B-2 flying wing, Spitfire and Zero
 (elliptical wings), Corsair (gull wings), P-38 (twin booms), radial and
-inline engines, and biplanes with struts, wires and wheels (the Fokker
-Dr.I has three wings). Ailerons, tailplanes and rudders move with the
+inline engines, and every biplane its own aircraft: the Classic, Tiger Moth
+(swept, staggered wings and two seats), Crop Duster (with its spray bar),
+Swift racer (wheel spats, I-struts), Gunship (rear gunner), Fokker Dr.I
+(three wings), SPAD XIII (flat radiator, two-bay struts), Fortress (a
+twin-engine biplane bomber with a glazed nose), Sopwith Camel (the hump over
+its guns) and Phantom (enclosed canopy), all with struts, bracing wires and
+wheels. Ailerons, tailplanes and rudders move with the
 controls, jet nozzles glow inside and flame on afterburner, and the paint
 has panel lines, weathering, your Hangar pattern, team markings and a side
 number.
@@ -477,6 +497,8 @@ js/
   dogfight/             Dogfights (3D beta):
     maps.js             The six maps and the times of day
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
+    erosion.js          Loads erosion.wasm (rain wearing the terrain), JavaScript fallback
+    erosion.wasm        Built from native/erosion.c
     post.js             Bloom, filmic tone mapping and color grading (High/Ultra)
     models.js           Realistic plane models (each real plane its own shape, moving controls)
     aircraft.js         Cockpits with instruments, flight model
@@ -491,6 +513,7 @@ assets/
   sprites/              Activity sprites (units, effects, scenery, ui)
   icons/                HUD and logo icons
 docs/screenshots/       Images for this README
+native/                 C code compiled to WebAssembly (build.sh rebuilds it; needs clang)
 server/                 Relay server for online play, friends and the leaderboard (Node.js)
 render.yaml             One-click deploy of the relay server on Render
 ```

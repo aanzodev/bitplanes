@@ -75,8 +75,64 @@
 
     // ------------------------------------------------------------- start
 
+    // Dogfights opens up at player level 10, or as soon as you own a special
+    // plane (the black or gold bordered ones in the Hangar: the jets and the B-2).
+    const UNLOCK_LEVEL = 10;
+
+    function access() {
+        const P = window.BitProgress, shop = window.BitShop;
+        const level = P ? P.levelInfo().level : 1;
+        const owned = shop ? shop.state().owned : [];
+        const special = shop ? shop.planes.filter(p => (p.special || p.exclusive) && owned.includes(p.id)) : [];
+        const cheapest = shop ? shop.planes.filter(p => p.special || p.exclusive).sort((a, b) => a.price - b.price)[0] : null;
+        return {ok: level >= UNLOCK_LEVEL || special.length > 0, level, need: UNLOCK_LEVEL, special, cheapest};
+    }
+
+    function showLocked(a) {
+        const el = document.createElement("div");
+        el.className = "df-deploy df-locked";
+        const P = window.BitProgress, info = P ? P.levelInfo() : {frac: 0};
+        const coins = window.BitShop ? window.BitShop.state().coins : 0;
+        el.innerHTML = `<div class="df-deploy-box df-lock-box">
+            <div class="df-deploy-head"><h2>🔒 Dogfights <span class="beta-tag">Beta</span></h2><button type="button" class="df-x" aria-label="Close">×</button></div>
+            <p class="df-lock-lead">Dogfights is for experienced pilots. Unlock it either way:</p>
+            <div class="df-lock-ways">
+                <div class="df-lock-way"><b>⭐ Reach level ${a.need}</b>
+                    <span>You're level ${a.level}${a.level < a.need ? ` · ${a.need - a.level} to go` : ""}</span>
+                    <div class="df-lock-bar"><i style="width: ${Math.min(100, ((a.level - 1 + (info.frac || 0)) / (a.need - 1)) * 100)}%"></i></div>
+                    <small>XP comes from kills, matches, quests and achievements in Bit Planes.</small></div>
+                <div class="df-lock-way"><b>✈ Own a special plane</b>
+                    <span>The jets with a black border in the Hangar${a.cheapest ? `, from the ${a.cheapest.name} (${a.cheapest.price.toLocaleString()} coins)` : ""}.</span>
+                    <small>You have ${coins.toLocaleString()} coins.</small>
+                    <button type="button" class="pill df-lock-hangar">Open the Hangar</button></div>
+            </div>
+        </div>`;
+        document.body.appendChild(el);
+        const close = () => {
+            el.remove();
+            document.removeEventListener("keydown", onKey, true);
+        };
+        const onKey = ev => {
+            if (ev.key === "Escape") {
+                ev.stopImmediatePropagation();
+                close();
+            }
+        };
+        document.addEventListener("keydown", onKey, true);
+        el.addEventListener("click", ev => {
+            if (ev.target === el || ev.target.closest(".df-x")) close();
+            if (ev.target.closest(".df-lock-hangar")) {
+                close();
+                const h = document.querySelector(".open-shop");
+                if (h) h.click();
+            }
+        });
+    }
+
     function open() {
         if (fight) return;
+        const a = access();
+        if (!a.ok) return showLocked(a);
         D.showDeploy(start);
     }
 
@@ -86,7 +142,7 @@
         status("Loading 3D Dogfights…");
         let THREE;
         try {
-            THREE = await loadThree();
+            [THREE] = await Promise.all([loadThree(), D.loadErosion ? D.loadErosion() : null]);
         } catch (e) {
             return status(e.message);
         }
@@ -988,6 +1044,7 @@
     else init();
 
     D.open = open;
+    D.access = access;
     D.start = start;
     D.stop = stop;
     D.state = () => fight;

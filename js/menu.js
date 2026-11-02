@@ -63,9 +63,13 @@
         const r = radios().find(x => x.checked) || radios()[0];
         if (!r) return;
         const m = MODES[r.value] || {name: r.value, desc: ""};
-        document.querySelector(".mode-title").innerHTML = m.name + (m.beta ? ' <span class="beta-tag">Beta</span>' : "");
+        const D = window.BitDogfight;
+        const locked = r.value === "dogfights" && D && D.access && !D.access().ok;
+        document.querySelector(".mode-title").innerHTML = (locked ? "🔒 " : "") + m.name + (m.beta ? ' <span class="beta-tag">Beta</span>' : "");
         document.querySelector(".mode-name").textContent = m.name;
-        document.querySelector(".mode-desc").textContent = m.desc;
+        document.querySelector(".mode-desc").textContent = locked ? "Unlocks at level 10, or with a special plane" : m.desc;
+        const play = document.querySelector(".play-btn");
+        if (play) play.textContent = locked ? "🔒 Locked" : "Play";
     }
 
     function nextMode() {
