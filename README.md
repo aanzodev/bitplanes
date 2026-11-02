@@ -193,14 +193,30 @@ whichever plane you fly. Coins and purchases are saved in your browser.
 
 ### Sound
 
-Every plane has its own engine sound, synthesized live with the Web Audio API
-(no audio files): each propeller plane has its own pitch, cylinder rhythm and
-tone (the Spitfire and P-51 get a smooth Merlin growl, the P-51 its air-scoop
-whistle, the Sopwith Camel a sputtering rotary). The special jets get turbine
-roar and whine: F-16 with afterburner, the A-10's high "hair dryer" whistle and
-GAU-8 *BRRRT*, the F-22's deep afterburner rumble. Guns, missiles, flares and
-explosions from other planes get quieter and pan with distance. Tweak the
-sounds in `js/audio/profiles.js`.
+Every plane's engine sound is modelled on its **real engine**, synthesized live
+with the Web Audio API (no audio files, `js/audio/engines.js`), in Bit Planes
+and in Dogfights:
+
+- **Piston engines** fire once per cylinder every two turns, so the note comes
+  from the real cylinder count and RPM: the Spitfire, Hurricane and P-51's
+  Merlin V12 (300 Hz at 3,000 rpm) growls smoothly with a supercharger whine,
+  the Bf 109's fuel-injected DB 605 is rougher, the Corsair and P-47's 18
+  cylinder R-2800 radials rumble and lope (the P-47 with its turbo whine), the
+  Zero and Fw 190's 14 cylinder radials sit in between, the Piper Cub putters,
+  and the Sopwith Camel and Fokker's spinning rotaries stutter on the blip
+  switch. On top: exhaust pops, the crankshaft lope, the propeller's
+  blade-pass whop and air wash, the P-51's scoop whistle, and the P-38 and
+  Fortress's two engines beating against each other.
+- **Jets:** turbine whine and its harmonic over the exhaust roar; turbofans
+  (F-16, F-15, Su-27, MiG-29, F-35, F-22) buzz at high thrust; the MiG-21's
+  turbojet rasps and howls; the A-10's TF34s whine like a hair dryer; the B-2
+  hums. The afterburner adds thunder and crackle.
+- In Dogfights other planes' engines come from where they are and shift pitch
+  as they pass (Doppler).
+
+Guns, missiles, flares and explosions from other planes get quieter and pan
+with distance. Tweak any plane's sound in `js/audio/profiles.js` (the
+`engine` entry is its real engine).
 
 **Guns:** every plane fires the gun it really carried, each synthesized from
 its muzzle crack, the blast's roar, the thump of the shot, the bolt clacking

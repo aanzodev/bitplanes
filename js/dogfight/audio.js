@@ -113,132 +113,56 @@
 
         // ---------------------------------------------------- your engine
 
-        function buildEngine(shape) {
-            const jet = shape === "jet" || shape === "bomber";
-            const e = {jet, nodes: []};
-            const out = gain(0);
-            out.connect(own);
-            e.out = out;
-            if (jet) {
-                // Turbine whine (two detuned tones) + core roar + afterburner rumble.
-                e.whine1 = osc("sine", 2200);
-                e.whine2 = osc("sine", 2213);
-                e.whineG = gain(0.02);
-                chain(e.whine1, e.whineG, out);
-                e.whine2.connect(e.whineG);
-                e.roar = noise();
-                e.roarF = filt("lowpass", 700, 0.7);
-                e.roarG = gain(0.3);
-                chain(e.roar, e.roarF, e.roarG, out);
-                e.core = noise();
-                e.coreF = filt("bandpass", 900, 1.2);
-                e.coreG = gain(0.12);
-                chain(e.core, e.coreF, e.coreG, out);
-                e.ab = noise();
-                e.abF = filt("lowpass", 260, 0.9);
-                e.abG = gain(0);
-                chain(e.ab, e.abF, e.abG, out);
-                e.abCrackle = noise();
-                e.abCrF = filt("bandpass", 120, 4);
-                e.abCrG = gain(0);
-                chain(e.abCrackle, shaper(6), e.abCrF, e.abCrG, out);
-                e.nodes.push(e.whine1, e.whine2, e.roar, e.core, e.ab, e.abCrackle);
-            } else {
-                // Piston engine: a gritty pulse train at the firing rate, exhaust
-                // pops, a low rumble, and the propeller's whop on top.
-                e.fire = osc("sawtooth", 45);
-                e.fireF = filt("lowpass", 420, 2.2);
-                e.fireG = gain(0.28);
-                chain(e.fire, shaper(3), e.fireF, e.fireG, out);
-                e.sub = osc("sine", 22);
-                e.subG = gain(0.25);
-                chain(e.sub, e.subG, out);
-                e.pops = noise();
-                e.popsF = filt("bandpass", 260, 1.5);
-                e.popsAM = gain(0);
-                chain(e.pops, e.popsF, e.popsAM, out);
-                e.lfo = osc("square", 45);
-                e.lfoG = gain(0.16);
-                chain(e.lfo, e.lfoG, e.popsAM.gain);
-                e.whop = osc("sine", 30);
-                e.whopG = gain(0.35);
-                e.whopDepth = gain(0);
-                chain(e.whop, e.whopDepth, out.gain);
-                e.nodes.push(e.fire, e.sub, e.pops, e.lfo, e.whop);
-            }
-            // Wind and the scream of air in hard turns.
-            e.wind = noise();
-            e.windF = filt("bandpass", 500, 0.6);
-            e.windG = gain(0);
-            chain(e.wind, e.windF, e.windG, own);
-            e.whistle = noise();
-            e.whistleF = filt("bandpass", 2600, 6);
-            e.whistleG = gain(0);
-            chain(e.whistle, e.whistleF, e.whistleG, own);
-            e.nodes.push(e.wind, e.whistle);
-            e.nodes.forEach(n => n.start());
-            return e;
-        }
+        // Every plane's engine is modelled on its real one (audio/engines.js).
+        const PROFILES = window.BitSoundProfiles || {};
+        const profileOf = p => PROFILES[p.planeId] || PROFILES.classic || {kind: p.shape === "jet" ? "jet" : "prop"};
 
-        let engine = null, engineShape = null;
+        // Wind and the scream of air in hard turns (your plane only).
+        const wind = noise(), windF = filt("bandpass", 500, 0.6), windG = gain(0);
+        chain(wind, windF, windG, own);
+        const scream = noise(), screamF = filt("bandpass", 2600, 6), screamG = gain(0);
+        chain(scream, screamF, screamG, own);
+        wind.start();
+        scream.start();
+
+        let engine = null, enginePlane = null;
+        const engineBus = gain(0);
+        engineBus.connect(own);
 
         function updateEngine(p, dt, cockpit) {
+            const t = now(), k = 0.08;
             if (!p || !p.alive) {
-                if (engine) engine.out.gain.setTargetAtTime(0, now(), 0.3), engine.windG.gain.setTargetAtTime(0, now(), 0.3), engine.whistleG.gain.setTargetAtTime(0, now(), 0.3);
+                engineBus.gain.setTargetAtTime(0, t, 0.3);
+                windG.gain.setTargetAtTime(0, t, 0.3);
+                screamG.gain.setTargetAtTime(0, t, 0.3);
                 return;
             }
-            if (!engine || engineShape !== p.shape) {
-                if (engine) engine.nodes.forEach(n => n.stop());
-                engine = buildEngine(p.shape);
-                engineShape = p.shape;
+            if (!engine || enginePlane !== p.planeId) {
+                if (engine) engine.stop();
+                engine = window.BitEngines.create(ctx, engineBus, profileOf(p), noiseBuf);
+                enginePlane = p.planeId;
             }
-            const e = engine, t = now(), k = 0.08;
-            const thr = p.throttle, sp = Math.min(1.5, p.speed / p.topSpeed), boost = p.boosting ? 1 : 0;
-            const vol = (cockpit ? 1.15 : 0.75) * (0.45 + 0.55 * thr);
-            if (e.jet) {
-                const spool = 0.55 + 0.45 * thr + 0.1 * boost;
-                e.whine1.frequency.setTargetAtTime(1500 + 2600 * spool, t, 0.25);
-                e.whine2.frequency.setTargetAtTime(1513 + 2620 * spool, t, 0.25);
-                e.whineG.gain.setTargetAtTime((cockpit ? 0.035 : 0.018) * spool, t, k);
-                e.roarF.frequency.setTargetAtTime(380 + 900 * spool, t, k);
-                e.roarG.gain.setTargetAtTime(0.22 + 0.25 * spool, t, k);
-                e.coreG.gain.setTargetAtTime(0.06 + 0.1 * thr, t, k);
-                e.abG.gain.setTargetAtTime(boost * 0.9, t, 0.15);
-                e.abCrG.gain.setTargetAtTime(boost * 0.6 * (0.6 + Math.random() * 0.4), t, 0.05);
-                e.out.gain.setTargetAtTime(vol * 0.55, t, k);
-            } else {
-                const rpm = 0.45 + 0.5 * thr + 0.12 * boost + 0.08 * sp; // also windmills faster when diving
-                const f = 28 + 46 * rpm;
-                e.fire.frequency.setTargetAtTime(f, t, 0.12);
-                e.lfo.frequency.setTargetAtTime(f, t, 0.12);
-                e.fireF.frequency.setTargetAtTime(260 + 520 * rpm, t, k);
-                e.sub.frequency.setTargetAtTime(f / 2, t, 0.12);
-                e.whop.frequency.setTargetAtTime(f * 0.75, t, 0.12);
-                e.whopDepth.gain.setTargetAtTime(vol * 0.18, t, k);
-                e.popsF.frequency.setTargetAtTime(180 + 300 * rpm, t, k);
-                e.out.gain.setTargetAtTime(vol * (p.burning && Math.random() < 0.2 ? 0.4 : 0.6), t, 0.04);
-            }
+            // Louder and bassier from the seat; a damaged engine misfires.
+            engineBus.gain.setTargetAtTime((cockpit ? 0.62 : 0.4) * (p.burning && Math.random() < 0.25 ? 0.35 : 1), t, 0.05);
+            engine.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed});
             const windLevel = Math.min(1, (p.speed / 260) ** 2);
-            e.windF.frequency.setTargetAtTime(300 + p.speed * 6, t, k);
-            e.windG.gain.setTargetAtTime((cockpit ? 0.12 : 0.3) * windLevel, t, k);
+            windF.frequency.setTargetAtTime(300 + p.speed * 6, t, k);
+            windG.gain.setTargetAtTime((cockpit ? 0.12 : 0.3) * windLevel, t, k);
             const gs = Math.max(0, (p.g - 4) / 6);
-            e.whistleG.gain.setTargetAtTime(0.08 * gs * windLevel, t, k);
-            e.whistleF.frequency.setTargetAtTime(1800 + p.speed * 6, t, k);
+            screamG.gain.setTargetAtTime(0.08 * gs * windLevel, t, k);
+            screamF.frequency.setTargetAtTime(1800 + p.speed * 6, t, k);
         }
 
         // ---------------------------------------------- other planes' engines
 
+        // The four nearest planes each get their own engine sound, placed where
+        // they are and pitched by the Doppler effect as they pass.
         const VOICES = 4;
         const voices = [];
         for (let i = 0; i < VOICES; i++) {
-            const p = panner();
-            const o = osc("sawtooth", 80), of = filt("lowpass", 900, 1), og = gain(0);
-            const n = noise(), nf = filt("bandpass", 700, 0.8), ng = gain(0);
-            chain(o, of, og, p);
-            chain(n, nf, ng, p);
-            o.start();
-            n.start();
-            voices.push({p, o, of, og, n, nf, ng, plane: null});
+            const pan = panner(), bus = gain(0);
+            bus.connect(pan);
+            voices.push({p: pan, bus, eng: null, planeId: null, plane: null});
         }
         const tmp = {x: 0, y: 0, z: 0};
 
@@ -248,12 +172,16 @@
             voices.forEach((v, i) => {
                 const o = others[i];
                 if (!o || o.d > 6000) {
-                    v.og.gain.setTargetAtTime(0, t, 0.2);
-                    v.ng.gain.setTargetAtTime(0, t, 0.2);
+                    v.bus.gain.setTargetAtTime(0, t, 0.2);
                     v.plane = null;
                     return;
                 }
                 const p = o.p, jet = p.shape === "jet" || p.shape === "bomber";
+                if (v.planeId !== p.planeId || !v.eng) {
+                    if (v.eng) v.eng.stop();
+                    v.eng = window.BitEngines.create(ctx, v.bus, profileOf(p), noiseBuf);
+                    v.planeId = p.planeId;
+                }
                 place(v.p, p.pos);
                 // Doppler: higher when coming at you, lower going away.
                 const dir = tmp;
@@ -263,12 +191,8 @@
                 const vs = p.forward.x * p.speed * dir.x + p.forward.y * p.speed * dir.y + p.forward.z * p.speed * dir.z;
                 const vl = listenerVel ? -(listenerVel.x * dir.x + listenerVel.y * dir.y + listenerVel.z * dir.z) : 0;
                 const dop = Math.max(0.5, Math.min(2.2, (C + vl) / Math.max(60, C - vs)));
-                const base = jet ? 120 + 90 * p.throttle : 40 + 45 * p.throttle;
-                v.o.frequency.setTargetAtTime(base * dop, t, 0.06);
-                v.of.frequency.setTargetAtTime((jet ? 1400 : 700) * dop, t, 0.06);
-                v.nf.frequency.setTargetAtTime((jet ? 1100 : 500) * dop, t, 0.06);
-                v.og.gain.setTargetAtTime(jet ? 0.12 : 0.22, t, 0.1);
-                v.ng.gain.setTargetAtTime(jet ? (p.boosting ? 0.9 : 0.45) : 0.25, t, 0.1);
+                v.eng.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed, pitch: dop});
+                v.bus.gain.setTargetAtTime(jet ? 1.1 : 1.3, t, 0.1);
                 // A close pass: a whoosh as it goes by.
                 if (v.plane === p && o.d < 160 && (!p._whooshAt || t - p._whooshAt > 2.5) && vs - vl < -40) {
                     p._whooshAt = t;
@@ -494,8 +418,10 @@
                 master.gain.setTargetAtTime(0, now(), 0.05);
                 setTimeout(() => {
                     try {
-                        if (engine) engine.nodes.forEach(n => n.stop());
-                        voices.forEach(v => (v.o.stop(), v.n.stop()));
+                        if (engine) engine.stop();
+                        voices.forEach(v => v.eng && v.eng.stop());
+                        wind.stop();
+                        scream.stop();
                         [seek, seekAM, warn, horn].forEach(n => n.stop());
                         master.disconnect();
                     } catch (e) {}

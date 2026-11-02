@@ -330,48 +330,11 @@
 
     // ---------------------------------------------------------- your engine
 
+    // Your plane's engine, modelled on its real engine (audio/engines.js).
     function buildEngine(profile) {
-        const out = gain(0);
+        const out = gain(0.42);
         out.connect(s.master);
-        const e = {profile, out, nodes: []};
-        if (profile.kind === "jet") {
-            const roar = noise(), roarLp = filter("lowpass", profile.roar[0], 0.7);
-            e.roarLp = roarLp;
-            e.roarGain = gain(0.2);
-            chain(roar, roarLp, e.roarGain, out);
-            e.whine = osc("sine", profile.whine[0]);
-            e.whineGain = gain(profile.whineVol);
-            chain(e.whine, e.whineGain, out);
-            const burner = noise();
-            e.burnerGain = gain(0);
-            chain(burner, filter("lowpass", 180, 0.8), e.burnerGain, out);
-            e.nodes.push(roar, e.whine, burner);
-        } else {
-            e.osc1 = osc(profile.wave, profile.base);
-            e.osc2 = osc("square", profile.base / 2);
-            const mix = gain(0.6), sub = gain(0.25);
-            e.tone = filter("lowpass", profile.tone, 1.5);
-            e.am = gain(0.6);
-            e.lfo = osc("sine", profile.pulse);
-            const depth = gain(0.4);
-            chain(e.lfo, depth);
-            depth.connect(e.am.gain);
-            e.osc1.connect(mix);
-            chain(e.osc2, sub, mix);
-            chain(mix, e.tone, e.am, out);
-            const wash = noise();
-            e.washGain = gain(0.05);
-            chain(wash, filter("bandpass", 650, 0.7), e.washGain, out);
-            e.nodes.push(e.osc1, e.osc2, e.lfo, wash);
-            if (profile.whistle) {
-                e.whistle = osc("sine", profile.whistle);
-                e.whistleGain = gain(0);
-                chain(e.whistle, e.whistleGain, out);
-                e.nodes.push(e.whistle);
-            }
-        }
-        e.nodes.forEach(n => n.start());
-        return e;
+        return {profile, out, eng: window.BitEngines.create(s.ctx, out, profile, s.noise)};
     }
 
     function stopEngine() {
@@ -379,7 +342,7 @@
         const e = s.engine;
         s.engine = null;
         e.out.gain.setTargetAtTime(0, s.ctx.currentTime, 0.05);
-        setTimeout(() => e.nodes.forEach(n => n.stop()), 300);
+        e.eng.stop();
     }
 
     function updateEngine() {
@@ -395,29 +358,11 @@
             stopEngine();
             s.engine = buildEngine(profile);
         }
-        const e = s.engine, now = s.ctx.currentTime, glide = 0.12;
+        const e = s.engine;
         const t = Math.max(0, Math.min(1, plane.thrust / (plane.maxThrust || 17)));
-        // Overall loudness for this plane; some engines are silent at idle.
-        const level = (profile.volume || 1) * (profile.idleSilent && t === 0 ? 0 : 1);
-        if (profile.kind === "jet") {
-            e.roarLp.frequency.setTargetAtTime(profile.roar[0] + (profile.roar[1] - profile.roar[0]) * t, now, glide);
-            e.roarGain.gain.setTargetAtTime(0.14 + 0.3 * t, now, glide);
-            e.whine.frequency.setTargetAtTime(profile.whine[0] + (profile.whine[1] - profile.whine[0]) * t, now, glide);
-            e.whineGain.gain.setTargetAtTime(profile.whineVol * (0.4 + 0.6 * t), now, glide);
-            e.burnerGain.gain.setTargetAtTime(t > 0.8 ? profile.burner * (t - 0.8) / 0.2 : 0, now, glide);
-            e.out.gain.setTargetAtTime(0.5 * level, now, glide);
-        } else {
-            const f = profile.base + profile.range * t;
-            e.osc1.frequency.setTargetAtTime(f, now, glide);
-            e.osc2.frequency.setTargetAtTime(f / 2, now, glide);
-            e.lfo.frequency.setTargetAtTime(profile.pulse * (0.6 + 0.8 * t), now, glide);
-            e.tone.frequency.setTargetAtTime(profile.tone * (0.6 + 0.9 * t), now, glide);
-            e.washGain.gain.setTargetAtTime(0.03 + 0.07 * t, now, glide);
-            if (e.whistleGain) e.whistleGain.gain.setTargetAtTime(0.03 * t, now, glide);
-            let vol = (0.16 + 0.22 * t) * level;
-            if (profile.sputter && Math.random() < profile.sputter) vol *= 0.35;
-            e.out.gain.setTargetAtTime(vol, now, 0.04);
-        }
+        e.out.gain.setTargetAtTime(profile.kind === "jet" ? 0.5 : 0.42, s.ctx.currentTime, 0.1);
+        // Jets light the afterburner at full throttle.
+        e.eng.set(t, {boost: profile.kind === "jet" && t > 0.85, speed: t, level: profile.idleSilent && t === 0 ? 0 : 1});
     }
 
     setInterval(updateEngine, 60);
