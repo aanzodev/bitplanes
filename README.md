@@ -166,6 +166,30 @@ GAU-8 *BRRRT*, the F-22's deep afterburner rumble. Guns, missiles, flares and
 explosions from other planes get quieter and pan with distance. Tweak the
 sounds in `js/audio/profiles.js`.
 
+**Guns:** every plane fires the gun it really carried, each synthesized from
+its muzzle crack, the blast's roar, the thump of the shot, the bolt clacking
+on light machine guns and the spinning barrels on rotary cannons:
+
+| Gun | Planes |
+|---|---|
+| Vickers .303 | Classic, SPAD XIII, Sopwith Camel, Crop Duster |
+| Lewis gun | Piper Cub, Tiger Moth |
+| LMG 08/15 Spandau | Fokker Dr.I |
+| ShKAS 7.62 mm | Polikarpov I-16 |
+| Browning .303 | Spitfire, Hurricane, Swift |
+| Browning M2 .50 cal | P-51, P-47, F4U Corsair, Gunship, Fortress |
+| MG 151/20 20 mm | Bf 109, Fw 190 |
+| Type 99 20 mm | A6M Zero |
+| ShVAK 20 mm | Yak-3 |
+| Hispano 20 mm | P-38, Phantom |
+| GSh-23 23 mm | MiG-21 |
+| GSh-30-1 30 mm | MiG-29, Su-27 |
+| M61 Vulcan 20 mm | F-16, F-15, F-22, B-2 |
+| GAU-22/A 25 mm | F-35 |
+| GAU-8 Avenger 30 mm | A-10 |
+
+Distant gunfire is quieter and duller, like the real thing.
+
 ### Activity console
 
 A secret console: press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd>
