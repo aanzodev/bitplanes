@@ -48,12 +48,23 @@
             #include <fog_vertex>
         }`;
     const WATER_FRAG = `
-        uniform vec3 deep, skyColor, sunColor, sunDir;
-        uniform float time, sunBoost;
+        uniform vec3 deep, shallow, skyColor, sunColor, sunDir;
+        uniform float time, sunBoost, mapSize, seaLevel;
+        uniform sampler2D heights;
         varying vec3 vWorld;
         #include <fog_pars_fragment>
+        float wHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float wNoise(vec2 p) {
+            vec2 i = floor(p), f = fract(p);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(mix(wHash(i), wHash(i + vec2(1, 0)), u.x), mix(wHash(i + vec2(0, 1)), wHash(i + vec2(1, 1)), u.x), u.y);
+        }
         void main() {
             vec2 p = vWorld.xz;
+            // How deep the water is here (the terrain's height map, as a texture).
+            vec2 huv = p / mapSize + 0.5;
+            float ground = (huv.x < 0.0 || huv.y < 0.0 || huv.x > 1.0 || huv.y > 1.0) ? -200.0 : texture2D(heights, huv).r * 260.0 - 200.0;
+            float depth = max(0.0, seaLevel - ground);
             // A few moving waves, summed as slopes for the normal.
             vec2 g = vec2(0.0);
             g += 0.06 * cos(dot(p, vec2(0.021, 0.013)) + time * 0.9) * vec2(0.021, 0.013) / 0.025;
@@ -63,11 +74,17 @@
             vec3 n = normalize(vec3(-g.x, 1.0, -g.y));
             vec3 v = normalize(cameraPosition - vWorld);
             float fres = pow(1.0 - max(dot(n, v), 0.0), 4.0);
-            vec3 col = mix(deep, skyColor, 0.15 + 0.75 * fres);
+            // Turquoise in the shallows, deep blue further out.
+            vec3 water = mix(shallow, deep, smoothstep(2.0, 45.0, depth));
+            vec3 col = mix(water, skyColor, 0.08 + 0.7 * fres);
             vec3 r = reflect(-v, n);
             float spec = pow(max(dot(r, normalize(sunDir)), 0.0), 180.0);
             col += sunColor * spec * 1.4 * sunBoost;
-            gl_FragColor = vec4(col, 0.94);
+            // White foam where waves break on the shore.
+            float surf = sin(depth * 1.3 - time * 1.6 + wNoise(p * 0.05) * 6.0) * 0.5 + 0.5;
+            float foam = smoothstep(4.0, 0.0, depth) * (0.45 + 0.55 * surf) * smoothstep(0.35, 0.75, wNoise(p * 0.35 + time * 0.2));
+            col = mix(col, vec3(0.92, 0.96, 1.0) * (0.6 + 0.4 * sunBoost * 0.1 + 0.4), foam * 0.85);
+            gl_FragColor = vec4(col, mix(0.8, 0.96, smoothstep(0.0, 8.0, depth)));
             #include <tonemapping_fragment>
             #include <encodings_fragment>
             #include <fog_fragment>
@@ -328,32 +345,139 @@
         return clouds;
     }
 
-    // High/Ultra ground: physically based, with fine color detail that
-    // changes across the ground (worked out per pixel from the position).
-    function detailMaterial(THREE) {
+    // The terrain heights as a small texture, so the water knows how deep it is.
+    function heightTexture(THREE, grid, W) {
+        const data = new Uint8Array(W * W * 4);
+        for (let i = 0; i < W * W; i++) {
+            const v = Math.max(0, Math.min(255, Math.round((grid[i] + 200) / 260 * 255)));
+            data[i * 4] = v;
+            data[i * 4 + 3] = 255;
+        }
+        const t = new THREE.DataTexture(data, W, W, THREE.RGBAFormat);
+        t.magFilter = t.minFilter = THREE.LinearFilter;
+        t.needsUpdate = true;
+        return t;
+    }
+
+    // High/Ultra ground, worked out per pixel: the map's colors from far
+    // away; up close, layers of rock (on steep slopes, with strata and
+    // cracks, the same from every side), soil and grass patches, wet sand at
+    // the waterline and snow that settles on flat ground, plus fine bumps
+    // that catch the light.
+    const GROUND_GLSL = `
+        varying vec3 vWPos;
+        varying vec3 vWNorm;
+        uniform float waterLevel, snowLevel, rockTint, dry;
+        // Colors below are written in sRGB (like hex colors) and turned into light values.
+        vec3 lin(vec3 c) { return pow(c, vec3(2.2)); }
+        float gHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float gNoise(vec2 p) {
+            vec2 i = floor(p), f = fract(p);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(mix(gHash(i), gHash(i + vec2(1.0, 0.0)), u.x), mix(gHash(i + vec2(0.0, 1.0)), gHash(i + vec2(1.0, 1.0)), u.x), u.y);
+        }
+        float gFbm(vec2 p) {
+            float s = 0.0, a = 0.5;
+            for (int i = 0; i < 4; i++) { s += a * gNoise(p); p = p * 2.03 + 17.1; a *= 0.5; }
+            return s;
+        }
+        // Noise seen from the three main directions, blended by the slope
+        // (so cliffs aren't stretched).
+        float gTri(vec3 p, vec3 n, float f) {
+            vec3 w = pow(abs(n), vec3(4.0));
+            w /= (w.x + w.y + w.z);
+            return gFbm(p.zy * f) * w.x + gFbm(p.xz * f) * w.y + gFbm(p.xy * f) * w.z;
+        }
+        vec3 gBump(vec3 p, vec3 n, float h) {
+            vec3 dpx = dFdx(p), dpy = dFdy(p);
+            float dhx = dFdx(h), dhy = dFdy(h);
+            vec3 r1 = cross(dpy, n), r2 = cross(n, dpx);
+            float det = dot(dpx, r1);
+            vec3 grad = sign(det) * (dhx * r1 + dhy * r2);
+            return normalize(abs(det) * n - grad);
+        }`;
+
+    function detailMaterial(THREE, map) {
         const mat = new THREE.MeshStandardMaterial({vertexColors: true, roughness: 0.93, metalness: 0});
+        const style = {canyon: {rock: 0.9, dry: 1}, islands: {rock: 0.3, dry: 0}, fjords: {rock: 0.15, dry: 0}, harbor: {rock: 0.35, dry: 0}, farmlands: {rock: 0.45, dry: 0.2}}[map.id] || {rock: 0.3, dry: 0};
         mat.onBeforeCompile = sh => {
+            sh.uniforms.waterLevel = {value: map.water > -1000 ? map.water : -9999};
+            sh.uniforms.snowLevel = {value: map.id === "alpine" ? 1750 : map.id === "fjords" ? 250 : 99999};
+            sh.uniforms.rockTint = {value: style.rock};
+            sh.uniforms.dry = {value: style.dry};
             sh.vertexShader = sh.vertexShader
-                .replace("#include <common>", "#include <common>\nvarying vec3 vWPos;")
-                .replace("#include <begin_vertex>", "#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+                .replace("#include <common>", "#include <common>\nvarying vec3 vWPos;\nvarying vec3 vWNorm;")
+                .replace("#include <begin_vertex>", "#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvWNorm = normalize(mat3(modelMatrix) * objectNormal);");
             sh.fragmentShader = sh.fragmentShader
-                .replace("#include <common>", `#include <common>
-                    varying vec3 vWPos;
-                    float dHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-                    float dNoise(vec2 p) {
-                        vec2 i = floor(p), f = fract(p);
-                        vec2 u = f * f * (3.0 - 2.0 * f);
-                        return mix(mix(dHash(i), dHash(i + vec2(1.0, 0.0)), u.x), mix(dHash(i + vec2(0.0, 1.0)), dHash(i + vec2(1.0, 1.0)), u.x), u.y);
-                    }`)
+                .replace("#include <common>", "#include <common>\n" + GROUND_GLSL)
                 .replace("#include <color_fragment>", `#include <color_fragment>
+                    vec3 wn = normalize(vWNorm);
                     float camD = length(vWPos - cameraPosition);
-                    float dt = (dNoise(vWPos.xz * 0.0035) - 0.5) * 0.28
-                             + (dNoise(vWPos.xz * 0.028) - 0.5) * 0.2
-                             + (dNoise(vWPos.xz * 0.21) - 0.5) * 0.16 * smoothstep(1800.0, 250.0, camD)
-                             + (dNoise(vWPos.xz * 1.3) - 0.5) * 0.12 * smoothstep(300.0, 40.0, camD);
-                    diffuseColor.rgb *= 1.0 + dt;`);
+                    float near = smoothstep(2500.0, 300.0, camD);
+                    float slope = 1.0 - wn.y;
+                    vec3 base = diffuseColor.rgb;
+                    // Big patches of lighter and darker ground, then finer ones.
+                    float patches = gFbm(vWPos.xz * 0.0025);
+                    float fine = gFbm(vWPos.xz * 0.045);
+                    base *= 0.82 + 0.36 * patches;
+                    base *= mix(1.0, 0.85 + 0.3 * fine, 0.7);
+                    // Dry soil showing through grass.
+                    float soil = smoothstep(0.55, 0.75, gFbm(vWPos.xz * 0.012 + 7.0)) * (1.0 - dry);
+                    base = mix(base, lin(vec3(0.36, 0.29, 0.2)), soil * 0.45);
+                    // Rock on steep ground: strata bands and cracks.
+                    float rockMask = smoothstep(0.28, 0.5, slope + (fine - 0.5) * 0.25);
+                    float strata = gNoise(vec2(vWPos.y * 0.09, gFbm(vWPos.xz * 0.004) * 6.0));
+                    float crag = gTri(vWPos, wn, 0.08);
+                    vec3 rock = mix(lin(vec3(0.45, 0.43, 0.4)), base, rockTint) * (0.65 + 0.5 * crag) * (0.85 + 0.25 * strata);
+                    base = mix(base, rock, rockMask);
+                    // Snow settles on flatter ground up high.
+                    float snow = smoothstep(snowLevel - 150.0, snowLevel + 150.0, vWPos.y + (patches - 0.5) * 300.0) * smoothstep(0.55, 0.3, slope);
+                    base = mix(base, lin(vec3(0.93, 0.95, 0.98)), snow);
+                    // Wet, darker sand at the waterline.
+                    float wet = smoothstep(4.0, 0.5, vWPos.y - waterLevel) * step(waterLevel - 3.0, vWPos.y);
+                    base *= 1.0 - wet * 0.35;
+                    // Nature is less saturated than paint.
+                    diffuseColor.rgb = mix(vec3(dot(base, vec3(0.2126, 0.7152, 0.0722))), base, 0.78);
+                    float bumpH = (crag * 3.0 * rockMask + fine * 0.8 + gNoise(vWPos.xz * 0.7) * 0.25 * near) * (1.0 - snow * 0.7);`)
+                .replace("#include <roughnessmap_fragment>", `#include <roughnessmap_fragment>
+                    roughnessFactor = mix(roughnessFactor, 0.8, rockMask);
+                    roughnessFactor = mix(roughnessFactor, 0.55, snow);
+                    roughnessFactor = mix(roughnessFactor, 0.35, wet);`)
+                .replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
+                    normal = gBump(-vViewPosition, normal, bumpH * 0.45);`);
         };
+        mat.customProgramCacheKey = () => "ground";
         return mat;
+    }
+
+    // Boulders on slopes and rocky ground.
+    function boulders(THREE, gridAt, SIZE, count, map, fancy) {
+        const geo = new THREE.DodecahedronGeometry(1, 1);
+        const p = geo.attributes.position;
+        for (let i = 0; i < p.count; i++) {
+            const k = 0.8 + Math.sin(p.getX(i) * 3.1 + p.getZ(i) * 2.3) * 0.12 + Math.cos(p.getY(i) * 4.7) * 0.1;
+            p.setXYZ(i, p.getX(i) * k, p.getY(i) * k * 0.7, p.getZ(i) * k);
+        }
+        geo.computeVertexNormals();
+        const color = map.id === "canyon" ? 0x8e4a2c : map.id === "fjords" ? 0x5a6066 : 0x6e6a63;
+        const mat = fancy ? new THREE.MeshStandardMaterial({color, roughness: 0.9}) : new THREE.MeshLambertMaterial({color, flatShading: true});
+        const rocks = new THREE.InstancedMesh(geo, mat, count);
+        const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), v = new THREE.Vector3(), c = new THREE.Color();
+        let k = 0;
+        for (let t = 0; t < count * 10 && k < count; t++) {
+            const x = (Math.random() - 0.5) * SIZE * 0.9, z = (Math.random() - 0.5) * SIZE * 0.9, h = gridAt(x, z);
+            if (h < (map.water > -1000 ? map.water + 2 : -1e9)) continue;
+            const slope = Math.abs(gridAt(x + 15, z) - h) + Math.abs(gridAt(x, z + 15) - h);
+            if (slope < 4 && Math.random() < 0.85) continue;
+            const r = 3 + Math.random() * Math.random() * 14;
+            q.setFromEuler(new THREE.Euler(Math.random(), Math.random() * 6.3, Math.random()));
+            m.compose(v.set(x, h - r * 0.25, z), q, s.set(r, r, r * (0.7 + Math.random() * 0.6)));
+            rocks.setMatrixAt(k, m);
+            rocks.setColorAt(k++, c.setScalar(0.75 + Math.random() * 0.4));
+        }
+        rocks.count = k;
+        rocks.castShadow = rocks.receiveShadow = fancy;
+        return rocks;
     }
 
     // ------------------------------------------------------------- world
@@ -377,6 +501,14 @@
         // ---- heights on a grid (the terrain mesh, and ground() reads it back)
         const W = SEG + 1, grid = new Float32Array(W * W);
         for (let j = 0; j < W; j++) for (let i = 0; i < W; i++) grid[j * W + i] = height(-SIZE / 2 + i * step, -SIZE / 2 + j * step);
+        // Rain wears the mountains into gullies, ridges and valley floors.
+        if (D.erode && map.erosion !== 0) {
+            const flat = map.city ? grid.slice() : null;
+            D.erode(grid, W, step, {sea: map.water > -1000 ? map.water : undefined, seed: seed, strength: map.erosion || 1,
+                drops: {low: 0.45, medium: 0.7, high: 0.9, ultra: 1.1}[quality] || 0.9});
+            // Keep the city's ground as it was (flat streets).
+            if (flat) for (let k = 0; k < grid.length; k++) if (flat[k] > 0 && flat[k] < 40) grid[k] = flat[k];
+        }
         function gridAt(x, z) {
             const fx = (x + SIZE / 2) / step, fz = (z + SIZE / 2) / step;
             if (fx < 0 || fz < 0 || fx >= SEG || fz >= SEG) return height(x, z);
@@ -403,7 +535,7 @@
         }
         geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
         geo.computeVertexNormals();
-        const terrain = new THREE.Mesh(geo, fancy ? detailMaterial(THREE) : new THREE.MeshLambertMaterial({vertexColors: true, flatShading: true}));
+        const terrain = new THREE.Mesh(geo, fancy ? detailMaterial(THREE, map) : new THREE.MeshLambertMaterial({vertexColors: true, flatShading: true}));
         terrain.receiveShadow = fancy;
         scene.add(terrain);
 
@@ -473,6 +605,8 @@
                 uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
                     deep: {value: new THREE.Color(sky.water)}, skyColor: {value: new THREE.Color(sky.horizon)},
                     sunColor: {value: new THREE.Color(sky.sunColor)}, sunDir: {value: sunDir.clone()}, time: {value: 0}, sunBoost: {value: hdr ? 6 : 1},
+                    shallow: {value: new THREE.Color(map.shallow || 0x2fb3b0).lerp(new THREE.Color(sky.water), sky.stars ? 0.8 : 0.25)},
+                    heights: {value: heightTexture(THREE, grid, W)}, mapSize: {value: SIZE}, seaLevel: {value: map.water},
                 }]),
             });
             water = new THREE.Mesh(new THREE.PlaneGeometry(SIZE * 3, SIZE * 3, 1, 1), wm);
@@ -586,12 +720,19 @@
                 const sc = 0.8 + Math.random() * 0.9;
                 q.setFromAxisAngle(up, Math.random() * 6.3);
                 m.compose(p.set(x, h - 1, z), q, s.set(sc, sc * (0.85 + Math.random() * 0.4), sc));
-                trees.setMatrixAt(k++, m);
+                trees.setMatrixAt(k, m);
+                // Every tree a slightly different green (or autumn tint now and then).
+                const tint = new THREE.Color(1, 1, 1).multiplyScalar(0.75 + Math.random() * 0.4);
+                if (Math.random() < 0.08) tint.setRGB(1.2, 0.95, 0.6);
+                trees.setColorAt(k++, tint);
             }
             trees.count = k;
             trees.castShadow = trees.receiveShadow = fancy;
             scene.add(trees);
         }
+
+        // ---- boulders
+        scene.add(boulders(THREE, gridAt, SIZE, Math.round(2200 * Q), map, fancy));
 
         // ---- clouds: soft lit billboards (High/Ultra), or puffy clusters
         const clouds = fancy ? softClouds(THREE, map, sky, Q, sunDir, hdr) : puffyClouds(THREE, map, sky, Q);

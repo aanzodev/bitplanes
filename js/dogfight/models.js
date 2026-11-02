@@ -672,81 +672,217 @@
 
     // ------------------------------------------------------------- biplane
 
+    // Every biplane is its own aircraft:
+    //   len/fw: fuselage length and half width; span/chord/gap/stagger/sweep: wings;
+    //   eng: "rotary" (spinning cylinders behind a ring), "radial" (cylinders
+    //   showing), "inline" (slim nose, exhaust pipe), "radiator" (flat front
+    //   radiator, SPAD), "twin" (two engines on the lower wing); bays: struts
+    //   each side; tips: "round" | "square"; extras: hump, spats, canopy,
+    //   gunner, spray bar, two seats, three wings.
+    const BIPLANES = {
+        classic: {len: 6.2, fw: 0.8, span: 4.0, chord: 1.5, gap: 2.5, stagger: 0.3, eng: "rotary", bays: 1, tips: "round"},
+        tigermoth: {len: 7.0, fw: 0.62, span: 4.4, chord: 1.4, gap: 2.4, stagger: 0.7, sweep: 0.18, eng: "inline", bays: 1, tips: "square", seats: 2},
+        duster: {len: 7.4, fw: 0.85, span: 4.7, chord: 1.7, gap: 2.6, stagger: 0.5, eng: "radial", bays: 1, tips: "round", spray: true, bigWheels: true},
+        swift: {len: 5.6, fw: 0.66, span: 3.3, chord: 1.25, gap: 2.0, stagger: 0.45, eng: "inline", bays: 0, tips: "round", spats: true, spinner: true, smooth: true},
+        gunship: {len: 7.6, fw: 0.92, span: 5.2, chord: 1.7, gap: 2.7, stagger: 0.3, eng: "radial", bays: 2, tips: "square", seats: 2, gunner: true, guns: 2},
+        fokker: {len: 5.8, fw: 0.78, span: 3.6, chord: 1.4, gap: 1.35, stagger: 0.25, eng: "rotary", bays: 1, tips: "round", wings: 3},
+        spad: {len: 6.2, fw: 0.8, span: 4.1, chord: 1.55, gap: 2.4, stagger: 0.35, eng: "radiator", bays: 2, tips: "square"},
+        fortress: {len: 10.5, fw: 0.82, span: 8.2, chord: 2.3, gap: 3.0, stagger: 0.2, eng: "twin", bays: 3, tips: "square", seats: 2, gunner: true, nose: true},
+        camel: {len: 5.7, fw: 0.8, span: 4.2, chord: 1.45, gap: 2.4, stagger: 0.35, eng: "rotary", bays: 1, tips: "round", hump: true, lowerDihedral: 0.09},
+        phantom: {len: 6.6, fw: 0.72, span: 4.3, chord: 1.45, gap: 2.2, stagger: 0.55, sweep: 0.1, eng: "inline", bays: 0, tips: "round", spats: true, spinner: true, canopy: true, smooth: true},
+    };
+
+    function biWingOutline(sp, c, tips, sweep = 0) {
+        const pts = tips === "square"
+            ? [[0.1, -c * 0.45], [sp - 0.1, -c * 0.45], [sp, -c * 0.4], [sp, c * 0.5], [sp - 0.1, c * 0.55], [0.1, c * 0.55]]
+            : [[0.1, -c * 0.45], [sp - 0.5, -c * 0.45], [sp - 0.1, -c * 0.32], [sp, 0], [sp - 0.1, c * 0.35], [sp - 0.5, c * 0.55], [0.1, c * 0.55]];
+        return both(pts.map(([x, z]) => [x, z + x * sweep]));
+    }
+
     function buildBiplane(color, opts, out, planeId) {
-        const g = out.group, body = paint(color, {pattern: opts.pattern, rough: 0.8, metal: 0}), fabric = paint(color, {pattern: opts.pattern, rough: 0.85, metal: 0});
-        const dark = plain(new T.Color(color).multiplyScalar(0.55).getHex(), 0.8, 0.1), metal = plain(0x4a4844, 0.45, 0.7), wood = plain(0x6b4a2e, 0.7, 0);
-        const tri = planeId === "fokker";
+        const def = BIPLANES[planeId] || BIPLANES.classic;
+        const g = out.group;
+        const fabric = paint(color, {pattern: opts.pattern, rough: def.smooth ? 0.45 : 0.85, metal: def.smooth ? 0.35 : 0});
+        const dark = plain(new T.Color(color).multiplyScalar(0.55).getHex(), 0.8, 0.1), metal = plain(0x4a4844, 0.45, 0.7);
+        const wood = plain(0x6b4a2e, 0.7, 0), black = plain(0x1b1b1b, 0.7, 0.3);
+        const L = def.len, nose = -L * 0.48, tail = L * 0.52, fw = def.fw, twin = def.eng === "twin";
+        const boxy = def.smooth ? 2.4 : 3.6;
+        // Fuselage (with the camel's hump over the guns).
         g.add(mesh(loft([
-            {z: -4.6, w: 0.85, h: 0.85, n: 2.2}, {z: -3.6, w: 0.92, h: 0.95, n: 3}, {z: -0.5, w: 0.82, h: 0.95, y: 0.05, n: 4},
-            {z: 2.5, w: 0.5, h: 0.65, y: 0.15, n: 3.5}, {z: 5.6, w: 0.1, h: 0.15, y: 0.35, n: 2},
-        ], 22), body));
-        // Rotary engine and cowling.
-        const ring = new T.Mesh(new T.TorusGeometry(0.82, 0.12, 8, 24), metal);
-        ring.position.z = -4.6;
-        g.add(ring);
-        g.add(mesh(new T.CircleGeometry(0.8, 20), plain(0x1b1b1b, 0.7, 0.3), 0, 0, -4.58).rotateY(Math.PI));
-        const spin = mesh(loft([{z: -5.4, w: 0.02, h: 0.02, n: 2}, {z: -5.15, w: 0.25, h: 0.25, n: 2}, {z: -4.75, w: 0.3, h: 0.3, n: 2}], 14), metal);
-        g.add(spin);
-        out.spinners.push(spin);
-        g.add(propeller(2, 1.45, out, -5.05));
-        // Wings: rounded tips, ribs show through the fabric (panel lines).
-        const wingOut = (sp, c) => both([[0.1, -c * 0.45], [sp - 0.4, -c * 0.45], [sp, -c * 0.3], [sp, c * 0.35], [sp - 0.4, c * 0.55], [0.1, c * 0.55]]);
-        const levels = tri ? [[1.9, 3.6, 1.4], [0.75, 3.8, 1.35], [-0.6, 3.4, 1.35]] : [[1.9, 4.4, 1.6], [-0.6, 4.0, 1.5]];
-        levels.forEach(([y, sp, c], i) => {
-            g.add(mesh(wing(wingOut(sp, c), 0.16, {tip: 0.7, dihedral: i === levels.length - 1 ? 0.04 : 0}), fabric, 0, y, -1.3 + (i === 0 ? -0.3 : 0)));
-        });
-        // Ailerons on the top wing.
+            {z: nose, w: fw * (def.eng === "radiator" ? 0.95 : 0.98), h: fw * 1.02, n: def.eng === "radiator" ? 4 : 2.2},
+            {z: nose + 0.9, w: fw * 1.05, h: fw * 1.1, n: boxy * 0.8},
+            {z: nose + L * 0.35, w: fw, h: fw * 1.12, y: 0.05, n: boxy, top: def.hump ? 1.35 : 1},
+            {z: nose + L * 0.55, w: fw * 0.85, h: fw * 1.0, y: 0.1, n: boxy},
+            {z: tail - 0.6, w: 0.14, h: 0.24, y: 0.35, n: 2.5},
+            {z: tail, w: 0.05, h: 0.1, y: 0.4, n: 2},
+        ], 22), fabric));
+        // The engine.
+        if (def.eng === "rotary" || def.eng === "radial") {
+            const ring = new T.Mesh(new T.TorusGeometry(fw * 0.98, 0.12, 8, 24), def.eng === "rotary" ? metal : dark);
+            ring.position.z = nose;
+            g.add(ring);
+            g.add(mesh(new T.CircleGeometry(fw * 0.95, 20), black, 0, 0, nose + 0.02).rotateY(Math.PI));
+            const cyls = def.eng === "rotary" ? 9 : 7;
+            for (let i = 0; i < cyls; i++) {
+                const a = i / cyls * Math.PI * 2, c = cyl(0.12, 0.14, 0.55, metal, 8);
+                c.rotation.z = a - Math.PI / 2;
+                c.geometry = c.geometry.clone().rotateX(-Math.PI / 2);
+                c.position.set(Math.cos(a) * fw * 0.6, Math.sin(a) * fw * 0.6, nose - (def.eng === "radial" ? 0.15 : -0.05));
+                g.add(c);
+            }
+        } else if (def.eng === "radiator") {
+            g.add(mesh(new T.BoxGeometry(fw * 1.7, fw * 1.7, 0.12), black, 0, 0, nose - 0.02));
+            for (let i = -3; i <= 3; i++) g.add(mesh(new T.BoxGeometry(fw * 1.6, 0.03, 0.14), metal, 0, i * fw * 0.22, nose - 0.04));
+        } else if (def.eng === "inline") {
+            g.add(mesh(cyl(0.07, 0.07, L * 0.4, metal, 8).geometry, metal, fw * 0.95, -0.25, nose + L * 0.2));
+        }
+        // Propeller(s).
+        if (twin) {
+            [-1, 1].forEach(s => {
+                const nx = s * def.span * 0.38;
+                g.add(mesh(loft([{z: -2.6, w: 0.5, h: 0.55, n: 2}, {z: -1.8, w: 0.58, h: 0.62, n: 2.4}, {z: 0.6, w: 0.45, h: 0.5, n: 2.4}, {z: 1.4, w: 0.1, h: 0.12, n: 2}], 18), dark, nx, -def.gap * 0.32, 0));
+                const ring = new T.Mesh(new T.TorusGeometry(0.5, 0.08, 8, 20), metal);
+                ring.position.set(nx, -def.gap * 0.32, -2.6);
+                g.add(ring);
+                g.add(propeller(2, 1.5, out, -2.95, nx, -def.gap * 0.32));
+                const sp = mesh(loft([{z: -3.3, w: 0.02, h: 0.02, n: 2}, {z: -3.1, w: 0.18, h: 0.18, n: 2}, {z: -2.85, w: 0.22, h: 0.22, n: 2}], 12), metal, nx, -def.gap * 0.32, 0);
+                g.add(sp);
+                out.spinners.push(sp);
+            });
+            // A glazed nose for the bomb aimer and gunner.
+            g.add(mesh(loft([{z: nose - 0.6, w: 0.05, h: 0.05, n: 2}, {z: nose - 0.3, w: 0.55, h: 0.55, n: 2}, {z: nose + 0.1, w: fw * 0.95, h: fw, n: 2.4}], 16), glassMat()));
+        } else {
+            const big = def.spinner;
+            const sp = mesh(loft([{z: nose - (big ? 1.0 : 0.75), w: 0.02, h: 0.02, n: 2}, {z: nose - (big ? 0.6 : 0.5), w: big ? 0.36 : 0.25, h: big ? 0.36 : 0.25, n: 2},
+                {z: nose - 0.12, w: big ? fw * 0.75 : 0.3, h: big ? fw * 0.75 : 0.3, n: 2}], 14), big ? fabric : metal);
+            g.add(sp);
+            out.spinners.push(sp);
+            g.add(propeller(2, def.span * 0.33 + 0.2, out, nose - 0.42));
+        }
+        // Wings: two or three, staggered, with ailerons on the top one.
+        const nw = def.wings || 2, top = def.gap * (nw === 3 ? 1.35 : 0.72), z0 = nose + L * 0.28;
+        const levels = [];
+        for (let i = 0; i < nw; i++) {
+            const y = top - i * def.gap * (nw === 3 ? 0.68 : 1);
+            const sp = def.span * (i === 0 ? 1 : nw === 3 && i === 1 ? 1.03 : 0.92);
+            const z = z0 - def.stagger * (nw - 1 - i) / (nw - 1 || 1) * 1.0 + (i === 0 ? -def.stagger : 0) * 0.3;
+            levels.push({y, sp, z});
+            g.add(mesh(wing(biWingOutline(sp, def.chord, def.tips, def.sweep), 0.16, {tip: 0.7, dihedral: i === nw - 1 ? (def.lowerDihedral || 0.04) : 0, span: sp}), fabric, 0, y, z));
+        }
+        const T0 = levels[0], B = levels[levels.length - 1];
         [-1, 1].forEach(s => {
-            const sp = levels[0][1], c = levels[0][2];
-            const a = [[sp * 0.6, c * 0.4], [sp - 0.1, c * 0.33], [sp - 0.2, c * 0.75], [sp * 0.6, c * 0.75]].map(([x, z]) => [x * s, z]);
-            const ail = hinge(mesh(wing(s > 0 ? a : a.slice().reverse(), 0.08, {tip: 1}), dark), 0, levels[0][0], -1.6 + c * 0.4, 0, levels[0][0], -1.6);
+            const sp = T0.sp, c = def.chord, sw = (def.sweep || 0);
+            const a = [[sp * 0.6, c * 0.4], [sp - 0.15, c * 0.33], [sp - 0.2, c * 0.6], [sp * 0.6, c * 0.6]].map(([x, z]) => [x * s, z + x * sw]);
+            const ail = hinge(mesh(wing(s > 0 ? a : a.slice().reverse(), 0.07, {tip: 1}), dark), 0, T0.y + 0.02, T0.z + c * 0.4, 0, T0.y + 0.02, T0.z);
             g.add(ail);
             out.ailerons.push({pivot: ail, side: s});
-            const r = roundel(0.5, opts.team, color);
+            const r = roundel(0.42 + def.span * 0.02, opts.team, color);
             r.rotation.x = -Math.PI / 2;
-            r.position.set(s * sp * 0.7, levels[0][0] + 0.12, -1.6);
+            r.position.set(s * sp * 0.68, T0.y + 0.1, T0.z + sp * 0.68 * sw);
             g.add(r);
         });
-        // Struts and bracing wires.
-        const top = levels[0][0], bottom = levels[levels.length - 1][0];
+        // Cabane struts from the fuselage to the top wing.
+        [-1, 1].forEach(s => [-0.35, 0.35].forEach(dz => {
+            const st = mesh(new T.BoxGeometry(0.06, T0.y - fw * 0.6, 0.06), metal, s * fw * 0.6, (T0.y + fw * 0.6) / 2, T0.z + dz);
+            st.rotation.z = s * -0.15;
+            g.add(st);
+        }));
+        // Interplane struts (bays), or a single streamlined I-strut on racers.
+        const bays = Math.max(1, def.bays);
         [-1, 1].forEach(s => {
-            [-1.9, -0.9].forEach(z => {
-                const st = mesh(new T.BoxGeometry(0.1, top - bottom, 0.18), wood, s * levels[0][1] * 0.72, (top + bottom) / 2, z);
-                g.add(st);
-            });
-            [[0.55, -2.0], [0.55, -0.9]].forEach(([x, z]) => g.add(mesh(new T.BoxGeometry(0.07, top - 0.5, 0.07), metal, s * x, (top + 0.5) / 2, z)));
-            const len = Math.hypot(levels[0][1] * 0.72, top - bottom);
-            const wire = mesh(new T.CylinderGeometry(0.015, 0.015, len, 4), metal, s * levels[0][1] * 0.36, (top + bottom) / 2, -1.4);
-            wire.rotation.z = s * Math.atan2(levels[0][1] * 0.72, top - bottom);
-            g.add(wire);
+            for (let b = 1; b <= bays; b++) {
+                const x = s * T0.sp * (bays === 1 ? 0.7 : 0.3 + 0.62 * (b - 1) / (bays - 1));
+                const zt = T0.z + Math.abs(x) * (def.sweep || 0), zb = B.z + Math.abs(x) * (def.sweep || 0);
+                if (def.bays === 0) {
+                    const st = mesh(new T.BoxGeometry(0.08, T0.y - B.y, def.chord * 0.5), wood, x, (T0.y + B.y) / 2, (zt + zb) / 2);
+                    st.rotation.x = Math.atan2(zt - zb, T0.y - B.y);
+                    g.add(st);
+                } else [-0.35, 0.35].forEach(dz => {
+                    const st = mesh(new T.BoxGeometry(0.08, T0.y - B.y, 0.12), wood, x, (T0.y + B.y) / 2, (zt + zb) / 2 + dz * def.chord);
+                    st.rotation.x = Math.atan2(zt - zb, T0.y - B.y);
+                    g.add(st);
+                });
+                // Crossed bracing wires in each bay.
+                if (def.bays > 0) {
+                    const inner = b === 1 ? s * fw : s * T0.sp * (0.3 + 0.62 * (b - 2) / (bays - 1));
+                    const dx = x - inner, dy = T0.y - B.y, len = Math.hypot(dx, dy);
+                    [1, -1].forEach(dir => {
+                        const w = mesh(new T.CylinderGeometry(0.012, 0.012, len, 4), metal, (x + inner) / 2, (T0.y + B.y) / 2, (zt + zb) / 2);
+                        w.rotation.z = Math.atan2(dx, dy) * dir;
+                        g.add(w);
+                    });
+                }
+            }
         });
-        // Landing gear: two wheels on V struts, and a tail skid.
+        // Landing gear (spats on the racers), tail skid.
+        const wr = def.bigWheels ? 0.55 : 0.45, gy = B.y - 1.1;
         [-1, 1].forEach(s => {
-            g.add(wheel(0.45, s * 0.9, -1.6, -2.4));
-            const leg = mesh(new T.BoxGeometry(0.06, 1.2, 0.06), metal, s * 0.6, -1.05, -2.6);
-            leg.rotation.z = s * 0.35;
+            g.add(wheel(wr, s * (fw + 0.25), gy, nose + L * 0.22));
+            if (def.spats) g.add(mesh(loft([{z: -0.7, w: 0.02, h: 0.05, n: 2}, {z: -0.3, w: 0.2, h: 0.5, n: 2}, {z: 0.4, w: 0.18, h: 0.45, n: 2}, {z: 0.8, w: 0.02, h: 0.05, n: 2}], 12), fabric, s * (fw + 0.25), gy, nose + L * 0.22));
+            const leg = mesh(new T.BoxGeometry(0.06, Math.abs(gy) + 0.2, 0.06), metal, s * (fw * 0.7), gy / 2 - 0.1, nose + L * 0.2);
+            leg.rotation.z = s * 0.3;
             g.add(leg);
         });
-        g.add(mesh(new T.CylinderGeometry(0.03, 0.03, 2, 4).rotateZ(Math.PI / 2), metal, 0, -1.6, -2.4));
+        if (!def.spats) g.add(mesh(new T.CylinderGeometry(0.03, 0.03, 2 * (fw + 0.25), 4).rotateZ(Math.PI / 2), metal, 0, gy, nose + L * 0.22));
+        g.add(mesh(new T.BoxGeometry(0.05, 0.5, 0.05), metal, 0, 0.0, tail - 0.4));
+        // Crop duster's spray bar.
+        if (def.spray) {
+            g.add(mesh(new T.CylinderGeometry(0.04, 0.04, B.sp * 1.7, 6).rotateZ(Math.PI / 2), metal, 0, B.y - 0.25, B.z + def.chord * 0.55));
+            for (let i = -6; i <= 6; i++) g.add(mesh(new T.BoxGeometry(0.04, 0.12, 0.04), metal, i * B.sp * 0.13, B.y - 0.33, B.z + def.chord * 0.55));
+            g.add(mesh(loft([{z: -0.6, w: 0.3, h: 0.3, n: 2}, {z: 0, w: 0.45, h: 0.45, n: 2}, {z: 0.6, w: 0.3, h: 0.3, n: 2}], 12), dark, 0, -fw - 0.2, nose + L * 0.3));
+        }
         // Tail.
-        g.add(mesh(wing(both([[0.1, -0.4], [1.9, -0.2], [2.2, 0.2], [1.9, 0.5], [0.1, 0.5]]), 0.1, {tip: 0.8}), fabric, 0, 0.35, 4.6));
-        const el = hinge(mesh(wing(both([[0.1, 0.5], [1.9, 0.5], [2.0, 0.9], [0.1, 0.95]]), 0.06, {tip: 1}), dark), 0, 0.35, 5.1, 0, 0.35, 4.6);
+        const tz = tail - 0.9;
+        g.add(mesh(wing(both([[0.1, -0.4], [1.6 + def.span * 0.06, -0.2], [1.9 + def.span * 0.06, 0.2], [1.6 + def.span * 0.06, 0.5], [0.1, 0.5]]), 0.1, {tip: 0.8}), fabric, 0, 0.35, tz));
+        const el = hinge(mesh(wing(both([[0.1, 0.5], [1.6 + def.span * 0.06, 0.5], [1.7 + def.span * 0.06, 0.9], [0.1, 0.95]]), 0.06, {tip: 1}), dark), 0, 0.35, tz + 0.5, 0, 0.35, tz);
         g.add(el);
         out.elevators.push(el);
-        g.add(mesh(fin([[3.8, 0.35], [5.3, 0.35], [5.3, 1.5], [4.6, 1.6]], 0.08), fabric));
-        const rud = hinge(mesh(fin([[5.3, 0.2], [5.9, 0.2], [5.9, 1.4], [5.3, 1.6]], 0.06), dark), 0, 0, 5.3);
+        g.add(mesh(fin([[tz - 0.9, 0.35], [tz + 0.6, 0.35], [tz + 0.6, 1.5], [tz, 1.6]], 0.08), fabric));
+        const rud = hinge(mesh(fin([[tz + 0.6, 0.2], [tz + 1.2, 0.2], [tz + 1.2, 1.4], [tz + 0.6, 1.6]], 0.06), dark), 0, 0, tz + 0.6);
         g.add(rud);
         out.rudders.push(rud);
-        // Two machine guns on the cowling, and the pilot in the open cockpit.
-        [-0.25, 0.25].forEach(x => g.add(cyl(0.07, 0.07, 1.6, metal, 8).translateX(x).translateY(1.0).translateZ(-2.6)));
-        const ws = mesh(new T.PlaneGeometry(0.7, 0.3), glassMat(), 0, 1.15, -0.2);
-        ws.rotation.x = -0.4;
-        g.add(ws);
-        out.canopy = ws;
-        out.helmetPos = [0, 1.35, 0.3];
-        out.eye = [0, 1.5, 0.35];
-        out.tips = [[-levels[0][1], top, -1.5], [levels[0][1], top, -1.5]];
-        out.tail = [0, 1.6, 5.4];
+        if (opts.number) [-1, 1].forEach(side => {
+            const d = numberDecal(opts.number, 0.7, 0.35);
+            d.position.set(side * fw * 0.8, 0.25, nose + L * 0.62);
+            d.rotation.y = side * Math.PI / 2;
+            g.add(d);
+        });
+        // Guns on the cowling, cockpits, the rear gunner.
+        const guns = def.guns || 2;
+        for (let i = 0; i < guns; i++) {
+            const x = (i - (guns - 1) / 2) * 0.45;
+            g.add(cyl(0.06, 0.06, 1.5, metal, 8).translateX(x).translateY(fw * (def.hump ? 1.45 : 1.15)).translateZ(nose + L * 0.2));
+        }
+        const cz = nose + L * 0.47;
+        let shield;
+        if (def.canopy) {
+            shield = mesh(loft([{z: cz - 0.8, w: 0.05, h: 0.05, y: fw * 0.95, n: 2, bot: 0.1}, {z: cz - 0.3, w: 0.4, h: 0.38, y: fw * 0.95, n: 2, bot: 0.1}, {z: cz + 0.6, w: 0.4, h: 0.38, y: fw * 0.95, n: 2, bot: 0.1}, {z: cz + 1.2, w: 0.1, h: 0.1, y: fw * 0.97, n: 2, bot: 0.1}], 16), glassMat());
+        } else {
+            shield = mesh(new T.PlaneGeometry(0.62, 0.28), glassMat(), 0, fw * 1.25, cz - 0.6);
+            shield.rotation.x = -0.4;
+        }
+        g.add(shield);
+        out.canopy = shield;
+        const rim = (r, z) => {
+            const m = new T.Mesh(new T.TorusGeometry(r, 0.06, 6, 16), black);
+            m.rotation.x = Math.PI / 2;
+            m.position.set(0, fw * 1.08, z);
+            g.add(m);
+        };
+        rim(0.38, cz);
+        if (def.seats === 2) rim(0.36, cz + 1.3);
+        if (def.gunner) {
+            const ring = new T.Mesh(new T.TorusGeometry(0.42, 0.05, 6, 18), metal);
+            ring.rotation.x = Math.PI / 2;
+            ring.position.set(0, fw * 1.1, cz + 1.3);
+            g.add(ring);
+            g.add(cyl(0.05, 0.05, 1.2, metal, 8).translateY(fw * 1.45).translateZ(cz + 1.9));
+            g.add(mesh(new T.SphereGeometry(0.24, 10, 8), plain(0x5a3b22, 0.8, 0), 0, fw * 1.4, cz + 1.3));
+        }
+        out.helmetPos = [0, fw * 1.25, cz + 0.1];
+        out.eye = [0, fw * 1.45, cz];
+        out.tips = [[-T0.sp, T0.y, T0.z], [T0.sp, T0.y, T0.z]];
+        out.tail = [0, 1.6, tz + 1.1];
     }
 
     // ------------------------------------------------------------- entry

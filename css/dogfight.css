@@ -1069,3 +1069,57 @@
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* ---- Dogfights locked */
+.df-lock-box {
+    max-width: 760px;
+    margin-top: 8vh;
+}
+
+.df-lock-lead {
+    color: #cfd8e3;
+    font-size: 18px;
+}
+
+.df-lock-ways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.df-lock-way {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 18px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.df-lock-way b {
+    font-size: 22px;
+}
+
+.df-lock-way small {
+    color: #9fb3c8;
+}
+
+.df-lock-way .pill {
+    align-self: flex-start;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+.df-lock-bar {
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+}
+
+.df-lock-bar i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #f5a623, #ffd23f);
+}
