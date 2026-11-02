@@ -15,6 +15,7 @@
     <link href="css/console.css" rel="stylesheet">
     <link href="css/panels.css" rel="stylesheet">
     <link href="css/dogfight.css" rel="stylesheet">
+    <link href="css/career.css" rel="stylesheet">
 </head>
 <body>
 <main>
@@ -30,9 +31,12 @@
             <button type="button" class="nav-tab open-shop">Hangar</button>
             <button type="button" class="nav-tab open-skins">Skins</button>
             <button type="button" class="nav-tab open-quests"><i class="nav-dot" hidden></i>Quests</button>
+            <button type="button" class="nav-tab open-achievements">Achievements</button>
+            <button type="button" class="nav-tab open-leaderboard">Leaderboard</button>
         </nav>
 
         <div class="lobby-profile">
+            <button type="button" class="lobby-level open-achievements" title="Level"><small>LV</small><b>1</b><span class="level-track"><span class="level-fill"></span></span></button>
             <span class="lobby-coins" title="Coins"><i class="coin"></i> <span class="coin-short">0</span></span>
             <button type="button" class="lobby-avatar open-skins" title="Your pilot (Skins)"><img alt="Your pilot"></button>
         </div>
@@ -76,6 +80,8 @@
             </div>
 
             <div class="lobby-corner">
+                <button type="button" class="pill open-friends-list" title="Friends"><i class="nav-dot friend-dot" hidden></i>👥 Friends</button>
+                <button type="button" class="pill open-settings" title="Settings">⚙</button>
                 <button type="button" class="pill open-controls">Controls</button>
                 <button type="button" class="pill open-servers" title="Multiplayer servers: pick by ping or find your friends">Servers</button>
             </div>
@@ -100,16 +106,8 @@
         <div class="controls-pop panel-backdrop" hidden>
             <div class="panel" role="dialog" aria-label="Controls">
                 <div class="shop-header"><h2>Controls</h2><button type="button" class="close-shop close-panel" aria-label="Close">×</button></div>
-                <table class="controls-list">
-                    <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Thrust up / down</td></tr>
-                    <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Pitch (elevator)</td></tr>
-                    <tr><td><kbd>Space</kbd></td><td>Fire the gun</td></tr>
-                    <tr><td><kbd>X</kbd></td><td>Fire a missile</td></tr>
-                    <tr><td><kbd>Q</kbd></td><td>Drop flares (jets, B-2, or any plane with the Flare pod)</td></tr>
-                    <tr><td><kbd>C</kbd></td><td>Eject / parachute. Land at the barn for a new plane</td></tr>
-                    <tr><td><kbd>M</kbd></td><td>Sound on / off</td></tr>
-                    <tr><td><kbd>Esc</kbd></td><td>Menu: resume, change plane or paint, leave</td></tr>
-                </table>
+                <table class="controls-list"></table>
+                <p class="shop-note">Change any key in <button type="button" class="pill open-settings">⚙ Settings</button></p>
                 <p class="shop-note">Every kill earns <strong>50</strong> <i class="coin"></i> coins. Spend them in the Hangar.</p>
             </div>
         </div>
@@ -129,7 +127,7 @@
             <h3>Paint</h3>
             <div class="shop-paint"></div>
             <h3>Upgrades</h3>
-            <p class="shop-note">Upgrades apply to whichever plane you fly.</p>
+            <p class="shop-note">Upgrades apply to whichever plane you fly. Player levels 10, 25 and 50 each unlock one more level of every upgrade (gold pips).</p>
             <div class="shop-upgrades"></div>
         </div>
     </div>
@@ -178,6 +176,8 @@
         <div class="pause-actions">
             <button type="button" class="btn resume-activity">▶ Resume</button>
             <button type="button" class="btn leave-activity">Leave to home</button>
+            <button type="button" class="btn open-settings">⚙ Settings</button>
+            <button type="button" class="btn open-friends-list">👥 Friends</button>
         </div>
         <h3>Your plane</h3>
         <p class="pause-hint"></p>
@@ -195,12 +195,14 @@
 <script src="js/weather.js"></script>
 <script src="js/audio/profiles.js"></script>
 <script src="js/audio/sound.js"></script>
+<script src="js/settings.js"></script>
 <script src="js/shop/catalog.js"></script>
 <script src="js/shop/shop.js"></script>
 <script src="js/shop/hangar.js"></script>
 <script src="js/stats.js"></script>
 <script src="js/daily.js"></script>
 <script src="js/quests.js"></script>
+<script src="js/progress.js"></script>
 <script src="js/skins.js"></script>
 <script src="js/console.js"></script>
 <script src="js/pause.js"></script>
@@ -214,13 +216,17 @@
 <script src="js/online/guest.js"></script>
 <script src="js/online/match.js"></script>
 <script src="js/online/lobby.js"></script>
+<script src="js/social.js"></script>
 <script src="js/menu.js"></script>
 <!-- Dogfights (3D beta): three.js itself loads only when you start it -->
+<script src="js/dogfight/maps.js"></script>
 <script src="js/dogfight/world.js"></script>
 <script src="js/dogfight/aircraft.js"></script>
 <script src="js/dogfight/combat.js"></script>
 <script src="js/dogfight/ai.js"></script>
+<script src="js/dogfight/audio.js"></script>
 <script src="js/dogfight/hud.js"></script>
+<script src="js/dogfight/deploy.js"></script>
 <script src="js/dogfight/mode.js"></script>
 <!-- Activity engine: each file registers a module, boot.js starts the activity -->
 <script src="js/engine/registry.js"></script>

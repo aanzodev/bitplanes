@@ -22,14 +22,17 @@ It also works on GitHub Pages as is. There is no build step.
 The start screen is a lobby, with the bots dogfighting behind it:
 
 - **Top bar:** Play · **Stats** · **Hangar** (planes, paint, upgrades) ·
-  **Skins** (pilot characters) · **Quests** (3 daily quests with coin
-  rewards; a yellow dot means one is ready to claim).
-- **Top right:** your coins (1.5K, 100K, 2.5M…) and your pilot's face.
+  **Skins** (pilot characters) · **Quests** (3 daily and 3 weekly quests with
+  coin and XP rewards; a yellow dot means one is ready to claim) ·
+  **Achievements** · **Leaderboard** (worldwide top 50).
+- **Top right:** your level and XP bar, your coins (1.5K, 100K, 2.5M…) and
+  your pilot's face.
 - **Middle:** your pilot on the pad. Click your name above them to change it.
   The chip under the pad shows your plane (click for the Hangar).
 - **Bottom left:** the mode (Death match or Multiplayer; click to switch) and
   **PLAY**. "Play with friends" hosts or joins a private room with a code.
-- **Bottom right:** **Controls** and **Servers** (Multiplayer server browser).
+- **Bottom right:** **👥 Friends**, **⚙ Settings**, **Controls** and
+  **Servers** (Multiplayer server browser).
 
 While flying, a timer sits in the bottom left: the match countdown in
 Multiplayer, your time in the air otherwise.
@@ -56,7 +59,40 @@ The short form also works:
 loads its page, styles, scripts and images. If GitHub can't be reached it falls
 back to jsDelivr's copy of `main`.
 
+## Levels, achievements and quests
+
+- **XP and levels (1 to 100):** you earn XP for kills (100), hits, matches and
+  time in the air, in Bit Planes and in Dogfights, plus quests, achievements
+  and Dogfights match scores. Every level pays coins (more every 5th level).
+  Levels **10, 25 and 50** each add one more level to every Hangar upgrade
+  (the gold pips).
+- **Achievements:** 36 of them in Combat, Flying, Dogfights and Career, from
+  "First Blood" to "Legend of the Skies" (1,000 kills). Each pays coins and XP
+  the moment you unlock it.
+- **Quests:** 3 daily and 3 weekly, including Dogfights quests.
+
+## Friends and the leaderboard
+
+**👥 Friends** shows your 6-letter friend code. Type a friend's code to send a
+request; once they accept, you see when they're online and where (lobby,
+Multiplayer match, private room, Dogfights). **Join** puts you in their room,
+and **Invite** (while you're in a room) pops up a Join button on their screen.
+The **Leaderboard** tab ranks every pilot worldwide by level, kills, Dogfights
+kills or best kill streak, with you and your friends highlighted. Both use the
+online server (see `server/README.md`).
+
+## Settings
+
+**⚙ Settings** (lobby, and both pause menus): volume, every key for Bit Planes
+and for Dogfights (two keys per action; Dogfights also takes mouse buttons),
+and the Dogfights options: graphics quality, starting camera, field of view,
+enemy skill, flying with the mouse, mouse sensitivity, inverted mouse or
+pitch keys, and camera shake. The **Controls** pop-up always lists your
+current keys.
+
 ## Controls
+
+These are the starting keys; change any of them in Settings.
 
 | Key | Action |
 |---|---|
@@ -65,7 +101,7 @@ back to jsDelivr's copy of `main`.
 | <kbd>Space</kbd> | Fire the gun |
 | <kbd>X</kbd> | Fire a missile |
 | <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets, the B-2, or any plane with the Flare pod upgrade) |
-| <kbd>C</kbd> | Eject / open parachute. Land at the barn for a new plane |
+| <kbd>C</kbd> | Eject / open parachute (the pilot wears your skin). Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in activity) |
 | <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online activities keep running |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd> | Activity console (see below) |
@@ -228,34 +264,84 @@ Or add `?coins=10000` to the page URL to add coins once.
 
 ## Dogfights (3D beta)
 
-Pick **Dogfights** on the mode card and press **PLAY** for a 3D dogfight over
-real terrain: hills, valleys, snowy mountains, lakes, forests and the sea, under
-day, sunset or overcast skies (new terrain every flight). You fly your Hangar
-plane (its shape, paint, speed, agility, armor and real gun sound) against 7
-computer pilots who chase, lead their shots, break when you're on their tail,
-fire missiles and fight each other too. Each kill pays 50 coins and counts in
-your stats and quests.
+Pick **Dogfights** on the mode card and press **PLAY**. The deploy screen picks
+the **map**, **time of day**, **team dogfight** (blue vs red, 4v4 to 8v8, first
+team to the kill goal or the most kills in 10 minutes) or **free for all**,
+and how good the **enemy pilots** are (Easy, Normal, Hard, Ace). You fly your
+Hangar plane with its paint, speed, armor, real gun sound and upgrades.
+
+**Maps** (24 km across):
+
+| Map | |
+|---|---|
+| 🏔 Alpine Valley | Snowy peaks, deep valleys, lakes and pine forests |
+| 🏜 Red Canyon | Desert mesas in red rock bands and a canyon to fly through |
+| 🏝 Pacific Islands | Tropical islands, a volcano, palm trees and an aircraft carrier |
+| 🧊 Arctic Fjords | Icy cliffs, narrow fjords and icebergs |
+| 🏙 Harbor City | Skyscrapers to fly between (their windows light up at dusk and night), a harbor and a carrier |
+| 🌾 Farmlands | Patchwork fields, red barns and silos, and a river |
+
+Each comes in Day, Dawn, Sunset, Overcast, Dusk or Night (stars and moon).
+
+**Fighting, Battlefield style:**
+
+- Guns with a **lead indicator** (the red circle: aim there to hit), tracers,
+  hit and kill markers, damage direction arrows and camera shake.
+- **Missiles** need a **lock**: keep an enemy in front until the diamond
+  closes and turns red (LOCKED). Without a lock they fly straight. Enemies
+  lock onto you too: "locking on" beeps, then MISSILE warnings.
+- **Flares** fool most missiles; they come back after a while.
+- **Afterburner** (boost) for a burst of speed, refilling over time.
+- **Repair** by holding the key when nobody has shot you for a moment.
+  Badly damaged planes catch fire and keep losing health until repaired.
+- **Eject** any time; your pilot drifts down under a parachute in your skin.
+- Score ribbons: +100 kill, +50 assist, revenge, double kill, missile kill,
+  missile evaded. 50 coins per kill, XP for your score at the end, and the
+  results screen with the MVP.
+- **Killcam** when you're shot down, **scoreboard** (Tab), radar with
+  missiles, PULL UP, STALL and boundary warnings, G-force blackout and vapor
+  trails off the wingtips in hard turns.
+
+**Flying:** planes turn best near their corner speed, hard turns bleed speed,
+climbing costs speed and diving gains it, and too slow stalls. Click the
+screen to fly with the **mouse** (it pitches and rolls, like Battlefield), or
+use keys. **V** switches between the chase camera and the **cockpit**, with a
+live instrument panel (airspeed, altitude, artificial horizon, heading, G,
+throttle, health).
 
 | Key | Action |
 |---|---|
-| <kbd>↑</kbd> <kbd>↓</kbd> | Pitch: nose up / down |
-| <kbd>←</kbd> <kbd>→</kbd> | Roll (bank, then pull <kbd>↑</kbd> to turn) |
+| <kbd>↑</kbd> <kbd>↓</kbd> / mouse | Pitch: nose up / down |
+| <kbd>←</kbd> <kbd>→</kbd> / mouse | Roll |
 | <kbd>A</kbd> <kbd>D</kbd> | Rudder |
-| <kbd>W</kbd> <kbd>S</kbd> | Throttle |
-| <kbd>Space</kbd> | Guns |
-| <kbd>X</kbd> | Missile (homes on the enemy in the yellow LOCK box) |
-| <kbd>Q</kbd> | Flares (planes that carry them) |
-| <kbd>Esc</kbd> | Pause / controls / leave |
+| <kbd>W</kbd> <kbd>S</kbd> / wheel | Throttle |
+| <kbd>Shift</kbd> | Afterburner (hold) |
+| <kbd>Space</kbd> / left mouse | Guns |
+| <kbd>X</kbd> / right mouse | Missile |
+| <kbd>Q</kbd> | Flares |
+| <kbd>V</kbd> | Cockpit / chase camera |
+| <kbd>C</kbd> (hold) | Free look with the mouse |
+| <kbd>B</kbd> (hold) | Look behind |
+| <kbd>R</kbd> (hold) | Repair |
+| <kbd>E</kbd> | Eject |
+| <kbd>Tab</kbd> (hold) | Scoreboard |
+| <kbd>Esc</kbd> | Pause: resume, settings, leave |
 
-The display shows a gunsight, boxes around enemies with their distance,
-arrows to enemies off screen, a radar, speed, altitude, throttle, ammo,
-missiles, flares, health, a kill feed, PULL UP and MISSILE warnings, and the
-timer bottom left. Climbing costs speed, diving gains it, and flying too slowly
-stalls the plane.
+**Sound:** all synthesized live and placed around you in 3D. Piston engines
+rumble and pop with the RPM under the propeller's whop; jets whine and roar,
+and the afterburner thunders. Wind rushes louder with speed and screams in
+hard turns. Other planes' engines shift pitch as they pass (Doppler), with a
+whoosh on close flybys. Every plane fires its real gun sound from where it is,
+hits on you clang, the missile seeker growls while locking and holds a tone
+when locked, warning beeps tell you someone is locking or has fired, and far
+explosions arrive late (sound travels 343 m/s) and duller. In the cockpit the
+outside is muffled.
 
-It uses [three.js](https://threejs.org) (MIT license, in `js/vendor/`), which
-only loads when you start Dogfights. It needs a browser with WebGL (any
-recent one).
+Graphics use [three.js](https://threejs.org) (MIT license, in `js/vendor/`,
+only loaded when you start Dogfights) plus small GLSL shaders for the sky,
+water, city windows and the fire, smoke and spark particles. It needs a
+browser with WebGL (any recent one). On slow computers pick **Low** graphics in
+Settings.
 
 ## Multiplayer
 
@@ -322,6 +408,8 @@ index.html              Start screen, HUD and script tags
 css/
   base.css              Page, buttons, keys
   menu.css              Start screen
+  career.css            Settings, levels, achievements, friends, leaderboard
+  dogfight.css          Dogfights
   hangar.css            Hangar shop
   online.css            Online play
   activity.css              In-activity HUD
@@ -332,7 +420,10 @@ js/
   health.js             Your plane's health bar
   daily.js              Daily reward
   stats.js              Lifetime stats and the Stats page
-  quests.js             Daily quests
+  quests.js             Daily and weekly quests
+  progress.js           XP, levels, achievements and pop-up notices
+  settings.js           Settings: volume, key bindings, Dogfights options
+  social.js             Friends, invites and the global leaderboard
   skins.js              Pilot skins (drawn in code) and the Skins tab
   menu.js               The lobby: pilot, coins, mode card, pop-ups
   console.js            Built-in console (Ctrl+Shift+K)
@@ -361,14 +452,22 @@ js/
     87-main.js          controls, physics, rendering, AI, activity modes…
     assets.js           Sprite file paths
     boot.js             …and boot.js starts the activity
-  dogfight/             Dogfights (3D beta): world.js (terrain), aircraft.js (models,
-                        flight), combat.js, ai.js, hud.js, mode.js
+  dogfight/             Dogfights (3D beta):
+    maps.js             The six maps and the times of day
+    world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds
+    aircraft.js         Plane models, cockpits with instruments, flight model
+    combat.js           Guns, missiles, flares, GLSL particle effects, debris
+    ai.js               Computer pilots
+    audio.js            3D synthesized sound
+    hud.js              The on-screen display, scoreboard and results
+    deploy.js           The deploy screen, and the parachuting pilot
+    mode.js             The match itself: teams, scoring, cameras, input
   vendor/peerjs.min.js, three.min.js
 assets/
   sprites/              Activity sprites (units, effects, scenery, ui)
   icons/                HUD and logo icons
 docs/screenshots/       Images for this README
-server/                 Optional relay server for online play (Node.js)
+server/                 Relay server for online play, friends and the leaderboard (Node.js)
 render.yaml             One-click deploy of the relay server on Render
 ```
 
