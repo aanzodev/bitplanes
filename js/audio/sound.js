@@ -449,7 +449,7 @@
         }
         const e = s.engine;
         const t = Math.max(0, Math.min(1, plane.thrust / (plane.maxThrust || 17)));
-        e.out.gain.setTargetAtTime((profile.kind === "jet" ? 0.28 : 0.24) * mix("engineVolume"), s.ctx.currentTime, 0.1);
+        e.out.gain.setTargetAtTime((profile.kind === "jet" ? 0.2 : 0.24) * mix("engineVolume"), s.ctx.currentTime, 0.1);
         // Jets light the afterburner at full throttle.
         e.eng.set(t, {boost: profile.kind === "jet" && t > 0.85, speed: t, level: profile.idleSilent && t === 0 ? 0 : 1});
     }

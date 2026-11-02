@@ -1,0 +1,28 @@
+# Runs the automated tests (tests/run.mjs) on every pull request and push to
+# main: the real page in headless Chromium, plus the relay server for the
+# online tests. A red X on a pull request means something broke.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the test tools
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Install the relay server
+        run: npm install --no-audit --no-fund
+        working-directory: server
+      - name: Run the tests
+        run: npm test

@@ -193,7 +193,7 @@
                 const vl = listenerVel ? -(listenerVel.x * dir.x + listenerVel.y * dir.y + listenerVel.z * dir.z) : 0;
                 const dop = Math.max(0.5, Math.min(2.2, (C + vl) / Math.max(60, C - vs)));
                 v.eng.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed, pitch: dop});
-                v.bus.gain.setTargetAtTime((jet ? 0.7 : 0.8) * (S.mix ? S.mix("engineVolume") : 0.6), t, 0.1);
+                v.bus.gain.setTargetAtTime((jet ? 0.5 : 0.8) * (S.mix ? S.mix("engineVolume") : 0.6), t, 0.1);
                 // A close pass: a whoosh as it goes by.
                 if (v.plane === p && o.d < 160 && (!p._whooshAt || t - p._whooshAt > 2.5) && vs - vl < -40) {
                     p._whooshAt = t;

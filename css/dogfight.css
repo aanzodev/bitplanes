@@ -1123,3 +1123,15 @@
     height: 100%;
     background: linear-gradient(90deg, #f5a623, #ffd23f);
 }
+
+.df-fps {
+    position: absolute;
+    top: 36px;
+    left: 18px;
+    font-size: 12px;
+    color: #9fb3c8;
+}
+
+.df-fps[hidden] {
+    display: none;
+}

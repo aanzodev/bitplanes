@@ -238,7 +238,8 @@ window.BitEngines = (function () {
                 v.ab.rumble.gain.setTargetAtTime(burner * 0.5, now, 0.12);
                 v.ab.crackle.gain.setTargetAtTime(burner * 0.45 * (0.5 + Math.random() * 0.5), now, 0.04);
                 const quiet = E.idleSilent && t < 0.02 ? 0 : 1;
-                out.gain.setTargetAtTime((0.5 + 0.3 * t + 0.25 * burner) * (E.volume || 1) * level * quiet, now, k);
+                // Jets are kept well below the guns and the propeller planes.
+                out.gain.setTargetAtTime((0.5 + 0.3 * t + 0.25 * burner) * 0.5 * (E.volume || 1) * level * quiet, now, k);
             }
         };
 

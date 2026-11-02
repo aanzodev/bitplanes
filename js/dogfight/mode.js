@@ -170,7 +170,8 @@
         }
         status("");
         const dpr = window.devicePixelRatio || 1;
-        renderer.setPixelRatio({low: Math.min(1, dpr) * 0.75, medium: Math.min(dpr, 1), high: Math.min(dpr, 1.5), ultra: Math.min(dpr, 2)}[quality] || 1);
+        const maxRatio = {low: Math.min(1, dpr) * 0.75, medium: Math.min(dpr, 1), high: Math.min(dpr, 1.5), ultra: Math.min(dpr, 2)}[quality] || 1;
+        renderer.setPixelRatio(maxRatio);
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.05;
@@ -247,7 +248,11 @@
         }
 
         bindInput();
+        g.maxRatio = maxRatio;
+        g.ratio = maxRatio;
+        g.fps = {frames: 0, time: 0, value: 60, slow: 0, fast: 0};
         g.onResize = () => {
+            renderer.setPixelRatio(g.ratio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             if (post) post.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -723,6 +728,37 @@
         g.last = now;
         if (!g.paused) step(dt);
         render(dt);
+        frameRate((now - (g.frameAt || now)) / 1000);
+        g.frameAt = now;
+    }
+
+    // Keeps the frame rate up: when frames get slow for a few seconds the
+    // picture renders at a lower resolution (the HUD stays sharp); when
+    // there's room again it goes back up, never above the chosen quality.
+    function frameRate(dt) {
+        const g = fight, f = g.fps;
+        if (!(dt > 0) || dt > 0.5) return; // tab was hidden
+        f.frames++;
+        f.time += dt;
+        if (f.time < 1) return;
+        f.value = f.frames / f.time;
+        f.frames = f.time = 0;
+        const el = g.root.querySelector(".df-fps");
+        if (el) {
+            el.hidden = !setting("dfShowFps");
+            el.textContent = `${Math.round(f.value)} FPS · ${Math.round(100 * g.ratio / g.maxRatio)}% res`;
+        }
+        if (g.paused || setting("dfAutoRes") === false) return;
+        f.slow = f.value < 42 ? f.slow + 1 : 0;
+        f.fast = f.value > 57 ? f.fast + 1 : 0;
+        let next = g.ratio;
+        if (f.slow >= 2) next = Math.max(g.maxRatio * 0.5, g.ratio * 0.85);
+        else if (f.fast >= 4) next = Math.min(g.maxRatio, g.ratio * 1.1);
+        if (Math.abs(next - g.ratio) > 0.01) {
+            g.ratio = next;
+            f.slow = f.fast = 0;
+            g.onResize();
+        }
     }
 
     function step(dt) {

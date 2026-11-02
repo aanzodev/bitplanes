@@ -1,0 +1,12 @@
+{
+  "name": "bitplanes",
+  "private": true,
+  "description": "Bit Planes: tests (npm test). The page itself needs no build.",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "build:wasm": "sh native/build.sh"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
