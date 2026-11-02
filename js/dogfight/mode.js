@@ -59,6 +59,7 @@
         const l = opts.loadout || {thrust: p.thrust, turn: p.turn, reload: p.reload, bulletSpeed: p.bulletSpeed || 1, life: p.life, ammo: p.ammo, missiles: p.missiles, flares: p.flares || 0};
         const a = new D.Aircraft(scene, {
             name, label: p.name, color, shape: p.skin || "", planeId: p.id, isPlayer: !!opts.isPlayer, team: opts.team || null,
+            pattern: opts.pattern || "", number: String(10 + Math.floor(Math.random() * 89)),
             stats: Object.assign({}, l, opts.extra || {}), gun, smartMissiles: !!p.smartMissiles,
         });
         a.heavyGun = HEAVY.includes(gun);
@@ -125,6 +126,7 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         }
         D.pbr = fancy;
+        if (D.resetModelCache) D.resetModelCache();
         D.shadows = fancy;
         D.glow = hdr ? 4 : 1;
         root.appendChild(renderer.domElement);
@@ -141,7 +143,7 @@
         const lvl = id => shop.level(id);
         const extra = {boost: lvl("boost"), seeker: lvl("seeker"), radar: lvl("radar"), airframe: lvl("airframe")};
         const teams = setup.mode === "team";
-        const player = makePlane(scene, selected, shop.colorOf(selected), cleanName(), {isPlayer: true, team: teams ? "blue" : null, loadout: shop.loadout(), extra});
+        const player = makePlane(scene, selected, shop.colorOf(selected), cleanName(), {isPlayer: true, team: teams ? "blue" : null, loadout: shop.loadout(), extra, pattern: shop.patternOf(selected)});
         player.setPilot(window.BitSkins ? window.BitSkins.selected() : null);
         const pool = shop.planes.filter(p => !p.exclusive);
         const names = CALLSIGNS.slice().sort(() => Math.random() - 0.5);
@@ -152,7 +154,7 @@
         for (let k = 0; k < count; k++) {
             const team = teams ? (k < setup.size - 1 ? "blue" : "red") : null;
             const p = pickPlane(pool, selected.skin || "");
-            const e = makePlane(scene, p, p.color, names[k % names.length], {team});
+            const e = makePlane(scene, p, p.color, names[k % names.length], {team, pattern: Math.random() < 0.3 ? ["camo", "tiger", "checkers"][k % 3] : ""});
             e.pilot = D.makePilot(THREE, e, lo + Math.random() * (hi - lo));
             e.setPilot(skins.length ? skins[Math.floor(Math.random() * skins.length)] : null);
             others.push(e);

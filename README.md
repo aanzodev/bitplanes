@@ -302,6 +302,17 @@ Each comes in Day, Dawn, Sunset, Overcast, Dusk or Night (stars and moon).
   missiles, PULL UP, STALL and boundary warnings, G-force blackout and vapor
   trails off the wingtips in hard turns.
 
+**Planes:** every real plane has its own model, built in code: the F-22's
+stealth shape, canted tails and flat nozzles, the Su-27 and MiG-29's engine
+pods and twin tails, the F-15, F-16, F-35, MiG-21 (nose intake and delta
+wing), A-10 (engines on the back), B-2 flying wing, Spitfire and Zero
+(elliptical wings), Corsair (gull wings), P-38 (twin booms), radial and
+inline engines, and biplanes with struts, wires and wheels (the Fokker
+Dr.I has three wings). Ailerons, tailplanes and rudders move with the
+controls, jet nozzles glow inside and flame on afterburner, and the paint
+has panel lines, weathering, your Hangar pattern, team markings and a side
+number.
+
 **Flying:** planes turn best near their corner speed, hard turns bleed speed,
 climbing costs speed and diving gains it, and too slow stalls. Click the
 screen to fly with the **mouse** (it pitches and rolls, like Battlefield), or
@@ -467,7 +478,8 @@ js/
     maps.js             The six maps and the times of day
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
     post.js             Bloom, filmic tone mapping and color grading (High/Ultra)
-    aircraft.js         Plane models, cockpits with instruments, flight model
+    models.js           Realistic plane models (each real plane its own shape, moving controls)
+    aircraft.js         Cockpits with instruments, flight model
     combat.js           Guns, missiles, flares, GLSL particle effects, debris
     ai.js               Computer pilots
     audio.js            3D synthesized sound
