@@ -101,19 +101,38 @@
         // Let the loading screen show before the heavy work.
         await new Promise(r => setTimeout(r, 30));
         const quality = setting("dfQuality") || "high";
+        const fancy = quality === "high" || quality === "ultra";
+        // Colors are given in sRGB and lit in linear light, like modern 3D engines.
+        if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
         let renderer;
         try {
-            renderer = new THREE.WebGLRenderer({antialias: quality !== "low", powerPreference: "high-performance"});
+            renderer = new THREE.WebGLRenderer({antialias: quality === "medium", powerPreference: "high-performance"});
         } catch (e) {
             root.remove();
             return status("Your browser or computer can't show 3D graphics (WebGL is off).");
         }
         status("");
-        renderer.setPixelRatio(quality === "low" ? Math.min(1, window.devicePixelRatio || 1) * 0.75 : Math.min(window.devicePixelRatio || 1, quality === "high" ? 1.5 : 1));
+        const dpr = window.devicePixelRatio || 1;
+        renderer.setPixelRatio({low: Math.min(1, dpr) * 0.75, medium: Math.min(dpr, 1), high: Math.min(dpr, 1.5), ultra: Math.min(dpr, 2)}[quality] || 1);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.05;
+        // High/Ultra: shadows, reflections, smooth bodies, and the cinematic look
+        // (glow, filmic tone mapping) when the browser has WebGL 2.
+        const hdr = fancy && renderer.capabilities.isWebGL2;
+        if (fancy) {
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
+        D.pbr = fancy;
+        D.shadows = fancy;
+        D.glow = hdr ? 4 : 1;
         root.appendChild(renderer.domElement);
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(setting("dfFov") || 72, 1, 0.5, 32000);
-        const world = D.makeWorld(THREE, scene, map, {quality, sky: setup.sky || map.sky});
+        const camera = new THREE.PerspectiveCamera(setting("dfFov") || 72, 1, 0.5, quality === "ultra" ? 38000 : 32000);
+        const world = D.makeWorld(THREE, scene, map, {quality, sky: setup.sky || map.sky, renderer, hdr});
+        const sky = D.SKIES[setup.sky || map.sky] || D.SKIES.day;
+        const post = hdr ? D.makePost(THREE, renderer, {samples: quality === "ultra" ? 8 : 4, exposure: sky.stars ? 1.3 : 0.82, bloom: quality === "ultra" ? 0.95 : 0.8}) : null;
         const hud = D.makeHud(root);
 
         // ---- the pilots
@@ -123,7 +142,7 @@
         const extra = {boost: lvl("boost"), seeker: lvl("seeker"), radar: lvl("radar"), airframe: lvl("airframe")};
         const teams = setup.mode === "team";
         const player = makePlane(scene, selected, shop.colorOf(selected), cleanName(), {isPlayer: true, team: teams ? "blue" : null, loadout: shop.loadout(), extra});
-        player.skin = window.BitSkins ? window.BitSkins.selected() : null;
+        player.setPilot(window.BitSkins ? window.BitSkins.selected() : null);
         const pool = shop.planes.filter(p => !p.exclusive);
         const names = CALLSIGNS.slice().sort(() => Math.random() - 0.5);
         const [lo, hi] = SKILL[setup.difficulty] || SKILL.normal;
@@ -135,13 +154,13 @@
             const p = pickPlane(pool, selected.skin || "");
             const e = makePlane(scene, p, p.color, names[k % names.length], {team});
             e.pilot = D.makePilot(THREE, e, lo + Math.random() * (hi - lo));
-            e.skin = skins.length ? skins[Math.floor(Math.random() * skins.length)] : null;
+            e.setPilot(skins.length ? skins[Math.floor(Math.random() * skins.length)] : null);
             others.push(e);
         }
         const planes = [player, ...others];
 
         const g = fight = {
-            THREE, renderer, scene, camera, world, hud, root, player, others, planes, setup, map,
+            THREE, renderer, post, scene, camera, world, hud, root, player, others, planes, setup, map,
             keys: new Set(), held: new Set(), paused: false, time: 0, coins: 0, last: performance.now(), raf: 0,
             respawnAt: new Map(), lock: {target: null, progress: 0}, audio: D.makeAudio(), lastEnemyGun: new Map(),
             view: setting("dfView") === "cockpit" ? "cockpit" : "chase", look: {yaw: 0, pitch: 0}, stick: {x: 0, y: 0},
@@ -172,6 +191,7 @@
         bindInput();
         g.onResize = () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
+            if (post) post.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
         };
@@ -856,9 +876,10 @@
         }
         g.shake *= Math.exp(-dt * 8);
         cam.updateProjectionMatrix();
-        g.world.update(dt, cam);
+        g.world.update(dt, cam, p.alive ? p.pos : cam.position);
         if (p.alive && g.view === "cockpit" && (g.frame++ % 3 === 0)) p.updateInstruments();
-        g.renderer.render(g.scene, cam);
+        if (g.post) g.post.render(g.scene, cam, dt);
+        else g.renderer.render(g.scene, cam);
 
         // Lead indicator: where to aim at the target nearest your gunsight.
         let lead = null;
@@ -939,6 +960,8 @@
             if (o.geometry) o.geometry.dispose();
             if (o.material) [].concat(o.material).forEach(mm => mm.dispose());
         });
+        if (g.post) g.post.dispose();
+        if (g.scene.environment) g.scene.environment.dispose();
         g.renderer.dispose();
         g.root.remove();
         fight = null;

@@ -199,7 +199,7 @@ window.BitSettings = (function () {
                 ${slider("volume", "Volume", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
                 <p class="shop-note"><kbd>M</kbd> turns the sound on and off at any time.</p>
                 <h3>Dogfights (3D)</h3>
-                ${option("dfQuality", "Graphics", [["low", "Low (fastest)"], ["medium", "Medium"], ["high", "High (best looking)"]])}
+                ${option("dfQuality", "Graphics", [["low", "Low (fastest)"], ["medium", "Medium"], ["high", "High (shadows, reflections, cinematic look)"], ["ultra", "Ultra (strong graphics card)"]])}
                 ${option("dfView", "Starting camera", [["chase", "Chase (third person)"], ["cockpit", "Cockpit (first person)"]])}
                 ${slider("dfFov", "Field of view", 55, 100, 1, v => v + "°")}
                 ${option("dfDifficulty", "Enemy pilots", [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"], ["ace", "Ace"]])}

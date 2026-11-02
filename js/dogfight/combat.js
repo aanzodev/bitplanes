@@ -28,14 +28,16 @@
     const PART_FRAG = `
         varying float vAlpha;
         varying vec3 vTint;
-        uniform float soft;
+        uniform float soft, boost;
         #include <fog_pars_fragment>
         void main() {
             vec2 p = gl_PointCoord * 2.0 - 1.0;
             float d = dot(p, p);
             if (d > 1.0) discard;
             float a = vAlpha * pow(1.0 - d, soft);
-            gl_FragColor = vec4(vTint, a);
+            gl_FragColor = vec4(vTint * boost, a);
+            #include <tonemapping_fragment>
+            #include <encodings_fragment>
             #include <fog_fragment>
         }`;
 
@@ -50,7 +52,9 @@
         const mat = new THREE.ShaderMaterial({
             vertexShader: PART_VERT, fragmentShader: PART_FRAG, transparent: true, depthWrite: false, fog: !additive,
             blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
-            uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {scale: {value: 600}, soft: {value: additive ? 1.6 : 1.1}}]),
+            uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {scale: {value: 600}, soft: {value: additive ? 1.6 : 1.1},
+                // Fire, sparks and flares shine brighter than white on High/Ultra, so they glow.
+                boost: {value: additive ? (D.glow || 1) : 1}}]),
         });
         const points = new THREE.Points(geo, mat);
         points.frustumCulled = false;
@@ -197,7 +201,8 @@
                 tail.copy(b.pos).addScaledVector(b.vel, -0.03);
                 tracerPos.set([b.pos.x, b.pos.y, b.pos.z, tail.x, tail.y, tail.z], n * 6);
                 const hot = b.owner.team === "red" ? [1, 0.45, 0.25] : [1, 0.85, 0.4];
-                tracerCol.set([hot[0], hot[1], hot[2], 0, 0, 0], n * 6);
+                const k = D.glow || 1;
+                tracerCol.set([hot[0] * k, hot[1] * k, hot[2] * k, 0, 0, 0], n * 6);
                 n++;
             }
             tracerGeo.setDrawRange(0, n * 2);
