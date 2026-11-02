@@ -52,6 +52,8 @@ window.BitSettings = (function () {
         dfInvertPitch: false,
         dfInvertMouse: false,
         dfShake: true,
+        dfAutoRes: true,        // lower the resolution by itself when frames get slow
+        dfShowFps: false,
         dfDifficulty: "normal", // easy | normal | hard | ace
         keys2d: {},
         keysDf: {},
@@ -211,7 +213,9 @@ window.BitSettings = (function () {
                 ${slider("dfMouseSens", "Mouse sensitivity", 0.3, 2.5, 0.05, v => Number(v).toFixed(2) + "×")}
                 ${check("dfInvertMouse", "Invert mouse up / down")}
                 ${check("dfInvertPitch", "Invert pitch keys (↑ = nose down)")}
-                ${check("dfShake", "Camera shake")}`;
+                ${check("dfShake", "Camera shake")}
+                ${check("dfAutoRes", "Keep it smooth (lower the resolution when frames get slow)")}
+                ${check("dfShowFps", "Show the frame rate")}`;
         } else {
             const set = tab === "keys2d" ? "keys2d" : "keysDf", list = set === "keys2d" ? KEYS_2D : KEYS_DF;
             body.innerHTML = `

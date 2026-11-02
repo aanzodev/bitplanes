@@ -64,6 +64,7 @@
                 <div class="df-repair"></div>
             </div>
             <div class="df-score"></div>
+            <div class="df-fps" hidden></div>
             <div class="df-vignette"></div>
             <div class="df-blackout"></div>
             <div class="df-board" hidden></div>

@@ -88,7 +88,9 @@ and **Guns** volume sliders, every key for Bit Planes
 and for Dogfights (two keys per action; Dogfights also takes mouse buttons),
 and the Dogfights options: graphics quality, starting camera, field of view,
 enemy skill, flying with the mouse, mouse sensitivity, inverted mouse or
-pitch keys, and camera shake. The **Controls** pop-up always lists your
+pitch keys, camera shake, keeping it smooth (Dogfights lowers its
+resolution by itself when frames get slow, and raises it again when there's
+room), and showing the frame rate. The **Controls** pop-up always lists your
 current keys.
 
 ## Controls
@@ -478,6 +480,23 @@ server instead (for example on a local network), run a
 [PeerJS server](https://github.com/peers/peerjs-server) and add
 `?peerhost=<ip>&peerport=9000` to the URL for everyone.
 
+## Tests
+
+`tests/run.mjs` opens the real page in a headless browser and plays it: the
+lobby panels, Bit Planes (flying, shooting, ejecting in your skin, remapped
+keys, flares), levels and the Dogfights lock, every plane's gun and engine
+sound, Dogfights (erosion, a match with guns, a missile lock, flares,
+ejecting and the results, and computer pilots fighting on their own) and
+online play through the relay server (private rooms, Multiplayer, friends).
+They run on every pull request (GitHub Actions, `.github/workflows/test.yml`).
+To run them yourself:
+
+```sh
+npm install && npx playwright install chromium   # once
+cd server && npm install && cd ..                # once, for the online tests
+npm test                                         # or: npm test -- dogfights sound
+```
+
 ## Project layout
 
 ```
@@ -549,6 +568,7 @@ assets/
   icons/                HUD and logo icons
 docs/screenshots/       Images for this README
 native/                 C code compiled to WebAssembly (build.sh rebuilds it; needs clang)
+tests/run.mjs           Automated tests (npm test), run on every pull request
 server/                 Relay server for online play, friends and the leaderboard (Node.js)
 render.yaml             One-click deploy of the relay server on Render
 ```
