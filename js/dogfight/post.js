@@ -1,7 +1,7 @@
 // Dogfights (3D): the cinematic look (High and Ultra graphics). The scene is
 // drawn into a high dynamic range image (brighter than white is allowed),
 // then GLSL passes add bloom (the sun, afterburners, tracers, fire and
-// explosions glow), filmic tone mapping (ACES, like film and game cameras),
+// explosions glow), filmic tone mapping (ACES, like film cameras),
 // a light color grade, a vignette, a touch of lens color fringing at the
 // edges and fine film grain.
 (function () {

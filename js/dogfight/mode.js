@@ -102,7 +102,7 @@
         await new Promise(r => setTimeout(r, 30));
         const quality = setting("dfQuality") || "high";
         const fancy = quality === "high" || quality === "ultra";
-        // Colors are given in sRGB and lit in linear light, like modern game engines.
+        // Colors are given in sRGB and lit in linear light, like modern 3D engines.
         if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
         let renderer;
         try {
