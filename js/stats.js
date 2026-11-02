@@ -11,7 +11,9 @@ window.BitStats = (function () {
         const s = window.BitEngine && window.BitEngine.require(7).c;
         if (!s) return null;
         for (const [k, v] of Object.entries({hits: 0, streak: 0, bestStreak: 0, flySeconds: 0, matches: 0, onlineMatches: 0,
-            coinsEarned: 0, planeSeconds: {}, planeKills: {}})) if (s[k] === undefined) s[k] = v;
+            coinsEarned: 0, planeSeconds: {}, planeKills: {},
+            // Dogfights (3D)
+            dfKills: 0, dfDeaths: 0, dfMissileKills: 0, dfGunKills: 0, dfFlareSaves: 0, dfWins: 0, dfMatches: 0, dfEjects: 0, dfMaps: {}})) if (s[k] === undefined) s[k] = v;
         return s;
     }
 
@@ -88,7 +90,10 @@ window.BitStats = (function () {
             .map(([id, sec]) => ({p: shop.planes.find(x => x.id === id), sec, kills: s.planeKills[id] || 0})).filter(x => x.p);
         const fav = planes[0];
         const card = (label, value, sub = "") => `<div class="stat-card"><b>${value}</b><span>${label}</span>${sub ? `<small>${sub}</small>` : ""}</div>`;
+        const lv = window.BitProgress ? window.BitProgress.levelInfo() : null;
         el.querySelector(".stats-body").innerHTML = `
+            ${lv ? `<div class="stat-level"><b>Level ${lv.level}</b><div class="level-track"><span style="width: ${lv.frac * 100}%"></span></div>
+                <small>${lv.need ? `${n(lv.into)} / ${n(lv.need)} XP to level ${lv.level + 1}` : "Max level"} · ${n(lv.xp)} XP in total</small></div>` : ""}
             <div class="stat-grid">
                 ${card("Kills", n(s.killed))}
                 ${card("Deaths", n(s.deaths))}
@@ -101,6 +106,15 @@ window.BitStats = (function () {
                 ${card("Coins earned", n(s.coinsEarned))}
                 ${card("Daily streak", n(daily.streak), `best: ${n(daily.best)}`)}
                 ${card("Cows hit", n(s.cowKilled), "oops")}
+            </div>
+            <h3>Dogfights (3D)</h3>
+            <div class="stat-grid">
+                ${card("Kills", n(s.dfKills), `${n(s.dfGunKills)} guns · ${n(s.dfMissileKills)} missiles`)}
+                ${card("Deaths", n(s.dfDeaths))}
+                ${card("K/D ratio", s.dfDeaths ? (s.dfKills / s.dfDeaths).toFixed(2) : n(s.dfKills))}
+                ${card("Matches", n(s.dfMatches), `${n(s.dfWins)} won`)}
+                ${card("Missiles dodged", n(s.dfFlareSaves), "with flares")}
+                ${card("Maps flown", n(Object.keys(s.dfMaps || {}).length) + " / 6")}
             </div>
             ${fav ? `<h3>Favorite plane</h3>
             <div class="stat-fav"><img src="${planeImg(fav.p)}" alt=""><div><b>${fav.p.name}</b>
@@ -116,7 +130,8 @@ window.BitStats = (function () {
         const s = S();
         if (!s) return;
         Object.assign(s, {bullets: 0, missiles: 0, killed: 0, deaths: 0, cowKilled: 0, hits: 0, streak: 0, bestStreak: 0,
-            flySeconds: 0, matches: 0, onlineMatches: 0, coinsEarned: 0, planeSeconds: {}, planeKills: {}});
+            flySeconds: 0, matches: 0, onlineMatches: 0, coinsEarned: 0, planeSeconds: {}, planeKills: {},
+            dfKills: 0, dfDeaths: 0, dfMissileKills: 0, dfGunKills: 0, dfFlareSaves: 0, dfWins: 0, dfMatches: 0, dfEjects: 0, dfMaps: {}});
         [lastKilled, lastDeaths] = [0, 0];
     }
 
@@ -132,7 +147,7 @@ window.BitStats = (function () {
         document.body.appendChild(el);
         el.addEventListener("click", ev => {
             if (ev.target === el || ev.target.closest(".stats-close")) el.hidden = true;
-            if (ev.target.closest(".stats-reset") && confirm("Reset all your stats? Coins and planes stay.")) {
+            if (ev.target.closest(".stats-reset") && confirm("Reset all your stats? Coins, planes, level and achievements stay.")) {
                 reset();
                 render();
             }
