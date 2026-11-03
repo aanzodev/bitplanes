@@ -257,7 +257,7 @@
         function flares(pos, mine) {
             const out = mine ? own : panner(pos);
             for (let k = 0; k < 24; k++) {
-                const t = now() + Math.floor(k / 2) * 0.07 + (k % 2) * 0.02, o = osc("sine", 900), g = gain(0);
+                const t = now() + Math.floor(k / 2) * 0.11 + (k % 2) * 0.03, o = osc("sine", 900), g = gain(0);
                 chain(o, g, out);
                 o.frequency.setValueAtTime(900, t);
                 o.frequency.exponentialRampToValueAtTime(180, t + 0.08);
