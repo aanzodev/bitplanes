@@ -221,7 +221,7 @@
     function resetShop() {
         state = {coins: 0, owned: ["classic"], selected: "classic", upgrades: {}, paint: {}, pattern: {}};
         save();
-        return "Shop reset";
+        return "Aircraft Market reset";
     }
 
     // Own a plane for free (console "give").

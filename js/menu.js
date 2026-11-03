@@ -2,9 +2,9 @@
 // the mode card with PLAY, and the Controls / Servers / friends pop-ups.
 (function () {
     const MODES = {
-        "death-match": {name: "Death match", desc: "Everyone against everyone"},
-        "multiplayer": {name: "Multiplayer", desc: "Real players online · 10 min matches"},
-        "dogfights": {name: "Dogfights", desc: "BETA · 3D dogfights over real terrain", beta: true},
+        "death-match": {name: "Competitive Flight", desc: "Everyone against everyone"},
+        "multiplayer": {name: "Multiplayer", desc: "Real players online · 10 min sessions"},
+        "dogfights": {name: "Flight Sessions", desc: "BETA · 3D flights over real terrain", beta: true},
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
 
@@ -32,7 +32,7 @@
         const st = shop.state(), p = shop.selected();
         document.querySelectorAll(".coin-short").forEach(el => {
             el.textContent = short(st.coins);
-            el.parentElement.title = st.coins.toLocaleString() + " coins";
+            el.parentElement.title = st.coins.toLocaleString() + " credits";
         });
         // Your plane: the chip under the pad (opens the Hangar).
         const chip = document.querySelector(".lobby-plane-chip");
@@ -87,7 +87,7 @@
         table.innerHTML = `<tr><th colspan="2">Bit Planes</th></tr>${rows("keys2d", S.actions2d)}
             <tr><td><kbd>M</kbd></td><td>Sound on / off</td></tr>
             <tr><td><kbd>Esc</kbd></td><td>Menu: resume, change plane or paint, settings, leave</td></tr>
-            <tr><th colspan="2">Dogfights (3D)</th></tr>${rows("keysDf", S.actionsDf)}
+            <tr><th colspan="2">Flight Sessions (3D)</th></tr>${rows("keysDf", S.actionsDf)}
             <tr><td>Mouse</td><td>${S.get("dfMouse") ? "Pitch and roll (click the screen first)" : "Mouse flying is off (Settings)"}</td></tr>`;
     }
 

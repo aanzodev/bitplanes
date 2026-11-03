@@ -196,7 +196,7 @@ window.BitSkins = (function () {
             <div class="shop-header"><h2>Skins</h2>
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
                 <button type="button" class="close-shop skins-close" aria-label="Close">×</button></div>
-            <p class="shop-note">Your pilot in the lobby, and the pilot who bails out when you eject (in Bit Planes and Dogfights). Rarer skins cost more coins.</p>
+            <p class="shop-note">Your pilot in the lobby, and the pilot who bails out when you eject (in Bit Planes and Flight Sessions). Rarer skins cost more credits.</p>
             <div class="skin-grid"></div>
         </div>`;
         document.body.appendChild(el);

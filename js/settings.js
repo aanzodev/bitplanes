@@ -15,8 +15,8 @@ window.BitSettings = (function () {
         {id: "pitchUp", name: "Turn ⟲ (nose up when flying right)", keys: ["ArrowLeft", "KeyA"]},
         {id: "pitchDown", name: "Turn ⟳ (nose down when flying right)", keys: ["ArrowRight", "KeyD"]},
         {id: "fire", name: "Fire the gun", keys: ["Space", ""]},
-        {id: "missile", name: "Fire a missile", keys: ["KeyX", ""]},
-        {id: "flare", name: "Drop flares", keys: ["KeyQ", ""]},
+        {id: "missile", name: "Fire a guided missile", keys: ["KeyX", ""]},
+        {id: "flare", name: "Drop countermeasures", keys: ["KeyQ", ""]},
         {id: "eject", name: "Eject / parachute", keys: ["KeyC", ""]},
     ];
     const KEYS_DF = [
@@ -30,8 +30,8 @@ window.BitSettings = (function () {
         {id: "throttleDown", name: "Throttle down", keys: ["KeyS", ""]},
         {id: "boost", name: "Afterburner / boost (hold)", keys: ["ShiftLeft", "ShiftRight"]},
         {id: "fire", name: "Guns", keys: ["Space", "Mouse0"]},
-        {id: "missile", name: "Missile", keys: ["KeyX", "Mouse2"]},
-        {id: "flare", name: "Flares", keys: ["KeyQ", ""]},
+        {id: "missile", name: "Guided missile", keys: ["KeyX", "Mouse2"]},
+        {id: "flare", name: "Countermeasures", keys: ["KeyQ", ""]},
         {id: "camera", name: "Switch camera (cockpit / chase)", keys: ["KeyV", ""]},
         {id: "look", name: "Free look (hold, then move the mouse)", keys: ["KeyC", ""]},
         {id: "lookBack", name: "Look behind (hold)", keys: ["KeyB", ""]},
@@ -204,11 +204,11 @@ window.BitSettings = (function () {
                 ${slider("engineVolume", "Engines", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
                 ${slider("gunVolume", "Guns", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
                 <p class="shop-note"><kbd>M</kbd> turns the sound on and off at any time.</p>
-                <h3>Dogfights (3D)</h3>
+                <h3>Flight Sessions (3D)</h3>
                 ${option("dfQuality", "Graphics", [["low", "Low (fastest)"], ["medium", "Medium"], ["high", "High (shadows, reflections, cinematic look)"], ["ultra", "Ultra (strong graphics card)"]])}
                 ${option("dfView", "Starting camera", [["chase", "Chase (third person)"], ["cockpit", "Cockpit (first person)"]])}
                 ${slider("dfFov", "Field of view", 55, 100, 1, v => v + "°")}
-                ${option("dfDifficulty", "Enemy pilots", [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"], ["ace", "Ace"]])}
+                ${option("dfDifficulty", "AI Pilots", [["easy", "Beginner"], ["normal", "Standard"], ["hard", "Advanced"], ["ace", "Expert"]])}
                 ${check("dfMouse", "Fly with the mouse (Battlefield style: mouse pitches and rolls)")}
                 ${slider("dfMouseSens", "Mouse sensitivity", 0.3, 2.5, 0.05, v => Number(v).toFixed(2) + "×")}
                 ${check("dfInvertMouse", "Invert mouse up / down")}
@@ -221,7 +221,7 @@ window.BitSettings = (function () {
             body.innerHTML = `
                 <p class="shop-note">Click a key, then press the new key${set === "keysDf" ? " or mouse button" : ""}. <kbd>Esc</kbd> cancels, <kbd>Backspace</kbd> clears.</p>
                 <table class="key-table"><tr><th>Action</th><th>Key</th><th>Second key</th></tr>${list.map(a => row(set, a)).join("")}</table>
-                <button type="button" class="pill set-reset" data-set="${set}">Reset ${set === "keys2d" ? "Bit Planes" : "Dogfights"} keys</button>`;
+                <button type="button" class="pill set-reset" data-set="${set}">Reset ${set === "keys2d" ? "Bit Planes" : "Flight Sessions"} keys</button>`;
         }
     }
 
@@ -283,7 +283,7 @@ window.BitSettings = (function () {
             <div class="set-tabs">
                 <button type="button" class="set-tab" data-tab="general">General</button>
                 <button type="button" class="set-tab" data-tab="keys2d">Bit Planes keys</button>
-                <button type="button" class="set-tab" data-tab="keysDf">Dogfights keys</button>
+                <button type="button" class="set-tab" data-tab="keysDf">Flight Sessions keys</button>
             </div>
             <div class="settings-body"></div>
         </div>`;

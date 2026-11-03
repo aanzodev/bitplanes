@@ -64,14 +64,14 @@
             },
         },
         clear: {help: "Clear the console", run: () => (out.innerHTML = "")},
-        coins: {help: "Show your coins", run: () => print(`${shop().state().coins.toLocaleString()} coins`)},
+        coins: {help: "Show your credits", run: () => print(`${shop().state().coins.toLocaleString()} credits`)},
         addcoins: {
-            args: "<n>", help: "Add coins",
-            run: a => print(`Coins: ${shop().addCoins(number(a[0], "addcoins")).toLocaleString()}`, "ok"),
+            args: "<n>", help: "Add credits",
+            run: a => print(`Credits: ${shop().addCoins(number(a[0], "addcoins")).toLocaleString()}`, "ok"),
         },
         setcoins: {
-            args: "<n>", help: "Set your coins",
-            run: a => print(`Coins: ${shop().setCoins(number(a[0], "setcoins")).toLocaleString()}`, "ok"),
+            args: "<n>", help: "Set your credits",
+            run: a => print(`Credits: ${shop().setCoins(number(a[0], "setcoins")).toLocaleString()}`, "ok"),
         },
         planes: {
             help: "List planes (★ = special, ◆ = exclusive, ✓ = owned)",
@@ -148,7 +148,7 @@
             run() {
                 const s = window.BitStats.get();
                 if (!s) throw new Error("Stats aren't ready yet.");
-                print(`Kills ${s.killed} · Deaths ${s.deaths} · Best streak ${s.bestStreak} · Hits ${s.hits}/${s.bullets} shots · Matches ${s.matches}`, "dim");
+                print(`Points ${s.killed} · Deaths ${s.deaths} · Best streak ${s.bestStreak} · Hits ${s.hits}/${s.bullets} shots · Sessions ${s.matches}`, "dim");
             },
         },
         daily: {
@@ -161,7 +161,7 @@
                     return print("Today's daily reward can be claimed again.", "ok");
                 }
                 const st = D.status();
-                print(st.next ? `Waiting: day ${st.next.day} reward, ${st.next.coins} coins (streak ${st.next.streak}).`
+                print(st.next ? `Waiting: day ${st.next.day} reward, ${st.next.coins} credits (streak ${st.next.streak}).`
                     : `Claimed today. Streak: ${st.streak} days (best ${st.best}). Come back tomorrow!`, "dim");
             },
         },
@@ -174,11 +174,11 @@
                 const list = S.list.map(s => `${s.id}${S.state().owned.includes(s.id) ? " ✓" : ""}`).join(", ");
                 const s = S.list.find(x => x.id === q || x.name.toLowerCase().replace(/[^a-z]/g, "") === q);
                 if (!s) throw new Error("Skins: " + list);
-                if (!S.equip(s.id)) throw new Error(`You don't own ${s.name} yet (${s.price.toLocaleString()} coins in the Skins tab).`);
+                if (!S.equip(s.id)) throw new Error(`You don't own ${s.name} yet (${s.price.toLocaleString()} credits in the Skins tab).`);
                 print(`Wearing ${s.name}.`, "ok");
             },
         },
-        reset: {help: "Reset coins, planes and upgrades", run: () => print(shop().resetShop(), "ok")},
+        reset: {help: "Reset credits, planes and upgrades", run: () => print(shop().resetShop(), "ok")},
         heal: {
             help: "Repair your plane (single player)",
             run() {
@@ -188,7 +188,7 @@
             },
         },
         refill: {
-            help: "Full ammo, missiles and flares (single player)",
+            help: "Full ammo, guided missiles and countermeasures (single player)",
             run() {
                 const plane = needSinglePlayer();
                 plane.ammo = plane.maxAmmo;

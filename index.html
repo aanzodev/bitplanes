@@ -28,16 +28,16 @@
             <span class="lobby-logo"><i class="logo"></i> Bit Planes</span>
             <button type="button" class="nav-tab active">Play</button>
             <button type="button" class="nav-tab open-stats">Stats</button>
-            <button type="button" class="nav-tab open-shop">Hangar</button>
+            <button type="button" class="nav-tab open-shop">Aircraft Selection</button>
             <button type="button" class="nav-tab open-skins">Skins</button>
             <button type="button" class="nav-tab open-quests"><i class="nav-dot" hidden></i>Quests</button>
-            <button type="button" class="nav-tab open-achievements">Achievements</button>
-            <button type="button" class="nav-tab open-leaderboard">Leaderboard</button>
+            <button type="button" class="nav-tab open-achievements">Milestones</button>
+            <button type="button" class="nav-tab open-leaderboard">Rankings</button>
         </nav>
 
         <div class="lobby-profile">
             <button type="button" class="lobby-level open-achievements" title="Level"><small>LV</small><b>1</b><span class="level-track"><span class="level-fill"></span></span></button>
-            <span class="lobby-coins" title="Coins"><i class="coin"></i> <span class="coin-short">0</span></span>
+            <span class="lobby-coins" title="Credits"><i class="coin"></i> <span class="coin-short">0</span></span>
             <button type="button" class="lobby-avatar open-skins" title="Your pilot (Skins)"><img alt="Your pilot"></button>
         </div>
 
@@ -54,13 +54,13 @@
                 <button type="button" class="lobby-hero open-skins" title="Change your skin"><img alt="Your pilot"></button>
                 <div class="lobby-pad"></div>
                 <div class="lobby-hero-name"></div>
-                <button type="button" class="lobby-plane-chip open-shop" title="Change your plane in the Hangar"><img alt=""><span></span></button>
+                <button type="button" class="lobby-plane-chip open-shop" title="Change your plane in Aircraft Selection"><img alt=""><span></span></button>
             </div>
 
             <div class="lobby-mode">
-                <h2 class="mode-title">Death match</h2>
+                <h2 class="mode-title">Competitive Flight</h2>
                 <button type="button" class="mode-switch" title="Change mode">
-                    <b>Mode: <span class="mode-name">Death match</span> ▸</b>
+                    <b>Mode: <span class="mode-name">Competitive Flight</span> ▸</b>
                     <small class="mode-desc">Everyone against everyone</small>
                 </button>
                 <button class="btn play-btn">Play</button>
@@ -68,13 +68,13 @@
                 <p class="online-status"></p>
                 <div class="activity-modes" hidden>
                     <div>
-                        <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked> Death match</label>
+                        <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked> Competitive Flight</label>
                     </div>
                     <div>
-                        <label title="Play with real people online: 10 minute matches, top 5 leaderboard."><input type="radio" name="mode" value="multiplayer"> Multiplayer</label>
+                        <label title="Play with real people online: 10 minute sessions, top 5 rankings."><input type="radio" name="mode" value="multiplayer"> Multiplayer</label>
                     </div>
                     <div>
-                        <label title="3D dogfights over real terrain (beta)."><input type="radio" name="mode" value="dogfights"> Dogfights (Beta)</label>
+                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="dogfights"> Flight Sessions (Beta)</label>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                 <div class="shop-header"><h2>Controls</h2><button type="button" class="close-shop close-panel" aria-label="Close">×</button></div>
                 <table class="controls-list"></table>
                 <p class="shop-note">Change any key in <button type="button" class="pill open-settings">⚙ Settings</button></p>
-                <p class="shop-note">Every kill earns <strong>50</strong> <i class="coin"></i> coins. Spend them in the Hangar.</p>
+                <p class="shop-note">Every point earns <strong>50</strong> <i class="coin"></i> credits. Spend them in the Aircraft Market.</p>
             </div>
         </div>
 
@@ -116,9 +116,9 @@
     </section>
 
     <div class="shop" hidden>
-        <div class="shop-panel" role="dialog" aria-label="Hangar">
+        <div class="shop-panel" role="dialog" aria-label="Aircraft Selection">
             <div class="shop-header">
-                <h2>Hangar</h2>
+                <h2>Aircraft Selection</h2>
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
                 <button type="button" class="close-shop" aria-label="Close">×</button>
             </div>
@@ -139,7 +139,7 @@
             <div class="missile"></div>
             <div class="missile"></div>
         </div>
-        <div class="flare-capacity" title="Flares (Q)" hidden></div>
+        <div class="flare-capacity" title="Countermeasures (Q)" hidden></div>
         <div class="thrust">
             <div class="thrust-level"></div>
         </div>
@@ -179,7 +179,7 @@
             <button type="button" class="btn open-settings">⚙ Settings</button>
             <button type="button" class="btn open-friends-list">👥 Friends</button>
         </div>
-        <h3>Your plane</h3>
+        <h3>Selected Aircraft</h3>
         <p class="pause-hint"></p>
         <div class="pause-planes"></div>
         <h3>Paint</h3>

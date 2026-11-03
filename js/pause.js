@@ -73,7 +73,7 @@
             </button>`).join("");
         const later = flying && flying.planeId && flying.planeId !== selected.id;
         document.querySelector(".pause-hint").textContent = later
-            ? `You'll fly the ${selected.name} with your next plane (after a respawn or at the barn).`
+            ? `You'll fly the ${selected.name} with your next plane (after you return to flight or at the barn).`
             : "A new plane choice takes effect with your next plane.";
 
         const current = (state.paint && state.paint[selected.id]) || null;

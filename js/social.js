@@ -9,8 +9,8 @@ window.BitSocial = (function () {
     const O = window.BitOnline || {};
     const BOARDS = [
         {id: "xp", name: "Level", unit: "XP"},
-        {id: "kills", name: "Kills", unit: "kills"},
-        {id: "dfKills", name: "Dogfights kills", unit: "kills"},
+        {id: "kills", name: "Points", unit: "points"},
+        {id: "dfKills", name: "Flight Sessions points", unit: "points"},
         {id: "streak", name: "Best streak", unit: "in a row"},
     ];
     let ws = null, ready = false, version = 0, myCode = "", retry = 3000, timer = null, lastHi = "";
@@ -130,7 +130,7 @@ window.BitSocial = (function () {
         if (msg.op === "hello") {
             version = msg.v || 0;
             if (version < 5) {
-                notice = "Friends and the leaderboard need the online server's update (Render installs it a few minutes after it's merged).";
+                notice = "Friends and the rankings need the online server's update (Render installs it a few minutes after it's merged).";
                 return render();
             }
             retry = 3000;
@@ -260,7 +260,7 @@ window.BitSocial = (function () {
         }
         const r = f.room;
         if (!r) return "Online · in the lobby";
-        return "Online · " + ({multiplayer: "in a Multiplayer match", room: "in a private room", dogfights: "in Dogfights", solo: "flying solo"}[r.mode] || "playing");
+        return "Online · " + ({multiplayer: "in a Multiplayer session", room: "in a private room", dogfights: "in Flight Sessions", solo: "flying solo"}[r.mode] || "playing");
     }
 
     function myRoom() {
@@ -314,7 +314,7 @@ window.BitSocial = (function () {
         const def = BOARDS.find(b => b.id === board.by) || BOARDS[0];
         const friendCodes = new Set(friends.map(f => f.code));
         const body = boardEl.querySelector(".board-body");
-        if (!serverUrl()) return (body.innerHTML = `<p class="social-note">The leaderboard needs the online server.</p>`);
+        if (!serverUrl()) return (body.innerHTML = `<p class="social-note">The rankings need the online server.</p>`);
         if (version && version < 5) return (body.innerHTML = `<p class="social-note">${notice}</p>`);
         if (!board.rows) return (body.innerHTML = `<p class="shop-note">${ready ? "Loading…" : "Connecting to the online server… (it can take up to a minute to wake up)"}</p>`);
         const val = r => (def.id === "xp" ? `<b>LV ${r.level}</b> <small>${Number(r.value).toLocaleString()} XP</small>` : `<b>${Number(r.value).toLocaleString()}</b>`);
@@ -360,8 +360,8 @@ window.BitSocial = (function () {
         boardEl = document.createElement("div");
         boardEl.className = "leaderboard panel-backdrop";
         boardEl.hidden = true;
-        boardEl.innerHTML = `<div class="panel" role="dialog" aria-label="Leaderboard">
-            <div class="shop-header"><h2>Global leaderboard</h2><button type="button" class="close-shop social-close" aria-label="Close">×</button></div>
+        boardEl.innerHTML = `<div class="panel" role="dialog" aria-label="Rankings">
+            <div class="shop-header"><h2>Global rankings</h2><button type="button" class="close-shop social-close" aria-label="Close">×</button></div>
             <div class="set-tabs">${BOARDS.map(b => `<button type="button" class="set-tab" data-by="${b.id}">${b.name}</button>`).join("")}</div>
             <div class="board-body"></div></div>`;
         document.body.appendChild(friendsEl);

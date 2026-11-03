@@ -474,14 +474,14 @@
                 <p class="match-sub">${map ? esc(map.name) + " · " : ""}${humans} real ${humans === 1 ? "player" : "players"}, ${list.length - humans} bots</p>
                 <ul class="match-players">${list.map(p => `<li>${nameHtml(p.name)}</li>`).join("")}</ul>`;
         } else {
-            html = `<h2>Match over</h2>
+            html = `<h2>Session over</h2>
                 <table class="match-top">${m.results.map((r, i) => {
                     const [color, skin, pattern] = Array.isArray(r.look) ? r.look : [];
                     const img = window.bitPlaneImage && /^#[0-9a-f]{3,8}$/i.test(color)
                         ? `<img src="${window.bitPlaneImage(color, true, skin || undefined, pattern || "")}" alt="">` : "";
                     return `<tr class="${i === 0 ? "first" : ""}"><td class="rank">${["🥇", "🥈", "🥉", "4", "5"][i]}</td>
                         <td>${img}</td><td class="who">${nameHtml(r.name)}<small>${esc(r.plane || "")}</small></td>
-                        <td class="score"><b>${Number(r.kills) || 0}</b> kills<small>${Number(r.deaths) || 0} deaths</small></td></tr>`;
+                        <td class="score"><b>${Number(r.kills) || 0}</b> points<small>${Number(r.deaths) || 0} deaths</small></td></tr>`;
                 }).join("")}</table>
                 <p class="match-sub">Next lobby in ${Math.ceil(left / 1000)}</p>`;
         }

@@ -42,7 +42,7 @@ BitModules[87] = function (M, j, t) {
         if (n.c.killed > 1 && n.c.deaths > 1 && n.c.cowKilled > 1) {
             if (
                 ((document.querySelector(".stats").innerHTML =
-                    `\n        You fired <em>${n.c.bullets.toLocaleString()}</em> <i class="ammo"></i> bullets \n        and <em>${n.c.missiles.toLocaleString()}</em> <i class="missile"></i> missiles\n        and destroyed <i class="target"></i> <em>${n.c.killed.toLocaleString()}</em> planes,\n        and unfortunately died <i class="skull"></i> <em>${n.c.deaths.toLocaleString()}</em> times. <br>\n        Also inadvertently you killed <em>${n.c.cowKilled.toLocaleString()}</em> <img src="${t(25)}" alt="cow" style="height: 14px"> cows. \n    `),
+                    `\n        You fired <em>${n.c.bullets.toLocaleString()}</em> <i class="ammo"></i> bullets \n        and <em>${n.c.missiles.toLocaleString()}</em> <i class="missile"></i> guided missiles\n        and destroyed <i class="target"></i> <em>${n.c.killed.toLocaleString()}</em> planes,\n        and unfortunately died <i class="skull"></i> <em>${n.c.deaths.toLocaleString()}</em> times. <br>\n        Also inadvertently you killed <em>${n.c.cowKilled.toLocaleString()}</em> <img src="${t(25)}" alt="cow" style="height: 14px"> cows. \n    `),
                 n.c.killed > 1e3)
             ) {
                 let M = document.createElement("div");
