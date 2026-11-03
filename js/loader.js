@@ -29,14 +29,48 @@
         return base; // GitHub unreachable or rate limited: use the branch copy
     }
 
-    function loadScript(src) {
+    function loadOnce(src) {
         return new Promise((resolve, reject) => {
             const s = document.createElement("script");
             s.src = src;
             s.onload = resolve;
-            s.onerror = () => reject(new Error("Could not load " + src));
+            s.onerror = () => {
+                s.remove();
+                reject(new Error("Could not load " + src));
+            };
             document.body.appendChild(s);
         });
+    }
+
+    // A download can fail now and then (a busy CDN, a dropped connection):
+    // try each file up to three times before giving up.
+    async function loadScript(src) {
+        for (let attempt = 1; ; attempt++) {
+            try {
+                return await loadOnce(attempt === 1 ? src : src + (src.includes("?") ? "&" : "?") + "retry=" + attempt);
+            } catch (e) {
+                if (attempt >= 3) throw e;
+                await new Promise(r => setTimeout(r, 600 * attempt));
+            }
+        }
+    }
+
+    // Files only the Dogfights (3D) mode needs. If one of them won't load,
+    // the rest of Bit Planes still starts, with Dogfights switched off.
+    const OPTIONAL = /js\/dogfight\//;
+
+    function dropDogfights(missing) {
+        console.warn("Dogfights is off: these files didn't load:", missing);
+        const radio = document.querySelector('input[name="mode"][value="dogfights"]');
+        if (radio) {
+            if (radio.checked) {
+                const first = document.querySelector('input[name="mode"]');
+                if (first) first.checked = true;
+            }
+            (radio.closest("div") || radio).remove();
+        }
+        const note = document.querySelector(".online-status");
+        if (note) note.textContent = "Dogfights (3D) couldn't load here. Bit Planes works as usual.";
     }
 
     // The page body may not exist yet if this script is in <head>.
@@ -105,9 +139,21 @@
         }
 
         // The activity's scripts, one after another like in index.html.
+        const missing = [];
         for (const s of doc.querySelectorAll("script[src]")) {
             const src = s.getAttribute("src");
-            await loadScript(/^https?:/.test(src) ? src : base + src);
+            // Once one Dogfights file is missing, skip the rest of them.
+            if (OPTIONAL.test(src) && missing.length) continue;
+            try {
+                await loadScript(/^https?:/.test(src) ? src : base + src);
+            } catch (e) {
+                if (!OPTIONAL.test(src)) throw e;
+                missing.push(src);
+            }
+        }
+        if (missing.length) {
+            window.BitDogfight = null;
+            dropDogfights(missing);
         }
         done();
     }

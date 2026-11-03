@@ -153,6 +153,56 @@ async function run() {
         check(seen.size === 3, "modes seen: " + [...seen]);
     });
 
+    // ---- the one-line version (js/loader.js, what play.html and other sites use)
+    async function oneLine(blockDogfight) {
+        const ctx = await browser.newContext({viewport: {width: 1100, height: 700}});
+        await ctx.addInitScript(() => localStorage.setItem("daily", JSON.stringify({last: new Date().toLocaleDateString("en-CA"), streak: 1})));
+        // A page with nothing but the loader's script tag.
+        await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
+            body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
+        if (blockDogfight) await ctx.route(/js\/dogfight\/deploy\.js/, r => r.abort());
+        const p = await ctx.newPage();
+        p.errors = [];
+        p.on("pageerror", e => p.errors.push(e.message));
+        await p.goto(base + "one-line-test.html?server=off");
+        await p.waitForFunction(() => (window.BitShop && document.querySelector(".play-btn") && !document.documentElement.classList.contains("bit-loading")) ||
+            document.body.textContent.includes("could not load"), null, {timeout: 60000});
+        await p.waitForTimeout(500);
+        return p;
+    }
+
+    await test("one-line", "the one-line loader builds the whole page", async () => {
+        const p = await oneLine(false);
+        try {
+            const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
+                dogfight: !!(window.BitDogfight && window.BitDogfight.open), modes: document.querySelectorAll('input[name="mode"]').length}));
+            check(!r.failed && r.shop && r.dogfight && r.modes === 3 && !p.errors.length, JSON.stringify(r) + p.errors);
+        } finally {
+            await p.context().close();
+        }
+    });
+
+    await test("one-line", "a blocked Dogfights file doesn't stop Bit Planes", async () => {
+        const p = await oneLine(true);
+        try {
+            const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
+                modes: [...document.querySelectorAll('input[name="mode"]')].map(x => x.value), note: document.querySelector(".online-status").textContent}));
+            check(!r.failed && r.shop && !r.modes.includes("dogfights") && /Dogfights/.test(r.note), JSON.stringify(r));
+            await p.click(".play-btn");
+            await p.waitForTimeout(800);
+            check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "Bit Planes didn't start");
+        } finally {
+            await p.context().close();
+        }
+    });
+
+    // ---- every script index.html lists exists
+    await test("source", "every file index.html loads exists", async () => {
+        const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+        const missing = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)].map(m => m[1]).filter(f => !/^https?:/.test(f) && !fs.existsSync(path.join(ROOT, f)));
+        check(!missing.length, "missing: " + missing.join(", "));
+    });
+
     // ---- Bit Planes (2D)
     await test("2d", "take off, shoot, eject in your pilot skin", async open => {
         const p = await open({storage: {skins: {owned: ["rookie", "neon"], selected: "neon"}}});
