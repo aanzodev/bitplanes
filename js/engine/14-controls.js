@@ -302,7 +302,7 @@ BitModules[14] = function (M, j, t) {
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
-        for (let k = 0; k < 24; k++)
+        for (let k = 0; k < 20; k++)
             setTimeout(
                 () => {
                     if (!M.has(j)) return;
@@ -319,7 +319,7 @@ BitModules[14] = function (M, j, t) {
                         M.effects.add(t),
                         X(M, t);
                 },
-                95 * Math.floor(k / 2),
+                125 * Math.floor(k / 2),
             );
         0 !== j.flares ||
             j.flareReloading ||
