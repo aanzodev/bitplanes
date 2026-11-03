@@ -1,7 +1,7 @@
 # ✈️ Bit Planes
 
-A small browser dogfighting activity. Fly biplanes, WWII fighters and jets, shoot
-down computer pilots, earn coins, upgrade your plane and play with friends
+A small browser flight activity. Fly biplanes, WWII fighters and jets, shoot
+down computer pilots, earn credits, upgrade your plane and play with friends
 online using a room code.
 
 ![Start screen](docs/screenshots/start.png)
@@ -19,27 +19,27 @@ It also works on GitHub Pages as is. There is no build step.
 
 ### The lobby
 
-The start screen is a lobby, with the bots dogfighting behind it:
+The start screen is a lobby, with the bots flying behind it:
 
-- **Top bar:** Play · **Stats** · **Hangar** (planes, paint, upgrades) ·
+- **Top bar:** Play · **Stats** · **Aircraft Selection** (planes, paint, upgrades) ·
   **Skins** (pilot characters) · **Quests** (3 daily and 3 weekly quests with
-  coin and XP rewards; a yellow dot means one is ready to claim) ·
-  **Achievements** · **Leaderboard** (worldwide top 50).
-- **Top right:** your level and XP bar, your coins (1.5K, 100K, 2.5M…) and
+  credit and XP rewards; a yellow dot means one is ready to claim) ·
+  **Milestones** · **Rankings** (worldwide top 50).
+- **Top right:** your level and XP bar, your credits (1.5K, 100K, 2.5M…) and
   your pilot's face.
 - **Middle:** your pilot on the pad. Click your name above them to change it.
-  The chip under the pad shows your plane (click for the Hangar).
-- **Bottom left:** the mode (Death match or Multiplayer; click to switch) and
+  The chip under the pad shows your plane (click for Aircraft Selection).
+- **Bottom left:** the mode (Competitive Flight or Multiplayer; click to switch) and
   **PLAY**. "Play with friends" hosts or joins a private room with a code.
 - **Bottom right:** **👥 Friends**, **⚙ Settings**, **Controls** and
   **Servers** (Multiplayer server browser).
 
-While flying, a timer sits in the bottom left: the match countdown in
+While flying, a timer sits in the bottom left: the session countdown in
 Multiplayer, your time in the air otherwise.
 
 **Skins:** 11 pilots from Common to Legendary: Rookie (free), Ace, Red Baron,
 Night Owl, Arctic Fox, Desert Hawk, Moo Pilot, Top Gun, Neon Rider, Stealth
-and Golden Ace (25,000 coins).
+and Golden Ace (25,000 credits).
 
 ### One-line version (loads from GitHub)
 
@@ -59,36 +59,36 @@ The short form also works:
 loads its page, styles, scripts and images. If GitHub can't be reached it falls
 back to jsDelivr's copy of `main`.
 
-## Levels, achievements and quests
+## Levels, milestones and quests
 
-- **XP and levels (1 to 100):** you earn XP for kills (100), hits, matches and
-  time in the air, in Bit Planes and in Dogfights, plus quests, achievements
-  and Dogfights match scores. Every level pays coins (more every 5th level).
-  Levels **10, 25 and 50** each add one more level to every Hangar upgrade
+- **XP and levels (1 to 100):** you earn XP for takedowns (100), hits, sessions and
+  time in the air, in Bit Planes and in Flight Sessions, plus quests, milestones
+  and Flight Sessions scores. Every level pays credits (more every 5th level).
+  Levels **10, 25 and 50** each add one more level to every upgrade
   (the gold pips).
-- **Achievements:** 36 of them in Combat, Flying, Dogfights and Career, from
-  "First Blood" to "Legend of the Skies" (1,000 kills). Each pays coins and XP
+- **Milestones:** 36 of them in Combat, Flying, Flight Sessions and Career, from
+  "First Blood" to "Legend of the Skies" (1,000 takedowns). Each pays credits and XP
   the moment you unlock it.
-- **Quests:** 3 daily and 3 weekly, including Dogfights quests.
+- **Quests:** 3 daily and 3 weekly, including Flight Sessions quests.
 
-## Friends and the leaderboard
+## Friends and the rankings
 
 **👥 Friends** shows your 6-letter friend code. Type a friend's code to send a
 request; once they accept, you see when they're online and where (lobby,
-Multiplayer match, private room, Dogfights). **Join** puts you in their room,
+Multiplayer session, private room, Flight Sessions). **Join** puts you in their room,
 and **Invite** (while you're in a room) pops up a Join button on their screen.
-The **Leaderboard** tab ranks every pilot worldwide by level, kills, Dogfights
-kills or best kill streak, with you and your friends highlighted. Both use the
+The **Rankings** tab ranks every pilot worldwide by level, takedowns, Flight Sessions
+takedowns or best score streak, with you and your friends highlighted. Both use the
 online server (see `server/README.md`).
 
 ## Settings
 
 **⚙ Settings** (lobby, and both pause menus): volume, separate **Engines**
 and **Guns** volume sliders, every key for Bit Planes
-and for Dogfights (two keys per action; Dogfights also takes mouse buttons),
-and the Dogfights options: graphics quality, starting camera, field of view,
-enemy skill, flying with the mouse, mouse sensitivity, inverted mouse or
-pitch keys, camera shake, keeping it smooth (Dogfights lowers its
+and for Flight Sessions (two keys per action; Flight Sessions also takes mouse buttons),
+and the Flight Sessions options: graphics quality, starting camera, field of view,
+AI pilot skill, flying with the mouse, mouse sensitivity, inverted mouse or
+pitch keys, camera shake, keeping it smooth (Flight Sessions lowers its
 resolution by itself when frames get slow, and raises it again when there's
 room), and showing the frame rate. The **Controls** pop-up always lists your
 current keys.
@@ -102,18 +102,18 @@ These are the starting keys; change any of them in Settings.
 | <kbd>↑</kbd> <kbd>↓</kbd> | Thrust up / down |
 | <kbd>←</kbd> <kbd>→</kbd> | Pitch (elevator) |
 | <kbd>Space</kbd> | Fire the gun |
-| <kbd>X</kbd> | Fire a missile |
-| <kbd>Q</kbd> | Drop flares: missiles chase the flares instead of you (special jets, the B-2, or any plane with the Flare pod upgrade) |
+| <kbd>X</kbd> | Fire a guided missile |
+| <kbd>Q</kbd> | Drop countermeasures: guided missiles chase the countermeasures instead of you (special jets, the B-2, or any plane with the Countermeasure pod upgrade) |
 | <kbd>C</kbd> | Eject / open parachute (the pilot wears your skin). Land at the barn for a new plane |
 | <kbd>M</kbd> | Sound on / off (also the 🔊 button in activity) |
 | <kbd>Esc</kbd> | Menu (also the ⏸ button): resume, change plane, paint, leave to home. Pauses single player; online activities keep running |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> or <kbd>`</kbd> | Activity console (see below) |
 
-## Hangar
+## Aircraft Selection
 
-Every kill earns **50 coins**. Spend them in the **Hangar** on the start screen.
+Every takedown earns **50 credits**. Spend them in **Aircraft Selection** on the start screen.
 
-![Hangar](docs/screenshots/hangar.png)
+![Aircraft Selection](docs/screenshots/hangar.png)
 
 | Plane | Price | Notes |
 |---|---:|---|
@@ -125,7 +125,7 @@ Every kill earns **50 coins**. Spend them in the **Hangar** on the start screen.
 | Gunship | 600 | Big ammo belt, quick reload |
 | Fokker Dr.I | 450 | The Red Baron's tight turner |
 | SPAD XIII | 750 | Fast, strong WWI fighter |
-| Fortress | 1,000 | Heavy armor, extra missiles, slow |
+| Fortress | 1,000 | Heavy armor, extra guided missiles, slow |
 | Polikarpov I-16 | 1,200 | Stubby, quick monoplane |
 | Sopwith Camel | 1,500 | Turns on a dime |
 | Phantom | 2,000 | Better at everything (biplane) |
@@ -139,52 +139,52 @@ Every kill earns **50 coins**. Spend them in the **Hangar** on the start screen.
 | F4U Corsair | 5,000 | Tough navy fighter with rockets |
 | P-47 Thunderbolt | 5,500 | Huge, tough, loaded with rockets |
 | P-38 Lightning | 6,000 | Fast twin-engine fighter |
-| **MiG-21 Fishbed** ★ | 7,000 | Cheap fast jet, 2 flares |
-| **F-16 Falcon** ★ | 9,000 | Fast gun, 3 flares |
+| **MiG-21 Fishbed** ★ | 7,000 | Cheap fast jet, 2 countermeasures |
+| **F-16 Falcon** ★ | 9,000 | Fast gun, 3 countermeasures |
 | **MiG-29 Fulcrum** ★ | 12,000 | Agile twin-engine jet |
 | **A-10 Warthog** ★ | 15,000 | Flying tank, huge cannon belt |
 | **F-15 Eagle** ★ | 20,000 | Powerful air superiority fighter |
 | **Su-27 Flanker** ★ | 24,000 | Long range, turns hard |
 | **F-35 Lightning** ★ | 30,000 | Stealth, second only to the Raptor |
-| **F-22 Raptor** ★ | 40,000 | The best jet: 3 smart missiles, fastest bullets |
-| **B-2 Spirit** ◆ | 100,000 | Exclusive stealth bomber: massive armor, 6 missiles, 4 flares |
+| **F-22 Raptor** ★ | 40,000 | The best jet: 3 smart guided missiles, fastest bullets |
+| **B-2 Spirit** ◆ | 100,000 | Exclusive stealth bomber: massive armor, 6 guided missiles, 4 countermeasures |
 
 In single player the computer pilots fly random planes from this list (the
 regular planes plus the MiG-21, F-16, MiG-29, A-10 and F-15, never the Su-27,
 F-35, F-22 or B-2), picked again every time they get a new plane. Some bots wear
-paint patterns, and bots in jets drop flares when a missile closes in.
+paint patterns, and bots in jets drop countermeasures when a guided missile closes in.
 
-The F-22's **smart missiles** lock on as soon as they launch (any direction,
+The F-22's **smart guided missiles** lock on as soon as they launch (any direction,
 twice the range), fly faster, turn harder, aim ahead of the target, explode
-when they pass close by. Flares still fool them, like any other missile.
+when they pass close by. Countermeasures still fool them, like any other guided missile.
 
-◆ Exclusive planes have a gold border in the Hangar.
+◆ Exclusive planes have a gold border in Aircraft Selection.
 
-★ Special jets have a black border in the Hangar and carry flares: press
-<kbd>Q</kbd> and missiles chasing you turn toward the flares and explode on them. Each press fires 16 flares in pairs over about a second, and
-they burn for 4 to 5 seconds (about 6 in Dogfights), so missiles stay fooled
+★ Special jets have a black border in Aircraft Selection and carry countermeasures: press
+<kbd>Q</kbd> and guided missiles chasing you turn toward the countermeasures and explode on them. Each press fires 16 countermeasures in pairs over about a second, and
+they burn for 4 to 5 seconds (about 6 in Flight Sessions), so guided missiles stay fooled
 longer.
 
-## Maps
+## Environments
 
-Every activity picks a random map (never the same one twice in a row):
+Every activity picks a random environment (never the same one twice in a row):
 Countryside, Desert, Arctic, Sunset and Night. Online, everyone who joins
-plays on the host's map. Map art is in `assets/sprites/maps/` and the list is
+plays on the host's environment. Environment art is in `assets/sprites/maps/` and the list is
 in `js/maps.js`.
 
-**Paint** any plane you own with one of 28 colors in the Hangar (free), and
+**Paint** any plane you own with one of 28 colors in Aircraft Selection (free), and
 add a **pattern** on top: camo, tiger stripes, checkers, a shark mouth or
 flames. Change both mid-flight from the Esc menu too.
 
-**Weather:** every match rolls clear skies, rain, fog or a thunderstorm with
-lightning and thunder (snow and blizzards on the Arctic map, a sandstorm in the
+**Weather:** every session rolls clear skies, rain, fog or a thunderstorm with
+lightning and thunder (snow and blizzards on the Arctic environment, a sandstorm in the
 Desert). Online, everyone gets the host's weather.
 
-**Daily reward:** open the activity once a day for free coins: 100, 150, 200,
+**Daily reward:** open the activity once a day for free credits: 100, 150, 200,
 300, 400, 500, then 1,000 on day 7 of a streak. Missing a day starts over.
 
-**Stats:** the Stats button on the start screen shows kills, deaths, K/D, best
-kill streak, accuracy, matches, time flying, your favorite planes and more.
+**Stats:** the Stats button on the start screen shows takedowns, deaths, K/D, best
+score streak, accuracy, sessions, time flying, your favorite planes and more.
 
 **Health bar:** bottom right shows your plane and its armor, green, then
 yellow, then red (online it comes from the host).
@@ -192,15 +192,15 @@ yellow, then red (online it comes from the host).
 **Damage:** hit planes trail smoke, thicker the more damage they've taken, and
 badly damaged planes catch fire.
 
-Upgrades (engine, handling, armor, ammo belt, reload, missile rack, gun barrels,
-missile loader, flare pod, repair kit) apply to
-whichever plane you fly. Coins and purchases are saved in your browser.
+Upgrades (engine, handling, armor, ammo belt, reload, guided missile rack, gun barrels,
+guided missile loader, countermeasure pod, repair kit) apply to
+whichever plane you fly. Credits and purchases are saved in your browser.
 
 ### Sound
 
 Every plane's engine sound is modelled on its **real engine**, synthesized live
 with the Web Audio API (no audio files, `js/audio/engines.js`), in Bit Planes
-and in Dogfights:
+and in Flight Sessions:
 
 - **Piston engines** fire once per cylinder every two turns, so the note comes
   from the real cylinder count and RPM: the Spitfire, Hurricane and P-51's
@@ -216,10 +216,10 @@ and in Dogfights:
   (F-16, F-15, Su-27, MiG-29, F-35, F-22) buzz at high thrust; the MiG-21's
   turbojet rasps and howls; the A-10's TF34s whine like a hair dryer; the B-2
   hums. The afterburner adds thunder and crackle.
-- In Dogfights other planes' engines come from where they are and shift pitch
+- In Flight Sessions other planes' engines come from where they are and shift pitch
   as they pass (Doppler).
 
-Guns, missiles, flares and explosions from other planes get quieter and pan
+Guns, guided missiles, countermeasures and explosions from other planes get quieter and pan
 with distance. Tweak any plane's sound in `js/audio/profiles.js` (the
 `engine` entry is its real engine).
 
@@ -271,7 +271,7 @@ themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</k
 
 | Command | What it does |
 |---|---|
-| `coins`, `addcoins <n>`, `setcoins <n>` | Show / add / set coins |
+| `coins`, `addcoins <n>`, `setcoins <n>` | Show / add / set credits |
 | `planes`, `give <plane>`, `plane <plane>` | List planes, own one free, fly one you own |
 | `paint <color>` | Paint your plane (`red`, `blue`, `factory`…) |
 | `unlockall`, `reset` | Own everything / start over |
@@ -279,7 +279,7 @@ themselves, so use <kbd>`</kbd> there (click on the activity first). <kbd>↑</k
 | `match [skip]` | Multiplayer phase and time left / skip to the next phase (host) |
 | `skin <skin>` | Wear a skin you own (lists skins if not found) |
 | `stats`, `daily [reset]` | Your stats / daily reward status (reset: claim again) |
-| `maps`, `map <map>` | List maps / switch map now (single player) |
+| `maps`, `map <map>` | List environments / switch environment now (single player) |
 | `weather <type>` | Change the weather now: clear, rain, fog, storm (single player) |
 | `pattern <name>` | Paint pattern: camo, tiger, checkers, shark, flames, none |
 | `mute`, `unmute`, `fps` | Sound off/on, FPS counter |
@@ -292,29 +292,29 @@ Open the browser console (F12) on the activity page:
 
 | Command | What it does |
 |---|---|
-| `addCoins(1000)` | Add coins |
-| `setCoins(10000)` | Set your coins to an exact amount |
+| `addCoins(1000)` | Add credits |
+| `setCoins(10000)` | Set your credits to an exact amount |
 | `unlockAll()` | Own every plane and max every upgrade |
-| `resetShop()` | Back to 0 coins and the Classic plane |
+| `resetShop()` | Back to 0 credits and the Classic plane |
 
-Or add `?coins=10000` to the page URL to add coins once.
+Or add `?coins=10000` to the page URL to add credits once.
 
-## Dogfights (3D beta)
+## Flight Sessions (3D beta)
 
-**Unlocking:** Dogfights opens at **player level 10**, or as soon as you own
-a **special plane** (the black or gold bordered ones in the Hangar: the jets
+**Unlocking:** Flight Sessions opens at **player level 10**, or as soon as you own
+a **special plane** (the black or gold bordered ones in Aircraft Selection: the jets
 and the B-2). Until then the mode card says 🔒 Locked and shows how far you
 are.
 
-Pick **Dogfights** on the mode card and press **PLAY**. The deploy screen picks
-the **map**, **time of day**, **team dogfight** (blue vs red, 4v4 to 8v8, first
-team to the kill goal or the most kills in 10 minutes) or **free for all**,
-and how good the **enemy pilots** are (Easy, Normal, Hard, Ace). You fly your
-Hangar plane with its paint, speed, armor, real gun sound and upgrades.
+Pick **Flight Sessions** on the mode card and press **PLAY**. The session setup screen picks
+the **environment**, **lighting**, **Team Flight** (blue vs red, 4v4 to 8v8, first
+team to the score goal or the most takedowns in 10 minutes) or **Open Flight**,
+and how good the **AI Pilots** are (Beginner, Standard, Advanced, Expert). You fly your
+selected aircraft with its paint, speed, armor, real gun sound and upgrades.
 
-**Maps** (24 km across):
+**Environments** (24 km across):
 
-| Map | |
+| Environment | |
 |---|---|
 | 🏔 Alpine Valley | Snowy peaks, deep valleys, lakes and pine forests |
 | 🏜 Red Canyon | Desert mesas in red rock bands and a canyon to fly through |
@@ -325,7 +325,7 @@ Hangar plane with its paint, speed, armor, real gun sound and upgrades.
 
 Each comes in Day, Dawn, Sunset, Overcast, Dusk or Night (stars and moon).
 
-**Terrain:** every map is worn down by simulated rain before you fly
+**Terrain:** every environment is worn down by simulated rain before you fly
 (hydraulic erosion: thousands of raindrops carve gullies and ravines into the
 slopes and lay sediment in the valleys), written in C and compiled to
 WebAssembly (`native/erosion.c`), with a JavaScript fallback. On High/Ultra
@@ -338,20 +338,20 @@ Boulders lie on the slopes, and every tree has its own shade.
 **Fighting, Battlefield style:**
 
 - Guns with a **lead indicator** (the red circle: aim there to hit), tracers,
-  hit and kill markers, damage direction arrows and camera shake.
-- **Missiles** need a **lock**: keep an enemy in front until the diamond
+  hit and takedown markers, damage direction arrows and camera shake.
+- **Guided missiles** need a **lock**: keep an enemy in front until the diamond
   closes and turns red (LOCKED). Without a lock they fly straight. Enemies
   lock onto you too: "locking on" beeps, then MISSILE warnings.
-- **Flares** fool most missiles; they come back after a while.
+- **Countermeasures** fool most guided missiles; they come back after a while.
 - **Afterburner** (boost) for a burst of speed, refilling over time.
 - **Repair** by holding the key when nobody has shot you for a moment.
   Badly damaged planes catch fire and keep losing health until repaired.
 - **Eject** any time; your pilot drifts down under a parachute in your skin.
-- Score ribbons: +100 kill, +50 assist, revenge, double kill, missile kill,
-  missile evaded. 50 coins per kill, XP for your score at the end, and the
+- Score ribbons: +100 takedown, +50 assist, revenge, double takedown, guided missile takedown,
+  guided missile evaded. 50 credits per takedown, XP for your score at the end, and the
   results screen with the MVP.
-- **Killcam** when you're shot down, **scoreboard** (Tab), radar with
-  missiles, PULL UP, STALL and boundary warnings, G-force blackout and vapor
+- **Takedown cam** when you're shot down, **scoreboard** (Tab), radar with
+  guided missiles, PULL UP, STALL and boundary warnings, G-force blackout and vapor
   trails off the wingtips in hard turns.
 
 **Planes:** every real plane has its own model, built in code: the F-22's
@@ -367,7 +367,7 @@ twin-engine biplane bomber with a glazed nose), Sopwith Camel (the hump over
 its guns) and Phantom (enclosed canopy), all with struts, bracing wires and
 wheels. Ailerons, tailplanes and rudders move with the
 controls, jet nozzles glow inside and flame on afterburner, and the paint
-has panel lines, weathering, your Hangar pattern, team markings and a side
+has panel lines, weathering, your paint pattern, team markings and a side
 number.
 
 **Flying:** planes turn best near their corner speed, hard turns bleed speed,
@@ -385,8 +385,8 @@ throttle, health).
 | <kbd>W</kbd> <kbd>S</kbd> / wheel | Throttle |
 | <kbd>Shift</kbd> | Afterburner (hold) |
 | <kbd>Space</kbd> / left mouse | Guns |
-| <kbd>X</kbd> / right mouse | Missile |
-| <kbd>Q</kbd> | Flares |
+| <kbd>X</kbd> / right mouse | Guided missile |
+| <kbd>Q</kbd> | Countermeasures |
 | <kbd>V</kbd> | Cockpit / chase camera |
 | <kbd>C</kbd> (hold) | Free look with the mouse |
 | <kbd>B</kbd> (hold) | Look behind |
@@ -400,7 +400,7 @@ rumble and pop with the RPM under the propeller's whop; jets whine and roar,
 and the afterburner thunders. Wind rushes louder with speed and screams in
 hard turns. Other planes' engines shift pitch as they pass (Doppler), with a
 whoosh on close flybys. Every plane fires its real gun sound from where it is,
-hits on you clang, the missile seeker growls while locking and holds a tone
+hits on you clang, the guided missile seeker growls while locking and holds a tone
 when locked, warning beeps tell you someone is locking or has fired, and far
 explosions arrive late (sound travels 343 m/s) and duller. In the cockpit the
 outside is muffled.
@@ -415,7 +415,7 @@ outside is muffled.
 | Ultra | High plus full screen sharpness, twice the terrain detail, more trees and clouds, a longer view, sharper and wider shadows, and 8x anti-aliasing. For a strong graphics card |
 
 Graphics use [three.js](https://threejs.org) (MIT license, in `js/vendor/`,
-only loaded when you start Dogfights) plus GLSL shaders for the sky, water,
+only loaded when you start Flight Sessions) plus GLSL shaders for the sky, water,
 clouds, ground detail, city windows, particles and the post-processing
 (`post.js`). It needs a browser with WebGL; High and Ultra's glow and film
 look need WebGL 2 (every recent browser). For the best picture, make sure
@@ -425,20 +425,20 @@ graphics acceleration when available").
 ## Multiplayer
 
 Pick **Multiplayer** on the start screen and press **Start**: no room code
-needed. You join the public match with the lowest ping that still has room, or
-start a new one if every match is full. Or press **Servers** to see every
-match (name, map, time left, real players, estimated ping), search for a
-friend's name and join their match.
+needed. You join the public session with the lowest ping that still has room, or
+start a new one if every session is full. Or press **Servers** to see every
+session (name, environment, time left, real players, estimated ping), search for a
+friend's name and join their session.
 
-- Up to **10 real players** per match. Every match always has 10 planes: bots
+- Up to **10 real players** per session. Every session always has 10 planes: bots
   fill the empty spots, each person who joins takes a bot's place, and a bot
-  comes back when someone leaves. A new match only starts when all are full.
+  comes back when someone leaves. A new session only starts when all are full.
 - Real people are tagged **[PLAYER]** and bots **[BOTS]** (Multiplayer only).
-- Matches loop: a **15 second lobby** (everyone parked, new map and weather) →
-  a **10 minute match** with a timer → the **top 5 leaderboard** with everyone's
+- Sessions loop: a **15 second lobby** (everyone parked, new environment and weather) →
+  a **10 minute session** with a timer → the **top 5 rankings** with everyone's
   planes → the next lobby.
-- One player's browser runs each match. If they leave, everyone else is moved
-  to another match automatically.
+- One player's browser runs each session. If they leave, everyone else is moved
+  to another session automatically.
 - Multiplayer needs the relay server (see below). Console: `match`, `match skip`
   (host only).
 
@@ -446,12 +446,12 @@ friend's name and join their match.
 
 ![In activity](docs/screenshots/activity.png)
 
-1. One player presses **Host a room**. A death match starts and a 5 character
+1. One player presses **Host a room**. A Competitive Flight session starts and a 5 character
    room code appears at the top of the screen.
 2. Friends type the code under **Play online with friends** and press **Join**.
-   They can join at any time during the match.
+   They can join at any time during the session.
 
-Everyone flies their own plane and upgrades, and kills earn coins for whoever
+Everyone flies their own plane and upgrades, and takedowns earn credits for whoever
 made them. Players who join see their ping to the host under the room code
 (the host runs the activity, so it has no ping). Green is under 80 ms, yellow
 under 160 ms, red above. The host's browser runs the activity, so the host should have the best
@@ -484,8 +484,8 @@ server instead (for example on a local network), run a
 
 `tests/run.mjs` opens the real page in a headless browser and plays it: the
 lobby panels, Bit Planes (flying, shooting, ejecting in your skin, remapped
-keys, flares), levels and the Dogfights lock, every plane's gun and engine
-sound, Dogfights (erosion, a match with guns, a missile lock, flares,
+keys, countermeasures), levels and the Flight Sessions lock, every plane's gun and engine
+sound, Flight Sessions (erosion, a session with guns, a guided missile lock, countermeasures,
 ejecting and the results, and computer pilots fighting on their own) and
 online play through the relay server (private rooms, Multiplayer, friends).
 They run on every pull request (GitHub Actions, `.github/workflows/test.yml`).
@@ -504,9 +504,9 @@ index.html              Start screen, HUD and script tags
 css/
   base.css              Page, buttons, keys
   menu.css              Start screen
-  career.css            Settings, levels, achievements, friends, leaderboard
-  dogfight.css          Dogfights
-  hangar.css            Hangar shop
+  career.css            Settings, levels, milestones, friends, rankings
+  dogfight.css          Flight Sessions
+  hangar.css            Aircraft Selection
   online.css            Online play
   activity.css              In-activity HUD
   pause.css             In-activity menu
@@ -517,21 +517,21 @@ js/
   daily.js              Daily reward
   stats.js              Lifetime stats and the Stats page
   quests.js             Daily and weekly quests
-  progress.js           XP, levels, achievements and pop-up notices
-  settings.js           Settings: volume, key bindings, Dogfights options
-  social.js             Friends, invites and the global leaderboard
+  progress.js           XP, levels, milestones and pop-up notices
+  settings.js           Settings: volume, key bindings, Flight Sessions options
+  social.js             Friends, invites and the global rankings
   skins.js              Pilot skins (drawn in code) and the Skins tab
-  menu.js               The lobby: pilot, coins, mode card, pop-ups
+  menu.js               The lobby: pilot, credits, mode card, pop-ups
   console.js            Built-in console (Ctrl+Shift+K)
-  maps.js               Maps (random each activity)
+  maps.js               Environments (random each activity)
   weather.js            Rain, snow, fog, sandstorms and thunderstorms
   audio/
     profiles.js         How each plane sounds (edit to tweak)
-    sound.js            Synthesized engine, guns, missiles, flares, explosions
+    sound.js            Synthesized engine, guns, guided missiles, countermeasures, explosions
   shop/
     catalog.js          Planes and upgrades for sale (edit prices/stats here)
-    shop.js             Coins, purchases, applying a plane in activity
-    hangar.js           The Hangar screen
+    shop.js             Credits, purchases, applying a plane in activity
+    hangar.js           The Aircraft Selection screen
   online/
     common.js           Settings and helpers
     sync.js             Turning activity objects into network messages
@@ -539,29 +539,29 @@ js/
     guest.js            Joining a room
     prediction.js       Guests fly their own plane locally (no input lag)
     lobby.js            Host / Join buttons
-    match.js            Multiplayer: matchmaking, server browser, lobby, timer, top 5
+    match.js            Multiplayer: matchmaking, server browser, lobby, timer, top 5 rankings
     config.js           Address of the relay server (empty = direct connections)
     relay.js            Connecting through the relay server
   engine/               The activity itself, one module per file
     registry.js         Modules register here…
-    00-vector.js …      …vector math, constants, sprites, plane, missile,
+    00-vector.js …      …vector math, constants, sprites, plane, guided missile,
     87-main.js          controls, physics, rendering, AI, activity modes…
     assets.js           Sprite file paths
     boot.js             …and boot.js starts the activity
-  dogfight/             Dogfights (3D beta):
-    maps.js             The six maps and the times of day
+  dogfight/             Flight Sessions (3D beta):
+    maps.js             The six environments and their lighting
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
     erosion.js          Loads erosion.wasm (rain wearing the terrain), JavaScript fallback
     erosion.wasm        Built from native/erosion.c
     post.js             Bloom, filmic tone mapping and color grading (High/Ultra)
     models.js           Realistic plane models (each real plane its own shape, moving controls)
     aircraft.js         Cockpits with instruments, flight model
-    combat.js           Guns, missiles, flares, GLSL particle effects, debris
+    combat.js           Guns, guided missiles, countermeasures, GLSL particle effects, debris
     ai.js               Computer pilots
     audio.js            3D synthesized sound
     hud.js              The on-screen display, scoreboard and results
-    deploy.js           The deploy screen, and the parachuting pilot
-    mode.js             The match itself: teams, scoring, cameras, input
+    deploy.js           The session setup screen, and the parachuting pilot
+    mode.js             The session itself: teams, scoring, cameras, input
   vendor/peerjs.min.js, three.min.js
 assets/
   sprites/              Activity sprites (units, effects, scenery, ui)
@@ -569,7 +569,7 @@ assets/
 docs/screenshots/       Images for this README
 native/                 C code compiled to WebAssembly (build.sh rebuilds it; needs clang)
 tests/run.mjs           Automated tests (npm test), run on every pull request
-server/                 Relay server for online play, friends and the leaderboard (Node.js)
+server/                 Relay server for online play, friends and the rankings (Node.js)
 render.yaml             One-click deploy of the relay server on Render
 ```
 
