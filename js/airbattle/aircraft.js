@@ -240,6 +240,7 @@
             this.maxMissiles = 2 + (opts.stats.missiles || 0);
             this.maxFlares = 3 + (opts.stats.flares || 0);
             this.maxBoost = 4 * (1 + 0.25 * (opts.stats.boost || 0));
+            this.flight = D.makeFlight ? D.makeFlight(opts.planeId, opts.shape || "", this.topSpeed, this.minSpeed, kind.boost) : null;
             const model = buildModel(opts);
             this.mesh = model.group;
             this.props = model.props;
@@ -368,8 +369,10 @@
             this._q.setFromAxisAngle(this._axis.set(0, 1, 0), bank * 0.32 * this.agility * dt);
             this.quat.premultiply(this._q);
             const f = this.forward;
-            if (this.speed < this.minSpeed) {
-                const drop = (this.minSpeed - this.speed) / this.minSpeed;
+            const stallSpeed = this.flight ? this.flight.stall(this.pos.y, this.g) : this.minSpeed;
+            this.stallSpeed = stallSpeed;
+            if (this.speed < stallSpeed) {
+                const drop = Math.min(1, (stallSpeed - this.speed) / stallSpeed);
                 this._q.setFromAxisAngle(this.right, -drop * 1.8 * dt * Math.sign(f.y + 0.2));
                 this.quat.premultiply(this._q);
                 this.stalling = true;
@@ -381,11 +384,15 @@
             this.quat.normalize();
             const gNow = 1 + Math.abs(pitchRate) * this.speed / 33;
             this.g += (gNow - this.g) * Math.min(1, dt * 6);
-            const top = this.topSpeed * (this.burning ? 0.8 : 1) * (this.boosting ? k.boost : 1);
-            const target = this.minSpeed * 0.75 + (top - this.minSpeed * 0.75) * (this.boosting ? 1 : this.throttle);
-            this.speed += (target - this.speed) * (this.boosting ? 0.9 : 0.42) * dt;
-            this.speed -= Math.abs(i.pitch) * this.turnFactor() * 0.11 * this.speed * dt;
-            this.speed -= this.forward.y * 9.8 * 1.6 * dt;
+            if (this.flight) {
+                this.speed = this.flight.step(this.speed, this.throttle, this.boosting, !!this.burning, this.pos.y, this.forward.y, this.g, dt);
+            } else {
+                const top = this.topSpeed * (this.burning ? 0.8 : 1) * (this.boosting ? k.boost : 1);
+                const target = this.minSpeed * 0.75 + (top - this.minSpeed * 0.75) * (this.boosting ? 1 : this.throttle);
+                this.speed += (target - this.speed) * (this.boosting ? 0.9 : 0.42) * dt;
+                this.speed -= Math.abs(i.pitch) * this.turnFactor() * 0.11 * this.speed * dt;
+                this.speed -= this.forward.y * 9.8 * 1.6 * dt;
+            }
             this.speed = Math.max(18, Math.min(this.topSpeed * 1.6, this.speed));
             this.pos.addScaledVector(this.forward, this.speed * dt);
             this.mesh.position.copy(this.pos);

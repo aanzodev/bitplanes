@@ -342,6 +342,46 @@ async function run() {
         check(r.wasm === "wasm" && r.js === "js" && r.changedWasm && r.changedJs && !r.nan, JSON.stringify(r));
     });
 
+    await test("airbattle", "flight model (C++ WebAssembly and the JavaScript fallback)", async open => {
+        const p = await open();
+        const r = await p.evaluate(async () => {
+            const D = BitAirBattle;
+            await D.loadFlight();
+            const out = {mismatch: 0, engines: []};
+            for (const id of Object.keys(D.FLIGHT_SPECS)) {
+                const jet = D.FLIGHT_SPECS[id][4] === 0;
+                const [top, min] = jet ? [210, 65] : [125, 45];
+                const a = D.makeFlight(id, "", top, min, 1.3), b = D.makeFlight(id, "", top, min, 1.3, {js: true});
+                out.engines = [a.engine, b.engine];
+                for (const [v, th, bo, bu, alt, sc, g] of [[top * 0.6, 1, false, false, 300, 0, 1], [top, 0.4, false, true, 4000, 0.3, 3],
+                    [min, 1, true, false, 0, -0.5, 1], [top * 1.2, 0, false, false, 6500, 0.9, 5]]) {
+                    const x = a.step(v, th, bo, bu, alt, sc, g, 1 / 60), y = b.step(v, th, bo, bu, alt, sc, g, 1 / 60);
+                    out.mismatch = Math.max(out.mismatch, Math.abs(x - y) / Math.max(1, Math.abs(y)));
+                    out.mismatch = Math.max(out.mismatch, Math.abs(a.stall(alt, g) - b.stall(alt, g)) / b.stall(alt, g));
+                }
+            }
+            const f = D.makeFlight("f16", "jet", 210, 65, 1.35);
+            const fly = (v, secs, args) => {
+                for (let t = 0; t < secs; t += 1 / 60) v = f.step(v, ...args, 1 / 60);
+                return v;
+            };
+            out.levelTop = fly(120, 30, [1, false, false, 0, 0, 1]);
+            out.boostTop = fly(210, 30, [1, true, false, 0, 0, 1]);
+            out.climb = fly(200, 3, [1, false, false, 1000, 0.6, 1]);
+            out.dive = fly(200, 3, [1, false, false, 1000, -0.6, 1]);
+            out.turn = fly(200, 3, [1, false, false, 1000, 0, 5]);
+            out.stallSea = f.stall(0, 1);
+            out.stallHigh = f.stall(6000, 1);
+            out.stallPull = f.stall(0, 4);
+            return out;
+        });
+        const ok = r.engines.join() === "wasm,js" && r.mismatch < 1e-3 &&
+            Math.abs(r.levelTop - 210) < 8 && Math.abs(r.boostTop - 210 * 1.35) < 12 &&
+            r.climb < 200 && r.dive > 200 && r.turn < 190 &&
+            Math.abs(r.stallSea - 65) < 0.5 && r.stallHigh > r.stallSea * 1.3 && r.stallPull > r.stallSea * 1.35;
+        check(ok, JSON.stringify(r));
+    });
+
     await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
