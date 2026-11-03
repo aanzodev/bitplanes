@@ -46,7 +46,7 @@ BitModules[22] = function (M, j, t) {
             y(M, j, t, mapForestBack, 1.05, 50),
             y(M, j, t, mapForest, 1.02, 100),
             (function (M, j, t) {
-                for (let L of t.groundObjects) {
+                for (let L of t.terrainEntities) {
                     const t = L.position.x - j.offsetX,
                         N = L.position.y - j.offsetY;
                     t + L.sprite.width < 0 ||
@@ -64,7 +64,7 @@ BitModules[22] = function (M, j, t) {
                 }
             })(M, j, t),
             (function (M, j, t) {
-                for (let L of t.clouds) {
+                for (let L of t.atmosphere) {
                     const t = L.position.x - j.offsetX,
                         N = L.position.y - j.offsetY;
                     t + L.sprite.width < 0 ||
@@ -139,7 +139,7 @@ BitModules[22] = function (M, j, t) {
                 M.restore();
             }
         }
-        for (let L of t.particles) {
+        for (let L of t.effects) {
             const t = L.getX() - j.offsetX,
                 i = L.getY() - j.offsetY;
             if (t < -200 || i < -200 || t > j.width + 200 || i > j.height + 200) continue;
@@ -204,12 +204,12 @@ BitModules[22] = function (M, j, t) {
             const t = j.angle;
             if (j.velocity.y < 40 && (t < g.o || Math.abs(2 * Math.PI - t) < g.m))
                 return void (j.landed = !0);
-            (M.delete(j), Object(A.d)(M, j, !0), M.onCrash(j), j.player && Object(S.c)(j.player));
+            (M.delete(j), Object(A.d)(M, j, !0), M.onImpact(j), j.player && Object(S.c)(j.player));
         }
     }
 
     function r(M, j) {
-        (M.delete(j), Object(A.d)(M, j), M.onCrash(j));
+        (M.delete(j), Object(A.d)(M, j), M.onImpact(j));
     }
 
     function s(M, j) {
@@ -260,14 +260,14 @@ BitModules[22] = function (M, j, t) {
                                 Object(g.h)(j.velocity) > 40
                                     ? (Object(A.e)(M, j),
                                       Object(A.c)(M, j),
-                                      M.onCrash(j),
+                                      M.onImpact(j),
                                       M.delete(j),
                                       j.player && Object(S.c)(j.player))
                                     : j.parachute && (M.delete(j.parachute), (j.parachute = void 0))),
                             j instanceof c.a && M.delete(j));
                     }
                 }
-            for (let j of M.bodies) for (let L of M.bodies) j !== L && x(j, L) && (t(j, L) || t(L, j));
+            for (let j of M.worldEntities) for (let L of M.worldEntities) j !== L && x(j, L) && (t(j, L) || t(L, j));
 
             function t(j, t) {
                 var L, N, I, D;
@@ -288,7 +288,7 @@ BitModules[22] = function (M, j, t) {
                 if (j instanceof e.a && t instanceof i.a)
                     return (
                         (null === (I = j.player) || void 0 === I ? void 0 : I.isHuman) && o.c.cowKilled++,
-                        M.onCowKill(t),
+                        M.onTargetDestroyed(t),
                         M.delete(t),
                         !0
                     );
@@ -297,7 +297,7 @@ BitModules[22] = function (M, j, t) {
                         (null === (D = j.source.player) || void 0 === D ? void 0 : D.isHuman) &&
                             o.c.cowKilled++,
                         Object(A.d)(M, t),
-                        M.onCowKill(t),
+                        M.onTargetDestroyed(t),
                         M.delete(j),
                         M.delete(t),
                         !0
@@ -309,7 +309,7 @@ BitModules[22] = function (M, j, t) {
                 }
                 return !1;
             }
-            let L = [...M.bullets];
+            let L = [...M.projectiles];
             for (let M = 0; M < L.length - 1; M++) {
                 const j = L[M];
                 for (let t = M + 1; t < L.length; t++) {
@@ -330,8 +330,8 @@ BitModules[22] = function (M, j, t) {
                         (M.position = Object(g.a)(M.position, Object(g.e)(i, -M.radius / 2))));
                 }
             }
-            for (let t of M.bullets) {
-                for (let L of M.bodies)
+            for (let t of M.projectiles) {
+                for (let L of M.worldEntities)
                     // Your own bullets never hit you or your missiles. (Online, a guest's
                     // plane can jump forward into its fresh bullets when the connection lags.)
                     L !== t.source &&
@@ -343,39 +343,39 @@ BitModules[22] = function (M, j, t) {
                             0 == L.life &&
                                 (r(M, L),
                                 t.source.player && L.player && Object(S.d)(t.source.player, L.player)),
-                            M.bullets.delete(t)),
+                            M.projectiles.delete(t)),
                         L instanceof u.a && (Object(A.d)(M, L), M.delete(t), M.delete(L)),
                         L instanceof i.a &&
                             ((null === (j = t.source.player) || void 0 === j ? void 0 : j.isHuman) &&
                                 o.c.cowKilled++,
-                            M.onCowKill(L),
+                            M.onTargetDestroyed(L),
                             M.delete(t),
                             M.delete(L)),
                         L instanceof c.a && (M.delete(L), (L.load.parachute = void 0)));
-                for (let j of M.pilots)
+                for (let j of M.aircraftOperators)
                     x(t, j) &&
-                        (M.onCrash(j),
+                        (M.onImpact(j),
                         M.delete(t),
                         M.delete(j),
                         Object(A.b)(M, j),
                         Object(A.c)(M, j),
                         t.source.player && j.player && Object(S.d)(t.source.player, j.player));
             }
-            for (let j of M.barns) for (let t of M.pilots) x(j, t) && j.newPlane(M, t);
-            for (let j of M.pilots)
-                for (let t of M.bodies)
+            for (let j of M.structures) for (let t of M.aircraftOperators) x(j, t) && j.newPlane(M, t);
+            for (let j of M.aircraftOperators)
+                for (let t of M.worldEntities)
                     x(j, t) &&
                         (t instanceof e.a &&
                             j.plane !== t &&
                             !t.landed &&
-                            (M.onCrash(j),
+                            (M.onImpact(j),
                             M.delete(j),
                             Object(A.b)(M, j),
                             Object(A.c)(M, j),
                             t.player && j.player && Object(S.d)(t.player, j.player, S.b)),
                         t instanceof u.a &&
                             (Object(A.d)(M, t),
-                            M.onCrash(j),
+                            M.onImpact(j),
                             M.delete(j),
                             M.delete(t),
                             Object(A.b)(M, j),

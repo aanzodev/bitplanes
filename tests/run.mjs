@@ -280,7 +280,7 @@ async function run() {
             pl.landed = false;
             BitEngine.require(14).f(BitEngine.world, pl);
         });
-        const count = () => p.evaluate(() => [...BitEngine.world.particles].filter(x => x.sprite === BitEngine.sprites.flare).length);
+        const count = () => p.evaluate(() => [...BitEngine.world.effects].filter(x => x.sprite === BitEngine.sprites.flare).length);
         await p.waitForTimeout(1400);
         check((await count()) >= 14, "flares out after 1.4 s: " + (await count()));
         await p.waitForTimeout(2200);
@@ -384,7 +384,9 @@ async function run() {
                 };
                 e.input = {pitch: 0, roll: 0, yaw: 0, throttle: 0.7};
             };
-            g.others.forEach((o, i) => (still(o), o.pos.set(9000, 3000, -9000 + i * 400)));
+            // Parked high above the Alpine peaks, so none of them crash meanwhile.
+            const park = (o, i) => o.pos.set(9000, 7000, -9000 + i * 400);
+            g.others.forEach((o, i) => (still(o), park(o, i)));
             pl.quat.identity();
             pl.pos.set(0, 2500, 3000);
             pl.speed = pl.cornerSpeed;
@@ -401,28 +403,33 @@ async function run() {
             }
             g.held.delete("fire");
             out.gunKill = !e.alive;
+            // Keep that one down, so it can't respawn in front of us and take the lock.
+            g.respawnAt.delete(e);
             // Missile lock and hit
-            const e2 = foes[1];
+            const e2 = foes.find(f => f !== e && f.alive);
             e2.flares = 0;
             for (let i = 0; i < 40 && g.lock.progress < 1; i++) {
+                foes.forEach((f, k) => f !== e2 && f.alive && park(f, k));
                 e2.pos.copy(pl.pos).addScaledVector(pl.forward, 900);
                 e2.quat.copy(pl.quat);
                 D.advance(0.1);
             }
-            // (A plane shot down a moment ago may respawn into view and take the lock.)
             out.locked = !!g.lock.target && g.lock.progress >= 1;
             const h = e2.health;
             g.combat.launch(pl, e2);
             for (let i = 0; i < 60 && e2.alive && e2.health === h; i++) D.advance(0.1);
             out.missileHit = e2.health < h || !e2.alive;
             // Flares
-            const shooter = foes[2];
-            shooter.pos.copy(pl.pos).addScaledVector(pl.forward, -900);
+            const shooter = foes.find(f => f !== e && f !== e2 && f.alive) || e2;
+            // Far enough back that the countermeasures are well clear of the
+            // plane when the missile reaches them (its proximity fuse would
+            // otherwise still catch the plane now and then).
+            shooter.pos.copy(pl.pos).addScaledVector(pl.forward, -1500);
             shooter.quat.copy(pl.quat);
             pl.health = pl.maxHealth;
             pl.flares = 3;
             g.combat.launch(shooter, pl);
-            D.advance(0.8);
+            D.advance(0.3);
             g.combat.dropFlares(pl, 1);
             D.advance(4);
             out.flareSaved = pl.alive && pl.health === pl.maxHealth;
@@ -493,7 +500,7 @@ async function run() {
         await b.waitForFunction(() => BitOnline.role === "guest" && BitOnline.match.state.phase, null, {timeout: 20000});
         await b.waitForTimeout(1000);
         const r = await a.evaluate(() => {
-            const ps = BitEngine.world.players;
+            const ps = BitEngine.world.participants;
             return [ps.length, ps.filter(x => /^\[PLAYER\]/.test(x.name)).length];
         });
         check(r[0] === 10 && r[1] === 2, JSON.stringify(r));

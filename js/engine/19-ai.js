@@ -59,7 +59,7 @@ BitModules[19] = function (M, j, t) {
                 if (y) {
                     let j;
                     M.ground - y.position.y < 300 && y.deployParachute(M);
-                    for (let t of M.barns)
+                    for (let t of M.structures)
                         (!j ||
                             Math.abs(j.position.x - y.position.x) > Math.abs(t.position.x - y.position.x)) &&
                             (j = t);
@@ -75,15 +75,15 @@ BitModules[19] = function (M, j, t) {
                 if (T) {
                     // Drop flares when a missile is closing in (jets that carry them).
                     if (T.flares > 0 && !(T.flareUntil > performance.now()))
-                        for (let t of M.bodies)
+                        for (let t of M.worldEntities)
                             if (t instanceof e.a && t.target === T && Object(a.q)(t.position, T.position) < 450) {
                                 Math.random() < 0.15 && Object(N.f)(M, T);
                                 break;
                             }
-                    if (1 == T.life && M.barns.size > 0) {
+                    if (1 == T.life && M.structures.size > 0) {
                         let t,
                             L = 1 / 0;
-                        for (let j of M.barns) {
+                        for (let j of M.structures) {
                             let M = Object(a.q)(j.position, T.position);
                             M < L && ((L = M), (t = j));
                         }

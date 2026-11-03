@@ -25,8 +25,8 @@
         const e = engine();
         const sim = new e.World({width: view.width, height: view.height, ground: 0, stratosphere: view.stratosphere});
         sim.ground = view.ground;
-        sim.players = [];
-        sim.particles = view.particles; // smoke and explosions show up in the guest's view
+        sim.participants = [];
+        sim.effects = view.effects; // smoke and explosions show up in the guest's view
         Object.assign(p, {view, sim, send, last: performance.now()});
         setInterval(controlTick, e.consts.c);
     }
@@ -102,7 +102,7 @@
         p.plane = plane;
         p.hostId = ghost.netId;
         p.ghost = ghost;
-        p.view.bodies.delete(ghost); // draw our local plane instead of the host's copy
+        p.view.worldEntities.delete(ghost); // draw our local plane instead of the host's copy
         p.acc = 0;
         p.last = performance.now();
     }
@@ -133,7 +133,7 @@
         for (; p.acc >= STEP; p.acc -= STEP) e.physicsStep(p.sim, STEP);
 
         // Mirror our plane and bullets into the world the guest sees.
-        for (const o of [...p.sim.bodies, ...p.sim.bullets]) {
+        for (const o of [...p.sim.worldEntities, ...p.sim.projectiles]) {
             if (!p.shown.has(o)) {
                 p.shown.add(o);
                 p.view.add(o);
@@ -141,8 +141,8 @@
         }
         for (const o of p.shown) {
             if (!p.sim.has(o)) {
-                p.view.bodies.delete(o);
-                p.view.bullets.delete(o);
+                p.view.worldEntities.delete(o);
+                p.view.projectiles.delete(o);
                 p.shown.delete(o);
             }
         }

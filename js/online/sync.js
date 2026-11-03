@@ -127,7 +127,7 @@
             else p[k] = v;
         }
         if (("sprite" in f && !p.sprite) || (p.sprites && p.sprites.some(s => !s))) return;
-        world.particles.add(p);
+        world.effects.add(p);
         const S = window.BitSound;
         if (S && p.position) {
             if (f.sprites && String(f.sprites[0]).startsWith("explosion")) S.explosion(p.position);

@@ -111,7 +111,7 @@
         const w = msg.world || {};
         const world = new e.World({width: w.width, height: w.height, ground: 0, stratosphere: w.stratosphere});
         world.ground = w.ground;
-        world.players = [];
+        world.participants = [];
         // Same map as the host.
         world.map = window.BitMaps && window.BitMaps.get(typeof w.map === "string" ? w.map : "countryside");
         e.decorate(world);
@@ -134,7 +134,7 @@
         };
         window.BitSound && window.BitSound.setListener(() => me.hasPlane() || me.hasPilot());
         const [camera, ctx] = e.camera(1.25, document.querySelector("#canvas"));
-        e.loop(camera, ctx, world, (cam, alpha) => e.follow(cam, world, me, alpha), g => e.scoreboard(g, world.players));
+        e.loop(camera, ctx, world, (cam, alpha) => e.follow(cam, world, me, alpha), g => e.scoreboard(g, world.participants));
         e.minimap(world);
         bindGuestKeys();
         banner(O.mode === "multiplayer" ? "🌐 Multiplayer" : "Room " + guest.code);
@@ -275,10 +275,10 @@
     }
 
     function removeObject(world, o) {
-        world.bodies.delete(o);
-        world.bullets.delete(o);
-        world.pilots.delete(o);
-        world.barns.delete(o);
+        world.worldEntities.delete(o);
+        world.projectiles.delete(o);
+        world.aircraftOperators.delete(o);
+        world.structures.delete(o);
     }
 
     // The gun of the plane that just fired this bullet (the closest plane).
@@ -326,7 +326,7 @@
         }
 
         guest.me = msg.me || 0;
-        world.players = (msg.p || []).map(([name, color, kills, deaths, objectId]) => ({
+        world.participants = (msg.p || []).map(([name, color, kills, deaths, objectId]) => ({
             name: cleanName(name), color: /^#[0-9a-f]{3,8}$/i.test(color) ? color : "#000", kills, deaths,
             points() {
                 return this.kills;

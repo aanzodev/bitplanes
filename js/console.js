@@ -219,8 +219,8 @@
                 if (!def) throw new Error("Maps: " + window.BitMaps.list.map(m => m.id).join(", "));
                 const W = window.BitEngine.world;
                 W.map = window.BitMaps.get(def.id);
-                W.groundObjects.clear();
-                W.clouds.length = 0;
+                W.terrainEntities.clear();
+                W.atmosphere.length = 0;
                 window.BitEngine.decorate(W);
                 window.BitMaps.announce(W.map);
                 print(`Map: ${def.name}`, "ok");

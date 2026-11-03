@@ -75,8 +75,8 @@ BitModules[87] = function (M, j, t) {
                 stratosphere: 50,
             });
             ((M.ground = M.height - A.b.ground.height),
-                (M.players = []),
-                (M.onCrash = function (j) {
+                (M.participants = []),
+                (M.onImpact = function (j) {
                     (j.player && j.player.detach(),
                         setTimeout(() => {
                             const t = j.player;
@@ -99,7 +99,7 @@ BitModules[87] = function (M, j, t) {
                     u = new y.a(N),
                     I = new T.a(t, N, u);
                 ((u.player = I),
-                    M.players.push(I),
+                    M.participants.push(I),
                     (u.ammo = u.maxAmmo = I.maxAmmo = e.b),
                     u.move(Object(o.s)(M.width * Math.random(), M.ground * Math.random())),
                     M.add(u),
@@ -112,13 +112,13 @@ BitModules[87] = function (M, j, t) {
                 g,
                 M,
                 (j, t) => {
-                    Object(u.a)(j, M, M.players[0], t);
+                    Object(u.a)(j, M, M.participants[0], t);
                 },
                 (M) => {},
             );
             return function () {
                 n();
-                for (let j of M.players) j.disableAI();
+                for (let j of M.participants) j.disableAI();
             };
         })();
         window.BitEngine.stopDemo = r;
@@ -151,8 +151,8 @@ BitModules[87] = function (M, j, t) {
                                     stratosphere: 50,
                                 });
                                 ((M.ground = M.height - A.b.ground.height),
-                                    (M.players = []),
-                                    (M.onCrash = function (j) {
+                                    (M.participants = []),
+                                    (M.onImpact = function (j) {
                                         j.player &&
                                             (j.player.detach(),
                                             setTimeout(() => {
@@ -176,7 +176,7 @@ BitModules[87] = function (M, j, t) {
                                     z = new T.a(Object(n.a)("nickname") || "YOU", "#ff0015", t);
                                 ((z.isHuman = !0),
                                     z.control(t),
-                                    M.players.push(z),
+                                    M.participants.push(z),
                                     (z.maxAmmo = e.f),
                                     (t.maxAmmo = e.f),
                                     (t.ammo = e.f),
@@ -203,7 +203,7 @@ BitModules[87] = function (M, j, t) {
                                         u = new y.a(N),
                                         I = new T.a(t, N, u);
                                     ((u.player = I),
-                                        M.players.push(I),
+                                        M.participants.push(I),
                                         (I.maxAmmo = u.maxAmmo = u.ammo = j <= 1 ? e.f : e.b),
                                         (u.landed = !0),
                                         u.move(Object(o.s)((j * M.width) / e.j - 800, M.ground)),
@@ -224,7 +224,7 @@ BitModules[87] = function (M, j, t) {
                                         Object(u.a)(j, M, z, t);
                                     },
                                     (j) => {
-                                        Object(c.f)(j, M.players);
+                                        Object(c.f)(j, M.participants);
                                     },
                                 ),
                                     Object(c.e)(M));
@@ -240,7 +240,7 @@ BitModules[87] = function (M, j, t) {
                                 });
                                 let j, t;
                                 ((M.ground = M.height - A.b.ground.height),
-                                    (M.players = []),
+                                    (M.participants = []),
                                     ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)),
                                     Object(a.a)(M));
                                 const N = new URLSearchParams(window.location.search);
@@ -254,7 +254,7 @@ BitModules[87] = function (M, j, t) {
                                     s.join(g),
                                     (g.leader = s),
                                     (r.player = s),
-                                    M.players.push(s),
+                                    M.participants.push(s),
                                     (s.maxAmmo = e.f),
                                     (r.maxAmmo = e.f),
                                     (r.ammo = e.f),
@@ -275,7 +275,7 @@ BitModules[87] = function (M, j, t) {
                                     }),
                                     w = [];
                                 let l;
-                                M.onCrash = function (M) {
+                                M.onImpact = function (M) {
                                     if (M.player) {
                                         let j = M.player;
                                         if ((j.detach(), j.isHuman)) {
@@ -309,7 +309,7 @@ BitModules[87] = function (M, j, t) {
                                     ((u.number = t),
                                         u.join(g),
                                         (N.player = u),
-                                        M.players.push(u),
+                                        M.participants.push(u),
                                         (u.maxAmmo = e.f),
                                         (N.maxAmmo = e.f),
                                         (N.ammo = e.f),
@@ -331,7 +331,7 @@ BitModules[87] = function (M, j, t) {
                                         u.join(z),
                                         0 === j && (z.leader = u),
                                         (N.player = u),
-                                        M.players.push(u),
+                                        M.participants.push(u),
                                         (u.maxAmmo = e.f),
                                         (N.maxAmmo = e.f),
                                         (N.ammo = e.f),
@@ -367,10 +367,10 @@ BitModules[87] = function (M, j, t) {
                                     ground: 0,
                                     stratosphere: 50,
                                 });
-                                ((M.ground = M.height - A.b.ground.height), (M.players = []), ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)));
+                                ((M.ground = M.height - A.b.ground.height), (M.participants = []), ((M.map = window.BitMaps && window.BitMaps.pick()), Object(a.b)(M)));
                                 const j = new y.a("#ff0015"),
                                     t = new T.a("YOU", "#ff0015", j);
-                                (M.players.push(t),
+                                (M.participants.push(t),
                                     t.control(j),
                                     j.move(Object(o.s)(M.width / 2 - 200, 500)),
                                     M.add(j),
@@ -393,7 +393,7 @@ BitModules[87] = function (M, j, t) {
                                         t = "#e2e2e2",
                                         N = new y.a(t),
                                         u = new T.a(j, t, N);
-                                    (M.players.push(u),
+                                    (M.participants.push(u),
                                         u.control(N),
                                         N.move(Object(o.s)(M.width / 2, 500)),
                                         M.add(N),
