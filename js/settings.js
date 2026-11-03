@@ -1,14 +1,6 @@
-// Settings (gear button in the lobby, and in both pause menus): sound
-// volume, Air Battle graphics / camera / mouse options, and key bindings for
-// Bit Planes (2D) and Air Battle (3D). Saved in localStorage under "settings".
-//
-// 2D key bindings work by translating: the engine listens for its usual keys
-// (arrows, W/A/S/D, Space, X, Q, C), so a key you bound is passed on as the
-// usual key for that action, and the usual keys you moved away stop working.
 window.BitSettings = (function () {
     const KEY = "settings";
 
-    // Each action has two key slots. "" = empty.
     const KEYS_2D = [
         {id: "thrustUp", name: "Speed up", keys: ["ArrowUp", "KeyW"]},
         {id: "thrustDown", name: "Slow down", keys: ["ArrowDown", "KeyS"]},
@@ -42,19 +34,19 @@ window.BitSettings = (function () {
 
     const DEFAULTS = {
         volume: 0.8,
-        engineVolume: 0.6,      // plane engines, on top of the main volume
-        gunVolume: 0.6,         // gunfire, on top of the main volume
-        dfQuality: "high",     // low | medium | high
-        dfView: "chase",       // chase | cockpit
+        engineVolume: 0.6,
+        gunVolume: 0.6,
+        dfQuality: "high",
+        dfView: "chase",
         dfFov: 72,
-        dfMouse: true,          // mouse flies the plane (Battlefield style)
+        dfMouse: true,
         dfMouseSens: 1,
         dfInvertPitch: false,
         dfInvertMouse: false,
         dfShake: true,
-        dfAutoRes: true,        // lower the resolution by itself when frames get slow
+        dfAutoRes: true,
         dfShowFps: false,
-        dfDifficulty: "normal", // easy | normal | hard | ace
+        dfDifficulty: "normal",
         keys2d: {},
         keysDf: {},
     };
@@ -101,7 +93,6 @@ window.BitSettings = (function () {
         if (window.BitSound && window.BitSound.setVolume) window.BitSound.setVolume(state.volume);
     }
 
-    // ----------------------------------------------------------- key names
 
     function keyName(code) {
         if (!code) return "–";
@@ -120,16 +111,13 @@ window.BitSettings = (function () {
         return code;
     }
 
-    // Which action of a key set does this key (or mouse button code) do?
     function actionOf(set, code) {
         const map = state[set];
         for (const id of Object.keys(map)) if (map[id].includes(code)) return id;
         return null;
     }
 
-    // ------------------------------------------------- 2D key translation
 
-    // The engine's own keys for each 2D action (the first one is sent).
     const ENGINE_KEYS = {
         thrustUp: ["ArrowUp", "KeyW"], thrustDown: ["ArrowDown", "KeyS"],
         pitchUp: ["ArrowLeft", "KeyA"], pitchDown: ["ArrowRight", "KeyD"],
@@ -149,7 +137,7 @@ window.BitSettings = (function () {
         if (/INPUT|TEXTAREA|SELECT/.test((ev.target && ev.target.tagName) || "")) return;
         const code = ev.code, action = actionOf("keys2d", code);
         if (action) {
-            if (ENGINE_KEYS[action].includes(code)) return; // the engine already knows this one
+            if (ENGINE_KEYS[action].includes(code)) return;
             const send = ENGINE_KEYS[action][0];
             ev.preventDefault();
             ev.stopImmediatePropagation();
@@ -160,7 +148,6 @@ window.BitSettings = (function () {
             } catch (e) {}
             (document.activeElement && document.activeElement !== document.body ? document.activeElement : document).dispatchEvent(fake);
         } else if (ENGINE_ALL.has(code)) {
-            // A usual key whose action you moved to another key: do nothing.
             ev.preventDefault();
             ev.stopImmediatePropagation();
         }
@@ -169,7 +156,6 @@ window.BitSettings = (function () {
     window.addEventListener("keydown", translate, true);
     window.addEventListener("keyup", translate, true);
 
-    // ------------------------------------------------------------- panel
 
     let el, tab = "general", capturing = null;
 
@@ -231,7 +217,6 @@ window.BitSettings = (function () {
         if (!c) return;
         const map = state[c.set];
         if (code !== null) {
-            // A key can only do one thing: take it off any other action.
             if (code) for (const id of Object.keys(map)) map[id] = map[id].map(k => (k === code ? "" : k));
             map[c.id][c.slot] = code;
             save();
@@ -246,14 +231,13 @@ window.BitSettings = (function () {
         if (ev.type !== "keydown") return;
         if (ev.code === "Escape") return bind(null);
         if (ev.code === "Backspace" || ev.code === "Delete") return bind("");
-        if (ev.code === "KeyM" || !ev.code) return; // M is always the sound key
+        if (ev.code === "KeyM" || !ev.code) return;
         bind(ev.code);
     }
 
     function onCaptureMouse(ev) {
         if (!capturing || capturing.set !== "keysDf") return;
         if (ev.target.closest && ev.target.closest(".key-bind.listening")) {
-            // The click that started listening: a left click on the button itself does nothing.
             if (ev.button === 0) return;
         }
         ev.preventDefault();

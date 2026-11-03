@@ -1,4 +1,3 @@
-// localStorage helpers and lifetime stats.
 BitModules[7] = function (M, j, t) {
     "use strict";
 

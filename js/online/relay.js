@@ -1,10 +1,6 @@
-// Online play through the relay server (server/index.js) instead of a direct
-// WebRTC connection. RelayPeer and RelayConn copy the small part of PeerJS's
-// API that host.js and guest.js use, so the rest of the online code works the
-// same either way. See config.js for when the relay server is used.
 (function () {
     const O = window.BitOnline;
-    const WAKE_NOTICE_MS = 3000; // free servers sleep when unused and take a while to wake up
+    const WAKE_NOTICE_MS = 3000;
     const OPEN_TIMEOUT_MS = 75000;
 
     class Emitter {
@@ -22,7 +18,6 @@
         }
     }
 
-    // One link between the host and a guest, through the server.
     class RelayConn extends Emitter {
         constructor(peer, remoteId) {
             super();
@@ -33,9 +28,8 @@
 
         send(data) {
             if (!this.open) return;
-            // Light format the server forwards without decoding (see server/index.js).
             const p = this._peer;
-            if (!p.fast) return p._send(p.isHost ? {op: "to", to: this.peer, d: data} : {op: "up", d: data}); // older server
+            if (!p.fast) return p._send(p.isHost ? {op: "to", to: this.peer, d: data} : {op: "up", d: data});
             const json = JSON.stringify(data);
             p._sendRaw(p.isHost ? "T" + this.peer + "\n" + json : "U" + json);
         }
@@ -55,7 +49,6 @@
     }
 
     class RelayPeer extends Emitter {
-        // id given: host a room with that id. No id: a guest that will connect().
         constructor(url, id) {
             super();
             this.url = url;
@@ -84,7 +77,6 @@
                 clearTimeout(wake);
                 clearTimeout(giveUp);
                 this.disconnected = false;
-                // pub: list this room for Multiplayer matchmaking.
                 if (this.isHost) this._send({op: "host", id: this.id, pub: !!O.publicRoom});
                 else this.emit("open", this.id);
             };
@@ -93,7 +85,6 @@
                 if (typeof text !== "string") return;
                 try {
                     if (text[0] === "D" && this.fast) {
-                        // Activity data: "D<json>" for guests, "D<guestId>\n<json>" for the host.
                         if (this.isHost) {
                             const nl = text.indexOf("\n");
                             const c = this.conns.get(text.slice(1, nl));
@@ -111,7 +102,6 @@
                 if (this.ws !== ws || this.destroyed) return;
                 this.disconnected = true;
                 if (!opened) {
-                    // A host that already had a room keeps trying (the server holds it for 15s).
                     if (this.isHost && this.hosted) return setTimeout(() => this._connect(), 2000);
                     return this._error("server-error");
                 }
@@ -127,7 +117,6 @@
         _onMessage(msg) {
             if (msg.op === "hello") {
                 this.fast = msg.v >= 2;
-                // Hosts measure their ping to the server for the server browser.
                 if (this.isHost && msg.v >= 4 && !this.pinger) {
                     this.pinger = setInterval(() => this.destroyed ? clearInterval(this.pinger) : this._send({op: "ping", t: performance.now()}), 5000);
                     this._send({op: "ping", t: performance.now()});
@@ -179,12 +168,10 @@
             if (this.ws && this.ws.readyState === WebSocket.OPEN) this.ws.send(text);
         }
 
-        // Hosts: room info shown in the Multiplayer server browser.
         setMeta(d) {
             this._send({op: "meta", d});
         }
 
-        // Guests: join the room with this id.
         connect(id) {
             const c = new RelayConn(this, id);
             this.conns.set("host", c);
@@ -192,7 +179,6 @@
             return c;
         }
 
-        // Hosts: the server keeps the room for a few seconds, so reconnect quickly.
         reconnect() {
             if (!this.destroyed && this.disconnected) this._connect();
         }
@@ -200,8 +186,6 @@
         destroy() {
             if (this.destroyed) return;
             this.destroyed = true;
-            // Tell the server this is on purpose, so it closes the room right away
-            // instead of waiting for the host to come back.
             if (this.isHost) this._send({op: "bye"});
             const ws = this.ws;
             this.ws = null;
@@ -209,14 +193,9 @@
         }
     }
 
-    // ------------------------------------------------------------------
-    // Direct first, server as backup. A direct (WebRTC) connection is fastest,
-    // e.g. two laptops on the same home Wi-Fi. Networks that block it (school,
-    // office) fall back to the relay server after a few seconds.
 
     const DIRECT_TRY_MS = 4500;
 
-    // The host listens on both: friends can reach it either way.
     class HybridHost extends Emitter {
         constructor(url, id) {
             super();
@@ -238,7 +217,6 @@
                 this.direct.on("connection", c => (c.via = "direct", this.emit("connection", c)));
                 this.direct.on("disconnected", () => this.direct.destroyed || this.direct.reconnect());
                 this.direct.on("error", err => {
-                    // Someone else has this code on the direct network: pick a new code.
                     if (err.type === "unavailable-id") return this.emit("error", err);
                     console.warn("Direct connections unavailable:", err.type);
                     this.directFailed = err;
@@ -250,14 +228,12 @@
             }
         }
 
-        // The room is open as soon as either way works.
         _opened() {
             if (this.isOpen) return;
             this.isOpen = true;
             this.emit("open", this.id);
         }
 
-        // Only an error when neither way works.
         _failed() {
             if (this.relayFailed && this.directFailed && !this.isOpen) this.emit("error", this.relayFailed);
             else if (this.relayFailed && this.isOpen) console.warn("Online server unavailable; direct connections only.");
@@ -281,7 +257,6 @@
         }
     }
 
-    // A guest's link to the host: tries direct, then the server.
     class HybridConn extends Emitter {
         constructor(guest, id) {
             super();
@@ -312,7 +287,6 @@
                 });
                 c.on("error", () => this._tryServer());
             };
-            // e.g. "peer-unavailable": the host has no direct link, use the server now.
             d.on("error", () => this._tryServer());
             if (d.open) go();
             else d.on("open", go);
@@ -341,7 +315,6 @@
                 this.emit("close");
             });
             c.on("error", err => this.emit("error", err));
-            // Stop the other attempt.
             if (via === "server" && this.guest.direct) this.guest.direct.destroy();
             this.emit("open");
         }
@@ -365,8 +338,6 @@
                 this._opened();
             });
             this.relay.on("waking", () => this.emit("waking"));
-            // "Room not found" comes from the relay (the backup path). If the server
-            // itself can't be reached, that only matters once the direct try failed.
             this.relay.on("error", err => {
                 if (err.type === "server-error") {
                     this.relayDown = err;
@@ -392,7 +363,6 @@
             }
         }
 
-        // Neither the server nor direct connections could even start.
         _maybeFail() {
             if (!this.isOpen && this.relayDown && this.directFailed) this.emit("error", this.relayDown);
         }

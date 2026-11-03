@@ -1,4 +1,3 @@
-// Particle classes and their update step.
 BitModules[10] = function (M, j, t) {
     "use strict";
     (t.d(j, "e", function () {

@@ -1,4 +1,3 @@
-// Rendering, physics step and the main loop.
 BitModules[22] = function (M, j, t) {
     "use strict";
     (t.d(j, "a", function () {
@@ -18,7 +17,6 @@ BitModules[22] = function (M, j, t) {
 
     function a(M, j, t, L, a) {
         var A;
-        // Map theme (sky colors, ground, forest). Falls back to the countryside look.
         const theme = t.map || {},
             mapSky = theme.sky || "#9be2fe",
             mapSpace = theme.space || "#1f4752",
@@ -332,8 +330,6 @@ BitModules[22] = function (M, j, t) {
             }
             for (let t of M.projectiles) {
                 for (let L of M.worldEntities)
-                    // Your own bullets never hit you or your missiles. (Online, a guest's
-                    // plane can jump forward into its fresh bullets when the connection lags.)
                     L !== t.source &&
                     !(L instanceof u.a && L.source === t.source) &&
                     x(t, L) &&
@@ -431,7 +427,6 @@ BitModules[22] = function (M, j, t) {
         const t = Object(g.h)(M.velocity),
             L = Object(g.s)(0, M.mass * l.a),
             N = Object(g.e)(M.forward, M.thrust),
-            // Smart (F-22) missiles have a higher top speed.
             i = Object(g.e)(Object(g.i)(Object(g.f)(M.velocity)), 2 ** (t - (M.smart ? 1.4 : 1.2) * l.l));
         M.force = Object(g.a)(L, N, i);
     }
@@ -474,8 +469,6 @@ BitModules[22] = function (M, j, t) {
             M.running ? (M.velocity.x = M.direction == i.b.Right ? 10 : -10) : (M.velocity.x = 0));
     }
 
-    // One fixed physics step for a world, without drawing. Online guests use
-    // it to fly their own plane locally.
     function Z(M, j) {
         (Object(L.c)(M, j), O(M, j));
     }
@@ -485,21 +478,15 @@ BitModules[22] = function (M, j, t) {
             I = 0,
             g = Object(D.g)(),
             y = 1 / 60;
-        // One simulation step (fixed 60 Hz physics, catching up on elapsed time).
         function step() {
             const A = Object(D.g)();
-            // Paused (single player menu): freeze the world but keep drawing it.
-            // Frozen: Multiplayer's lobby and results screens.
             if (window.bitPaused || t.frozen) return ((g = A), 0);
             let n = (A - g) / 1e3;
             for (n > 0.1 && (n = 0.1), g = A, I += n, t.remote || Object(L.c)(t, n); I >= y;)
                 (t.remote || O(t, y), (I -= y));
-            // Online hosts place the planes guests fly here (smooth playback).
             t.onStep && t.onStep();
             return (Object(N.g)(t, y), n);
         }
-        // Lets the activity keep running while the window is covered or hidden and
-        // animation frames stop (used by online hosts).
         t.tick = function () {
             Object(D.g)() - g > 50 && step();
         };

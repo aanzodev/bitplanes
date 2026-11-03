@@ -1,18 +1,12 @@
-// Lifetime stats and the Stats page (button on the start screen). Builds on
-// the counters the engine already saves (bullets, missiles, kills, deaths,
-// cows) and adds hits, kill streaks, time flown per plane, matches and coins.
-// Online guests count kills and deaths from the host's scoreboard.
 window.BitStats = (function () {
     const COINS_PER_KILL = 50;
     let el, lastKilled = null, lastDeaths = null, uiShown = false;
 
-    // The engine's saved stats object (written to localStorage every second).
     function S() {
         const s = window.BitEngine && window.BitEngine.require(7).c;
         if (!s) return null;
         for (const [k, v] of Object.entries({hits: 0, streak: 0, bestStreak: 0, flySeconds: 0, matches: 0, onlineMatches: 0,
             coinsEarned: 0, planeSeconds: {}, planeKills: {},
-            // Air Battle (3D)
             dfKills: 0, dfDeaths: 0, dfMissileKills: 0, dfGunKills: 0, dfFlareSaves: 0, dfWins: 0, dfMatches: 0, dfEjects: 0, dfMaps: {}})) if (s[k] === undefined) s[k] = v;
         return s;
     }
@@ -26,7 +20,6 @@ window.BitStats = (function () {
 
     let lastPlaneId = "";
 
-    // Once a second: time flown, new kills/deaths (streaks, kills per plane), matches.
     function tick() {
         const s = S();
         if (!s) return;
@@ -55,7 +48,6 @@ window.BitStats = (function () {
         uiShown = shown;
     }
 
-    // Online guests: the host's scoreboard says how many kills and deaths we have.
     let guestRow = null;
     function guestScore(kills, deaths) {
         const s = S();
@@ -67,7 +59,6 @@ window.BitStats = (function () {
         guestRow = {kills, deaths};
     }
 
-    // ------------------------------------------------------------------ page
 
     function time(sec) {
         const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);

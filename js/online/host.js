@@ -1,5 +1,3 @@
-// Online play, host side: opens the room, adds guests' planes to the activity,
-// drives them with the guests' key presses and sends out snapshots.
 (function () {
     const O = window.BitOnline;
     const {PREFIX, SNAPSHOT_MS, TIMEOUT_MS, GUEST_COLORS, engine, newPeer, errorText, makeTimeline, makeCode, cleanName, round, status, banner, addLog, engineClasses, indexSprites, lookKey, serializeParticle} = O;
@@ -34,7 +32,6 @@
             });
         });
         peer.on("disconnected", () => {
-            // Lost the signaling server; reconnect so new friends can still join.
             if (!peer.destroyed) peer.reconnect();
         });
         peer.on("error", err => {
@@ -42,7 +39,6 @@
                 peer.destroy();
                 openHostPeer();
             } else if (!host.world) {
-                // Never got a room: stop trying and let the player retry.
                 peer.destroy();
                 O.role = null;
                 status("Couldn't create a room. " + errorText(err.type));
@@ -52,7 +48,6 @@
         });
     }
 
-    // Called by the death match once its world exists.
     function onWorld(world, localPlayer) {
         if (O.role !== "host") return;
         engineClasses();
@@ -63,7 +58,6 @@
         O.match && O.match.onHostWorld(world);
 
         const add = world.effects.add.bind(world.effects);
-        // Remember new particles; they are sent (in their current state) with the next snapshot.
         world.effects.add = p => {
             if (host.clients.size) host.fx.add(p);
             return add(p);
@@ -72,7 +66,6 @@
 
         updateHostBanner();
         keepRunning(world);
-        // Drop guests that went silent (closed tab, lost connection).
         setInterval(() => {
             const now = performance.now();
             for (const [conn, c] of host.clients) {
@@ -86,9 +79,6 @@
         host.pending.splice(0).forEach(spawnGuest);
     }
 
-    // Browsers pause animation frames in covered or hidden windows, and slow
-    // down their timers. A Web Worker timer is not slowed down, so it keeps the
-    // host's activity simulating and sending snapshots while the host looks away.
     function keepRunning(world) {
         let last = 0;
         const beat = () => {
@@ -110,7 +100,6 @@
 
     function updateHostBanner() {
         const n = [...host.clients.values()].filter(c => c.player).length;
-        // Multiplayer needs no code: anyone who picks Multiplayer is matched in.
         if (O.mode === "multiplayer") banner(`🌐 Multiplayer · ${n + 1} real player${n ? "s" : ""}`);
         else banner(`Room code: ${host.code} · ${n} friend${n === 1 ? "" : "s"} connected`);
     }
@@ -172,12 +161,10 @@
         }
         if (!client || !client.player) return;
         if (msg.t === "loadout") {
-            // New plane choice from the guest's menu: used for their next plane.
             client.loadout = cleanLoadout(msg.l);
             client.player.loadout = client.loadout;
             client.player.loadoutColor = client.loadout.color;
         } else if (msg.t === "paint" && /^#[0-9a-f]{3,8}$/i.test(msg.c)) {
-            // New paint: repaint the guest's current plane right away.
             const player = client.player, plane = player.hasPlane();
             client.loadout.color = player.loadoutColor = msg.c;
             client.loadout.pattern = (window.bitPlanePatterns || []).includes(msg.p) ? msg.p : "";
@@ -188,11 +175,9 @@
         } else if (msg.t === "st" && Array.isArray(msg.s)) {
             applyGuestPlane(client, msg.s);
         } else if (msg.t === "ping") {
-            // Echo the guest's timestamp so it can measure its own ping.
             if (client.conn.open) client.conn.send({t: "pong", c: msg.c});
         } else if (msg.t === "in" && msg.s) {
             client.input = {u: !!msg.s.u, d: !!msg.s.d, l: !!msg.s.l, r: !!msg.s.r, f: !!msg.s.f};
-            // Turn right away instead of waiting for the next control tick.
             const plane = client.player.hasPlane(), i = client.input;
             if (plane && !plane.remoteDriven) plane.elevator = i.l && !i.r ? -1 : !i.l && i.r ? 1 : 0;
         } else if (msg.t === "act") {
@@ -243,17 +228,9 @@
         });
         updateHostBanner();
         hostLog(`<span class="message">${player.html()} joined</span>`);
-        // Multiplayer: the newcomer takes a bot's place.
         if (O.mode === "multiplayer" && O.match) O.match.fitBots();
     }
 
-    // Mirrors the keyboard controls, but driven by the guest's key presses.
-    // The guest flies its own plane and reports where it is; copy that onto
-    // our plane. Hits, damage and crashes are still worked out here.
-    // A guest reports where its plane is. Older guests (no timestamp) are placed
-    // right away; newer ones are played back smoothly by placeGuestPlanes(), a
-    // little in the past, so their plane doesn't jump back and forth when
-    // reports arrive unevenly.
     function applyGuestPlane(client, s) {
         const plane = client.player.hasPlane(), world = host.world;
         const [id, x, y, vx, vy, a, thrust, elevator, landed, ts] = s.map(Number);
@@ -288,7 +265,6 @@
         return a + d * t;
     }
 
-    // Every frame: put each guest's plane where it was at the playback time.
     function placeGuestPlanes() {
         const now = performance.now();
         for (const client of host.clients.values()) {
@@ -298,7 +274,6 @@
             let x, y, vx, vy, a;
             if (t <= h[0][0]) [, x, y, vx, vy, a] = h[0];
             else if (t >= h[h.length - 1][0]) {
-                // Late report: keep going the way it was flying for a moment.
                 const [t1, x1, y1, vx1, vy1, a1] = h[h.length - 1];
                 const prev = h[h.length - 2];
                 const k = prev && t1 > prev[0] ? Math.min(t - t1, 60) / (t1 - prev[0]) : 0;
@@ -310,7 +285,6 @@
                 while (i > 0 && h[i][0] > t) i--;
                 const [t0, x0, y0, vx0, vy0, a0] = h[i], [t1, x1, y1, vx1, vy1, a1] = h[i + 1];
                 const k = t1 > t0 ? (t - t0) / (t1 - t0) : 1;
-                // Don't blend across the world's edge (wrap-around).
                 const wrap = Math.abs(x1 - x0) > host.world.width / 2;
                 x = wrap ? (k < 0.5 ? x0 : x1) : x0 + (x1 - x0) * k;
                 y = y0 + (y1 - y0) * k;
@@ -330,7 +304,7 @@
             const input = client.input, plane = player.hasPlane();
             if (plane) {
                 if (input.f) controls.d(world, plane);
-                if (plane.remoteDriven) return; // the guest flies it and reports its position
+                if (plane.remoteDriven) return;
                 if (input.d) plane.thrust = Math.max(0, plane.thrust - 2);
                 if (input.u) plane.thrust = Math.min(plane.maxThrust || consts.k, plane.thrust + 2);
                 plane.elevator = input.l && !input.r ? -1 : !input.l && input.r ? 1 : 0;
@@ -361,7 +335,6 @@
         const player = client.player;
         if (player && host.world) {
             const world = host.world;
-            // Stop the death match from respawning a plane for someone who left.
             player.inActivity = () => true;
             const obj = player.object;
             if (obj && world.has(obj)) world.delete(obj);
@@ -369,7 +342,6 @@
             const index = world.participants.indexOf(player);
             if (index >= 0) world.participants.splice(index, 1);
             hostLog(`<span class="message">${player.html()} left</span>`);
-            // Multiplayer: a bot takes the empty spot.
             if (O.mode === "multiplayer" && O.match) O.match.fitBots();
         }
         updateHostBanner();
@@ -409,7 +381,6 @@
         for (const client of host.clients.values()) {
             if (!client.player || !client.conn.open) continue;
             const defs = [], looks = [];
-            // A guest draws its own bullets itself, so leave those out.
             const mine = client.player.object;
             const own = o => o.source === mine && o.constructor === engineClasses().bodies[2];
             for (const o of all) {

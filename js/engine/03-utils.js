@@ -1,4 +1,3 @@
-// Small helpers: time, shuffle, DOM ready, rounded rects.
 BitModules[3] = function (M, j, t) {
     "use strict";
     (t.d(j, "g", function () {

@@ -1,4 +1,3 @@
-// Online play: the "Host a room" / "Join" buttons on the start screen.
 (function () {
     const O = window.BitOnline;
     const {status} = O;
@@ -13,7 +12,6 @@
             if (joinBtn) joinBtn.disabled = true;
             return;
         }
-        // Rooms with friends are private: no Multiplayer tags, timer or lobby.
         const privateRoom = () => ((O.mode = null), (O.publicRoom = false));
         hostBtn && hostBtn.addEventListener("click", () => (privateRoom(), O.startHost()));
         joinBtn && joinBtn.addEventListener("click", () => (privateRoom(), O.join(codeInput.value)));

@@ -1,9 +1,3 @@
-// Air Battle (3D): the cinematic look (High and Ultra graphics). The scene is
-// drawn into a high dynamic range image (brighter than white is allowed),
-// then GLSL passes add bloom (the sun, afterburners, tracers, fire and
-// explosions glow), filmic tone mapping (ACES, like film cameras),
-// a light color grade, a vignette, a touch of lens color fringing at the
-// edges and fine film grain.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
 
@@ -14,7 +8,6 @@
             gl_Position = vec4(position.xy, 0.0, 1.0);
         }`;
 
-    // Keep only the bright parts (soft knee), for the glow.
     const BRIGHT_FRAG = `
         uniform sampler2D tex;
         uniform float threshold;
@@ -26,7 +19,6 @@
             gl_FragColor = vec4(c * k * k, 1.0);
         }`;
 
-    // One direction of a 9-tap Gaussian blur.
     const BLUR_FRAG = `
         uniform sampler2D tex;
         uniform vec2 dir;
@@ -46,14 +38,12 @@
         uniform vec2 res;
         varying vec2 vUv;
         vec3 aces(vec3 x) {
-            // ACES filmic curve (Narkowicz fit).
             return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
         }
         float rand(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
         void main() {
             vec2 d = vUv - 0.5;
             float r2 = dot(d, d);
-            // Lens fringing: red and blue shift apart a little toward the edges.
             vec2 off = d * fringe * r2;
             vec3 c;
             c.r = texture2D(scene, vUv + off).r;
@@ -61,13 +51,12 @@
             c.b = texture2D(scene, vUv - off).b;
             c += (texture2D(bloom1, vUv).rgb * 0.6 + texture2D(bloom2, vUv).rgb * 0.9) * bloomStrength;
             c = aces(c * exposure);
-            // Grade: a little more contrast and saturation, cool shadows, warm highlights.
             float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
             c = mix(vec3(l), c, 0.96);
             c = mix(c * vec3(0.97, 0.99, 1.04), c * vec3(1.03, 1.0, 0.96), smoothstep(0.2, 0.8, l));
-            c = pow(c, vec3(1.0 / 2.2)); // to the screen's sRGB
+            c = pow(c, vec3(1.0 / 2.2));
             c = (c - 0.5) * 1.04 + 0.5;
-            c *= 1.0 - smoothstep(0.18, 0.75, r2) * 0.45; // vignette
+            c *= 1.0 - smoothstep(0.18, 0.75, r2) * 0.45;
             c += (rand(vUv * res + time) - 0.5) * grain;
             gl_FragColor = vec4(c, 1.0);
         }`;
@@ -116,7 +105,6 @@
             render(scene, camera, dt) {
                 renderer.setRenderTarget(sceneRT);
                 renderer.render(scene, camera);
-                // Bright parts at half size, blurred; then again at a quarter size for a wider glow.
                 bright.uniforms.tex.value = sceneRT.texture;
                 pass(bright, rtA);
                 blur.uniforms.tex.value = rtA.texture;

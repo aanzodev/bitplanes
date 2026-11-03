@@ -1,4 +1,3 @@
-// Base class for everything that moves.
 BitModules[13] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

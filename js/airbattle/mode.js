@@ -1,13 +1,3 @@
-// Air Battle (3D beta): pick "Air Battle" on the mode card and press PLAY.
-// The deploy screen picks the map and match; then this loads three.js (only
-// for this mode), builds the world and runs the match: blue team vs red team
-// (or free for all), first to the kill goal or the most kills in 10 minutes.
-//   Flying: keys and/or the mouse (Battlefield style), afterburner, chase or
-//   cockpit camera, free look and look back. Keys come from Settings.
-//   Fighting: guns with a lead indicator, missiles that need a lock (or fly
-//   straight), flares, holding a key to repair, ejecting.
-//   Scoring: kills, assists, missile and revenge bonuses as score ribbons;
-//   coins per kill and XP at the end. Killcam when you're shot down.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
     const COINS_PER_KILL = 50;
@@ -21,7 +11,6 @@
 
     let fight = null;
 
-    // ------------------------------------------------------------ loading
 
     function loadThree() {
         if (window.THREE) return Promise.resolve(window.THREE);
@@ -47,7 +36,6 @@
         return window.BitSettings ? window.BitSettings.get(k) : undefined;
     }
 
-    // ------------------------------------------------------------- planes
 
     function gunOf(planeId) {
         const prof = window.BitSoundProfiles && window.BitSoundProfiles[planeId];
@@ -66,17 +54,13 @@
         return a;
     }
 
-    // Computer pilots fly planes from the same era as yours, mostly.
     function pickPlane(pool, shape) {
         const same = pool.filter(p => (p.skin || "") === shape);
         const list = same.length && Math.random() < 0.65 ? same : pool;
         return list[Math.floor(Math.random() * list.length)];
     }
 
-    // ------------------------------------------------------------- start
 
-    // Air Battle opens up at player level 10, or as soon as you own a special
-    // plane (the black or gold bordered ones in the Hangar: the jets and the B-2).
     const UNLOCK_LEVEL = 10;
 
     function access() {
@@ -155,11 +139,9 @@
         loading.innerHTML = `<div><span>${map.icon}</span><h2>${map.name}</h2><p>Building the world…</p></div>`;
         root.appendChild(loading);
         document.body.appendChild(root);
-        // Let the loading screen show before the heavy work.
         await new Promise(r => setTimeout(r, 30));
         const quality = setting("dfQuality") || "high";
         const fancy = quality === "high" || quality === "ultra";
-        // Colors are given in sRGB and lit in linear light, like modern 3D engines.
         if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
         let renderer;
         try {
@@ -175,8 +157,6 @@
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.05;
-        // High/Ultra: shadows, reflections, smooth bodies, and the cinematic look
-        // (glow, filmic tone mapping) when the browser has WebGL 2.
         const hdr = fancy && renderer.capabilities.isWebGL2;
         if (fancy) {
             renderer.shadowMap.enabled = true;
@@ -194,7 +174,6 @@
         const post = hdr ? D.makePost(THREE, renderer, {samples: quality === "ultra" ? 8 : 4, exposure: sky.stars ? 1.3 : 0.82, bloom: quality === "ultra" ? 0.95 : 0.8}) : null;
         const hud = D.makeHud(root);
 
-        // ---- the pilots
         const shop = window.BitShop;
         const selected = shop.selected();
         const lvl = id => shop.level(id);
@@ -236,10 +215,8 @@
             },
         }, {quality});
 
-        // Everyone starts in the air: teams on opposite sides.
         planes.forEach(p => spawn(p));
 
-        // Stats: one more match played, and this map flown.
         const st = stats();
         if (st) {
             st.matches++;
@@ -296,7 +273,6 @@
         const g = fight, T = g.THREE, w = g.world;
         let pos, look;
         if (g.match.teams) {
-            // Blue comes from the south, red from the north, spread out in a line.
             const side = plane.team === "blue" ? 1 : -1;
             const mates = g.planes.filter(p => p.team === plane.team), i = mates.indexOf(plane);
             pos = new T.Vector3((i - mates.length / 2) * 260 + (Math.random() - 0.5) * 300, 0, side * w.size * 0.15 + (Math.random() - 0.5) * 600);
@@ -318,7 +294,6 @@
         }
     }
 
-    // ------------------------------------------------------------- input
 
     function bindInput() {
         const g = fight;
@@ -389,7 +364,6 @@
         g.onLockChange = () => {
             if (!fight || document.pointerLockElement === canvas) return;
             g.stick.x = g.stick.y = 0;
-            // Esc while flying with the mouse releases it before we see the key: pause.
             if (!g.unlocking && !g.paused && !g.match.over) setPaused(true);
             g.unlocking = false;
         };
@@ -410,7 +384,6 @@
         g.camInit = false;
     }
 
-    // ------------------------------------------------------------- combat
 
     function onHit(by, target, dmg, kind, at) {
         const g = fight;
@@ -435,7 +408,6 @@
         if (target === g.player) {
             g.audio.clang();
             g.shake = Math.max(g.shake, kind === "missile" ? 1.6 : 0.35);
-            // Which way did it come from (relative to your nose)?
             let ang;
             if (by && by.pos) {
                 const to = by.pos.clone().sub(target.pos);
@@ -458,13 +430,11 @@
         }
     }
 
-    // A plane is shot down (or crashes). how: "gun" | "missile" | "crash" | "collision" | "eject"
     function destroy(plane, by, how, collidedWith) {
         const g = fight;
         if (!plane.alive) return;
         const T = g.THREE;
         g.combat.breakUp(plane);
-        // The pilot gets out under a parachute (unless they already ejected).
         if (how !== "eject") spawnChute(plane, plane.pos.clone().add(new T.Vector3(0, 6, 0)), plane.velocity.multiplyScalar(0.3));
         plane.hide();
         if (plane.isPlayer) plane.setCockpit(false);
@@ -480,7 +450,6 @@
             g.hud.feed(`${name(killer)} <span class="df-feed-icon">${icon}</span> ${name(plane)}`);
         } else if (collidedWith) g.hud.feed(`${name(plane)} 💥 ${name(collidedWith)}`);
         else g.hud.feed(`${name(plane)} ${how === "eject" ? "ejected 🪂" : "crashed 💥"}`);
-        // Assists: anyone else who did a quarter of the damage lately.
         for (const [p, d] of plane.damageBy || []) {
             if (p === killer || !p || d.dmg < plane.maxHealth * 0.25 || g.time - d.t > 15) continue;
             p.score += 50;
@@ -545,7 +514,6 @@
         for (let i = g.chutes.length - 1; i >= 0; i--) {
             const c = g.chutes[i];
             c.t += dt;
-            // A second of free fall, then the canopy opens and they drift down.
             const open = c.t > 0.8;
             c.vel.multiplyScalar(1 - (open ? 2.5 : 0.4) * dt);
             c.vel.y += (open ? -6 - c.vel.y : -9.8) * dt * (open ? 2 : 1);
@@ -568,13 +536,11 @@
         const st = stats();
         if (st && p.health < p.maxHealth * 0.4) st.dfEjects++;
         spawnChute(p, p.pos.clone().addScaledVector(p.up, 4), p.velocity.multiplyScalar(0.4).addScaledVector(p.up, 25));
-        // The plane flies on without you for a moment, then goes down.
         const credit = p.lastHitBy && g.time - (p.lastHitAt || 0) < 8 ? p.lastHitBy : null;
         destroy(p, credit, credit ? "gun" : "eject");
         g.chuteCam = g.chutes[g.chutes.length - 1];
     }
 
-    // Your missile target: an enemy near the middle of your view, in range.
     function lockCandidate() {
         const g = fight, p = g.player;
         const range = 2800 * (1 + 0.2 * (p.stats.radar || 0));
@@ -628,7 +594,6 @@
         const g = fight;
         if (!plane.alive || plane.flares <= 0) return;
         plane.flares--;
-        // Your flares fool most missiles; computer pilots' a bit fewer.
         g.combat.dropFlares(plane, plane.isPlayer ? 0.85 : 0.65);
         g.audio.flares(plane.pos, plane === g.player);
         if (plane.flares <= 0 && !plane.flareReloadAt) plane.flareReloadAt = g.time + 14;
@@ -654,7 +619,6 @@
         } else g.audio.gun(plane, false, g.camera.position, plane.gunT);
     }
 
-    // ------------------------------------------------------------- match
 
     function checkEnd() {
         const g = fight, m = g.match;
@@ -717,7 +681,6 @@
         }, stop);
     }
 
-    // ------------------------------------------------------------- loop
 
     function loop() {
         const g = fight;
@@ -732,12 +695,9 @@
         g.frameAt = now;
     }
 
-    // Keeps the frame rate up: when frames get slow for a few seconds the
-    // picture renders at a lower resolution (the HUD stays sharp); when
-    // there's room again it goes back up, never above the chosen quality.
     function frameRate(dt) {
         const g = fight, f = g.fps;
-        if (!(dt > 0) || dt > 0.5) return; // tab was hidden
+        if (!(dt > 0) || dt > 0.5) return;
         f.frames++;
         f.time += dt;
         if (f.time < 1) return;
@@ -771,10 +731,8 @@
         }
         m.leader = Math.max(...g.planes.filter(x => x !== p).map(x => x.kills), 0);
 
-        // ---- your controls
         const h = a => g.held.has(a) && !m.over;
         const inv = setting("dfInvertPitch") ? -1 : 1;
-        // The mouse stick springs back to the middle (moving the mouse = turning).
         const back = Math.exp(-dt * 7);
         g.stick.x *= back;
         g.stick.y *= back;
@@ -789,7 +747,6 @@
             g.look.pitch *= Math.exp(-dt * 6);
         }
 
-        // ---- warnings
         let warning = "", alarm = false, threat = "";
         if (p.alive && !m.over) {
             const out = Math.hypot(p.pos.x, p.pos.z);
@@ -801,7 +758,6 @@
                     p.input.pitch = 0.6;
                 }
             }
-            // Ground ahead within about 4 seconds.
             const ahead = p.pos.clone().addScaledVector(p.forward, p.speed * 3);
             const below = g.world.ground(p.pos.x, p.pos.z);
             if ((ahead.y < g.world.ground(ahead.x, ahead.z) + 40 || p.pos.y - below < 120) && p.forward.y < 0.1) {
@@ -826,19 +782,16 @@
         g.alarm = alarm;
         g.threat = threat;
 
-        // ---- your guns, lock, repair
         if (p.alive && h("fire")) shoot(p, dt);
         else if (p.alive) p.gunT = (p.gunT || 0) - dt;
         for (const pl of g.planes) {
             if (pl.missileReloadAt && g.time >= pl.missileReloadAt) [pl.missiles, pl.missileReloadAt] = [pl.maxMissiles, 0];
             if (pl.flareReloadAt && g.time >= pl.flareReloadAt) [pl.flares, pl.flareReloadAt] = [pl.maxFlares, 0];
             if (pl.reloadAt && g.time >= pl.reloadAt) [pl.ammo, pl.reloadAt] = [pl.maxAmmo, 0];
-            // Burning planes lose health until repaired.
             if (pl.alive && pl.burning) {
                 pl.health -= pl.maxHealth * 0.012 * dt;
                 if (pl.health <= 0) destroy(pl, pl.lastHitBy, "gun");
             }
-            // Computer pilots patch themselves up when left alone a while.
             if (pl.alive && !pl.isPlayer && g.time - (pl.lastHitAt || -99) > 10 && pl.health < pl.maxHealth) {
                 pl.health = Math.min(pl.maxHealth, pl.health + pl.maxHealth * 0.04 * dt);
                 if (pl.health > pl.maxHealth * 0.25) pl.burning = false;
@@ -862,7 +815,6 @@
             if (!g.repairText) g.repairText = g.repairCd > 0 ? `🔧 Repair in ${Math.ceil(g.repairCd)}s` : p.health < p.maxHealth ? `🔧 Hold ${keyName("repair")} to repair` : "";
         }
 
-        // ---- computer pilots
         const ctx = {
             planes: g.planes, player: p, world: g.world, combat: g.combat, time: g.time,
             focusPlayer: {easy: 0.2, normal: 0.35, hard: 0.45, ace: 0.5}[g.setup.difficulty] || 0.35,
@@ -874,14 +826,12 @@
             if (e.pilot.wantFire) shoot(e, dt);
             else e.gunT = (e.gunT || 0) - dt;
         }
-        // ---- fly everyone; hitting the ground (or a building) is fatal
         for (const plane of g.planes) {
             if (plane.update(dt, g.world) === "crash") {
                 const by = plane.lastHitBy && g.time - (plane.lastHitAt || 0) < 6 ? plane.lastHitBy : null;
                 destroy(plane, by, by ? "gun" : "crash");
             }
         }
-        // ---- mid-air collisions
         for (let a = 0; a < g.planes.length; a++) for (let b = a + 1; b < g.planes.length; b++) {
             const A = g.planes[a], B = g.planes[b];
             if (A.alive && B.alive && A.pos.distanceTo(B.pos) < (A.radius * A.scale + B.radius * B.scale) * 0.55) {
@@ -891,7 +841,6 @@
         }
         g.combat.update(dt, g.planes, g.camera);
         updateChutes(dt);
-        // ---- respawns
         for (const [plane, t] of g.respawnAt) {
             if (plane.isPlayer) {
                 const left = Math.max(0, Math.ceil(t - g.time));
@@ -904,7 +853,6 @@
                 if (plane.isPlayer) g.chuteCam = null;
             }
         }
-        // ---- time in the air counts for stats and quests
         g.secT = (g.secT || 0) + dt;
         if (g.secT >= 1) {
             g.secT -= 1;
@@ -914,12 +862,10 @@
                 st.planeSeconds[p.planeId] = (st.planeSeconds[p.planeId] || 0) + 1;
             }
         }
-        // ---- blackout in long hard pulls
         if (p.alive && p.g > 8) g.blackout = Math.min(1, g.blackout + (p.g - 8) * 0.06 * dt);
         else g.blackout = Math.max(0, g.blackout - dt * 0.6);
     }
 
-    // ------------------------------------------------------------- camera
 
     function render(dt) {
         const g = fight, p = g.player, cam = g.camera, T = g.THREE;
@@ -929,13 +875,10 @@
             const yaw = g.look.yaw + (lookBack ? Math.PI : 0);
             const look = new T.Quaternion().setFromEuler(new T.Euler(g.look.pitch, yaw, 0, "YXZ"));
             if (g.view === "cockpit") {
-                // In the seat: the camera is your head, turning with the plane.
                 cam.position.copy(p.eye).applyQuaternion(p.quat).add(p.pos);
                 cam.quaternion.copy(p.quat).multiply(look);
-                // G pushes your head down a little.
                 cam.position.addScaledVector(p.up, -Math.min(0.15, Math.max(0, p.g - 1) * 0.015));
             } else {
-                // Chase camera: lags a little behind the plane's turns.
                 if (!g.camInit) {
                     g.camQuat.copy(p.quat);
                     g.camInit = true;
@@ -945,13 +888,11 @@
                 const offset = new T.Vector3(0, 6 * p.scale + 2, dist).applyQuaternion(q);
                 cam.position.copy(p.pos).add(offset);
                 cam.quaternion.copy(q);
-                // Look slightly above the plane so it sits low on the screen.
                 cam.rotateX(-0.06);
             }
             cam.fov = (setting("dfFov") || 72) + 8 * Math.min(1.2, p.speed / p.topSpeed) + (p.boosting ? 6 : 0);
         } else {
             deadView = true;
-            // Killcam: look at whoever got you, then the parachute or the wreck.
             const kc = g.killcam && g.time < g.killcam.until && g.killcam.target.alive ? g.killcam.target : null;
             const chute = g.chuteCam && g.chutes.includes(g.chuteCam) ? g.chuteCam.mesh : null;
             const focus = kc ? kc.pos : chute ? chute.position : g.lastDeathPos || p.pos;
@@ -962,7 +903,6 @@
             cam.fov = 55;
         }
         if (p.alive) g.lastDeathPos = p.pos.clone();
-        // Shake: hits, explosions, firing.
         if (g.shake > 0.001 && setting("dfShake") !== false) {
             const s = g.shake * 0.02;
             cam.rotateX((Math.random() - 0.5) * s);
@@ -975,7 +915,6 @@
         if (g.post) g.post.render(g.scene, cam, dt);
         else g.renderer.render(g.scene, cam);
 
-        // Lead indicator: where to aim at the target nearest your gunsight.
         let lead = null;
         if (p.alive) {
             const t = g.lock.target || nearestAhead();
@@ -1061,10 +1000,8 @@
         fight = null;
     }
 
-    // ------------------------------------------------------------- lobby
 
     function init() {
-        // PLAY with "Air Battle" chosen opens the deploy screen instead of the 2D activity.
         document.addEventListener("submit", ev => {
             const form = ev.target;
             if (!form || form.id !== "activity") return;
@@ -1084,7 +1021,6 @@
     D.start = start;
     D.stop = stop;
     D.state = () => fight;
-    // For automated tests: run the match for some seconds without drawing.
     D.advance = seconds => {
         for (let t = 0; fight && t < seconds; t += 1 / 60) step(1 / 60);
     };

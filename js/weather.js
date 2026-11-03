@@ -1,7 +1,3 @@
-// Weather: every match rolls clear skies, rain, fog or a thunderstorm (snow on
-// the Arctic map, a sandstorm instead of fog in the Desert). Online, everyone
-// gets the host's weather. It's drawn over the world every frame and doesn't
-// change how planes fly.
 window.BitWeather = (function () {
     const CHANCES = [["clear", 0.45], ["rain", 0.2], ["fog", 0.15], ["storm", 0.2]];
     const TYPES = ["clear", "rain", "fog", "storm"];
@@ -38,19 +34,16 @@ window.BitWeather = (function () {
         nextBolt = performance.now() + 3000 + Math.random() * 5000;
     }
 
-    // A match starts: the host's weather when we joined one, otherwise a new roll.
     function start(map) {
         set(forced || roll(), map);
         forced = null;
         return type;
     }
 
-    // Online guests: use this weather for the next start().
     function force(t) {
         forced = TYPES.includes(t) ? t : null;
     }
 
-    // ---------------------------------------------------------------- drawing
 
     function makeDrops(w, h, count) {
         drops = [];
@@ -72,7 +65,6 @@ window.BitWeather = (function () {
             ctx.beginPath();
         }
         for (const d of drops) {
-            // Move with the world (camera) so the rain stays put while you fly through it.
             d.x += wind * d.s * dt - dx;
             d.y += fall * d.s * dt - dy;
             if (snow) d.x += Math.sin(time * 1.5 + d.p) * 12 * dt;
@@ -94,7 +86,6 @@ window.BitWeather = (function () {
         ctx.save();
         ctx.fillStyle = `rgba(${base},${sand ? 0.28 : 0.3})`;
         ctx.fillRect(0, 0, w, h);
-        // Slow drifting bands so the fog moves.
         for (let i = 0; i < 3; i++) {
             const y = h * (0.2 + 0.3 * i) + Math.sin(time * 0.3 + i * 2) * 40;
             const g = ctx.createLinearGradient(0, y - 90, 0, y + 90);
@@ -138,7 +129,6 @@ window.BitWeather = (function () {
         flash -= dt * 2.5;
     }
 
-    // Called after each frame is drawn. cam has width, height, offsetX, offsetY.
     function draw(ctx, cam, world, dt) {
         if (type === "clear" || !ctx || !cam) return;
         dt = Math.min(dt || 0, 0.1);
@@ -146,7 +136,6 @@ window.BitWeather = (function () {
         const w = cam.width, h = cam.height;
         const dx = lastCam ? cam.offsetX - lastCam.x : 0, dy = lastCam ? cam.offsetY - lastCam.y : 0;
         lastCam = {x: cam.offsetX, y: cam.offsetY};
-        // A big jump means a respawn or the world wrapping around: don't streak.
         const jump = Math.abs(dx) > 300 || Math.abs(dy) > 300;
         if (type === "storm") {
             ctx.save();

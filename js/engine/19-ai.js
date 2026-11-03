@@ -1,4 +1,3 @@
-// Computer pilots.
 BitModules[19] = function (M, j, t) {
     "use strict";
     (t.d(j, "a", function () {
@@ -73,7 +72,6 @@ BitModules[19] = function (M, j, t) {
                 }
                 const T = j.hasPlane();
                 if (T) {
-                    // Drop flares when a missile is closing in (jets that carry them).
                     if (T.flares > 0 && !(T.flareUntil > performance.now()))
                         for (let t of M.worldEntities)
                             if (t instanceof e.a && t.target === T && Object(a.q)(t.position, T.position) < 450) {

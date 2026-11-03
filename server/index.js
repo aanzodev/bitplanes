@@ -1,45 +1,3 @@
-// Relay server for online play. Players connect to it over a normal secure
-// WebSocket (port 443 when hosted), which school and office networks allow,
-// instead of connecting straight to each other. The host's browser still runs
-// the activity; this server only passes messages between the host and guests.
-//
-// Messages (JSON, one per WebSocket frame):
-//   client -> server  {op: "host", id}       open a room (id = room name)
-//                     {op: "join", id}       join a room
-//                     {op: "to", to, d}      host -> one guest
-//                     {op: "up", d}          guest -> host
-//                     {op: "kick", to}       host drops a guest
-//                     {op: "bye"}            host closes the room on purpose
-//                     {op: "find"}           Multiplayer: which public match to join?
-//                     {op: "list"}           Multiplayer server browser: all public matches
-//                     {op: "meta", d}        host: room info for the browser (name, players, ping…)
-//                     {op: "ping", t}        latency check, answered with {op: "pong", t}
-//   Friends and the global leaderboard (version 5, see social.js):
-//                     {op: "hi", uid, name, level, xp, kills, ...}  who you are (uid is secret)
-//                     {op: "where", room, mode}                      the room you are in now
-//                     {op: "friends", codes}                         your friends' status
-//                     {op: "fadd" | "faccept" | "fdecline" | "fremove", code}
-//                     {op: "invite", code}                            invite a friend to your room
-//                     {op: "lb", by}                                  top 50 by xp | kills | dfKills | streak
-//   (a host can add pub: true to "host" to list its room for Multiplayer)
-//   server -> client  {op: "hello", v}       on connect: server version (2 = light format below)
-//                     {op: "hosted"}         room is open
-//                     {op: "joined"}         joined the room
-//                     {op: "conn", from}     (host) a guest joined
-//                     {op: "data", from, d}  a message (from = guest id for the host)
-//                     {op: "gone", from}     (host) a guest left
-//                     {op: "closed"}         (guest) the host left
-//                     {op: "list", rooms}    answer to "list": [{id, players, meta}]
-//                     {op: "found", id}      answer to "find": a public room id, or null =
-//                                            host a new one (retry: ms = ask again soon)
-//                     {op: "err", type}      "unavailable-id" | "peer-unavailable" | "bad-request" | "full"
-//
-// Activity data uses a lighter format the server forwards without decoding
-// (much less work for a small free server):
-//   host  -> server   "T<guestId>\n<json>"   to one guest
-//   guest -> server   "U<json>"               to the host
-//   server -> guest   "D<json>"
-//   server -> host    "D<guestId>\n<json>"
 const http = require("http");
 const social = require("./social");
 const {WebSocketServer} = require("ws");
@@ -47,12 +5,12 @@ const {WebSocketServer} = require("ws");
 const PORT = Number(process.env.PORT) || 8787;
 const MAX_ROOMS = 1000;
 const MAX_GUESTS = 16;
-const HOST_GRACE_MS = 15000; // keep a room this long while its host reconnects
+const HOST_GRACE_MS = 15000;
 const ID = /^[A-Za-z0-9_-]{1,64}$/;
-const MAX_PUBLIC_PLAYERS = 10; // real people (host + guests) in one Multiplayer match
-let lastHostOffer = 0; // when we last told someone to host a new public match
+const MAX_PUBLIC_PLAYERS = 10;
+let lastHostOffer = 0;
 
-const rooms = new Map(); // id -> {host, guests: Map<guestId, socket>, nextId, timer}
+const rooms = new Map();
 
 function send(ws, msg) {
     if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
@@ -71,7 +29,6 @@ function closeRoom(id) {
 }
 
 function onMessage(ws, text) {
-    // Fast path: forward activity data as is.
     const kind = text[0];
     if (kind === "T" || kind === "U") {
         const room = ws.room && rooms.get(ws.room);
@@ -106,21 +63,17 @@ function onMessage(ws, text) {
 
     if (msg.op === "meta") {
         const room = ws.isHost && rooms.get(ws.room);
-        // Only small, plain room info is kept.
         if (room && msg.d && typeof msg.d === "object" && JSON.stringify(msg.d).length < 2000) room.meta = msg.d;
         return;
     }
 
     if (msg.op === "find") {
-        // The fullest public match that still has room.
         let best = null;
         for (const [id, room] of rooms) {
             if (!room.public || !room.host || room.guests.size + 1 >= MAX_PUBLIC_PLAYERS) continue;
             if (!best || room.guests.size > best.room.guests.size) best = {id, room};
         }
         if (best) return send(ws, {op: "found", id: best.id});
-        // Nobody hosting yet. If someone was just told to host, wait for them
-        // instead of starting a second empty match.
         if (Date.now() - lastHostOffer < 6000) return send(ws, {op: "found", id: null, retry: 1500});
         lastHostOffer = Date.now();
         return send(ws, {op: "found", id: null});
@@ -131,7 +84,6 @@ function onMessage(ws, text) {
         let room = rooms.get(msg.id);
         if (room && room.host) return send(ws, {op: "err", type: "unavailable-id"});
         if (room) {
-            // The host is back after a short disconnect: same room, same guests.
             clearTimeout(room.timer);
             room.host = ws;
         } else {
@@ -193,7 +145,6 @@ function onClose(ws) {
 }
 
 const server = http.createServer((req, res) => {
-    // Health check page (Render and you can open it to see the server is up).
     res.writeHead(200, {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"});
     const pub = [...rooms.values()].filter(r => r.public).length;
     res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size} (${pub} Multiplayer). ${social.summary()}\n`);
@@ -201,8 +152,7 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({server, maxPayload: 512 * 1024});
 wss.on("connection", ws => {
-    // Tells browsers this server understands the light "T"/"U" data format.
-    send(ws, {op: "hello", v: 5}); // 3 = Multiplayer matchmaking, 4 = server browser, 5 = friends + leaderboard
+    send(ws, {op: "hello", v: 5});
     ws.alive = true;
     ws.on("pong", () => (ws.alive = true));
     ws.on("message", data => onMessage(ws, data.toString()));
@@ -210,7 +160,6 @@ wss.on("connection", ws => {
     ws.on("error", () => {});
 });
 
-// Drop connections that stopped answering, and keep idle ones from timing out.
 setInterval(() => {
     for (const ws of wss.clients) {
         if (!ws.alive) {

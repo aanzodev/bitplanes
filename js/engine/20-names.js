@@ -1,4 +1,3 @@
-// Names for computer pilots.
 BitModules[20] = function (M, j, t) {
     "use strict";
     var L = t(3);

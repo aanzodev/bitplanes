@@ -1,24 +1,19 @@
-// Online play, guest side: fly the guest's own plane right here in the
-// browser so turning, thrust and bullets react instantly, instead of waiting
-// for the host. The guest tells the host where its plane is ~30 times a
-// second; the host still decides hits, damage and deaths, and when it says
-// the plane is gone (shot down, crashed, ejected) the local copy goes too.
 (function () {
     const O = window.BitOnline;
     const {engine, engineClasses, SNAPSHOT_MS} = O;
     const STEP = 1 / 60;
 
     const p = {
-        view: null,        // the world the guest sees (host snapshots)
-        sim: null,         // a small world that only holds our plane and its bullets
-        plane: null,       // our locally simulated plane
-        hostId: 0,         // the host's id for the plane we are flying
+        view: null,
+        sim: null,
+        plane: null,
+        hostId: 0,
         acc: 0,
         last: 0,
         sentAt: 0,
         input: {},
         send: null,
-        shown: new Set(),  // local objects currently drawn in the view world
+        shown: new Set(),
     };
 
     function start(view, send) {
@@ -26,7 +21,7 @@
         const sim = new e.World({width: view.width, height: view.height, ground: 0, stratosphere: view.stratosphere});
         sim.ground = view.ground;
         sim.participants = [];
-        sim.effects = view.effects; // smoke and explosions show up in the guest's view
+        sim.effects = view.effects;
         Object.assign(p, {view, sim, send, last: performance.now()});
         setInterval(controlTick, e.consts.c);
     }
@@ -35,7 +30,6 @@
         return p.plane && p.sim.has(p.plane) ? p.plane : undefined;
     }
 
-    // Same rules as the keyboard controls in single player.
     function controlTick() {
         const plane = flying();
         if (!plane) return;
@@ -56,7 +50,6 @@
         const before = p.input;
         p.input = input;
         steer();
-        // React to a fresh press right away instead of on the next control tick.
         const plane = flying(), e = engine();
         if (!plane) return;
         if (input.fire && !before.fire) e.controls.d(p.sim, plane);
@@ -65,18 +58,14 @@
         e.cockpit(plane);
     }
 
-    // Called with every snapshot: start, keep or stop flying locally.
-    // ghost: the host's copy of our current object; hud: host's cockpit numbers.
     function sync(ghost, hud) {
         const isPlane = ghost && ghost.constructor === engineClasses().Plane;
         if (!isPlane) return stop();
         if (ghost.netId !== p.hostId) begin(ghost, hud);
         const plane = flying();
         if (plane && hud) {
-            // Missiles and flares are fired by the host; show its counts.
             [plane.missiles, plane.maxMissiles] = [hud[2], hud[3]];
             [plane.flares, plane.maxFlares] = [hud[6], hud[7]];
-            // Health comes from the host, which decides hits.
             if (typeof hud[9] === "number") [plane.life, plane.maxLife] = [hud[9], hud[10]];
         }
     }
@@ -93,8 +82,6 @@
         plane.move(e.vec(last[1], last[2]));
         plane.angle = last[3];
         plane.landed = !!(hud && hud[8]);
-        // Apply this browser's Hangar plane and upgrades, then detach the
-        // temporary player so local crashes don't write to the kill log.
         plane.player = {isHuman: true, loadoutColor: color};
         window.BitShop && window.BitShop.apply(plane);
         plane.player = undefined;
@@ -102,7 +89,7 @@
         p.plane = plane;
         p.hostId = ghost.netId;
         p.ghost = ghost;
-        p.view.worldEntities.delete(ghost); // draw our local plane instead of the host's copy
+        p.view.worldEntities.delete(ghost);
         p.acc = 0;
         p.last = performance.now();
     }
@@ -110,18 +97,14 @@
     function stop() {
         if (p.plane) p.sim.delete(p.plane);
         p.plane = null;
-        // Show the host's copy again (for example after ejecting, the empty plane keeps flying).
         if (p.ghost && p.ghost.goneAt === undefined) p.view.add(p.ghost);
         p.ghost = null;
         p.hostId = 0;
     }
 
-    // Called every frame by the guest's render loop. Returns how far we are
-    // between the last physics step and the next (0..1), for smooth drawing.
     function step() {
         if (!p.sim) return 1;
         const e = engine(), now = performance.now();
-        // Multiplayer lobby and results: everyone waits, nobody flies.
         if (O.match && O.match.frozen()) {
             p.last = now;
             p.acc = 0;
@@ -132,7 +115,6 @@
         const wasFlying = flying();
         for (; p.acc >= STEP; p.acc -= STEP) e.physicsStep(p.sim, STEP);
 
-        // Mirror our plane and bullets into the world the guest sees.
         for (const o of [...p.sim.worldEntities, ...p.sim.projectiles]) {
             if (!p.shown.has(o)) {
                 p.shown.add(o);
@@ -148,7 +130,7 @@
         }
 
         const plane = flying();
-        if (wasFlying && !plane) report(wasFlying); // crashed locally: tell the host where
+        if (wasFlying && !plane) report(wasFlying);
         else if (plane && now - p.sentAt >= SNAPSHOT_MS - 4) report(plane);
         return p.acc / STEP;
     }

@@ -1,4 +1,3 @@
-// Clouds, ground decorations and cows.
 BitModules[18] = function (M, j, t) {
     "use strict";
     (t.d(j, "b", function () {

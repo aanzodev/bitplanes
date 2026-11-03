@@ -1,4 +1,3 @@
-// Vector math helpers.
 BitModules[0] = function (M, j, t) {
     "use strict";
 

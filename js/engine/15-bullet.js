@@ -1,4 +1,3 @@
-// Bullet body.
 BitModules[15] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

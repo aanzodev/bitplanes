@@ -1,4 +1,3 @@
-// Sprite class and the sprite sheet used by the renderer.
 BitModules[2] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

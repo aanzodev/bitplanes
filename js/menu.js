@@ -1,5 +1,3 @@
-// The lobby (start screen): your plane on its pad, coins and profile up top,
-// the mode card with PLAY, and the Controls / Servers / friends pop-ups.
 (function () {
     const MODES = {
         "death-match": {name: "Competitive Flight", desc: "Everyone against everyone"},
@@ -8,7 +6,6 @@
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
 
-    // 950 -> "950", 1500 -> "1.5K", 100000 -> "100K", 2500000 -> "2.5M"
     function short(n) {
         n = Math.floor(n || 0);
         const units = [[1e12, "T"], [1e9, "B"], [1e6, "M"], [1e3, "K"]];
@@ -34,14 +31,12 @@
             el.textContent = short(st.coins);
             el.parentElement.title = st.coins.toLocaleString() + " credits";
         });
-        // Your plane: the chip under the pad (opens the Hangar).
         const chip = document.querySelector(".lobby-plane-chip");
         if (chip) {
             const img = planeImage(p);
             if (chip.querySelector("img").src !== img) chip.querySelector("img").src = img;
             chip.querySelector("span").textContent = p.name;
         }
-        // Your pilot: on the pad and in the profile circle.
         const S = window.BitSkins;
         if (S) {
             const skin = S.selected(), r = S.rarity[skin.rarity];
@@ -54,7 +49,6 @@
         }
     }
 
-    // The mode card cycles through the (hidden) mode radios.
     function radios() {
         return [...document.querySelectorAll('input[name="mode"]')];
     }
@@ -78,7 +72,6 @@
         showMode();
     }
 
-    // The Controls pop-up lists your current keys (change them in Settings).
     function renderControls() {
         const S = window.BitSettings, table = document.querySelector(".controls-list");
         if (!S || !table) return;
@@ -102,7 +95,6 @@
         if (window.BitSkins) window.BitSkins.onChange(update);
         update();
         showMode();
-        // The Multiplayer link back after a host leaves (?multiplayer=1) checks a radio later.
         setInterval(showMode, 500);
 
         document.querySelector(".mode-switch").addEventListener("click", nextMode);
@@ -115,13 +107,11 @@
         document.querySelectorAll(".controls-pop, .friends").forEach(el => el.addEventListener("click", ev => {
             if (ev.target === el || ev.target.closest(".close-panel")) el.hidden = true;
         }));
-        // Starting a private room or joining one closes the friends pop-up.
         document.querySelectorAll(".host-activity, .join-activity").forEach(b => b.addEventListener("click", () => popup(".friends", false)));
         document.addEventListener("keydown", ev => {
             if (ev.key === "Escape") ["controls-pop", "friends"].forEach(c => popup("." + c, false));
         });
 
-        // Name: click it to edit; Enter or clicking away saves (Enter must not start a match).
         const nick = document.querySelector('input[name="nickname"]');
         nick.addEventListener("keydown", ev => {
             if (ev.key === "Enter") {

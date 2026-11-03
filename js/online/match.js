@@ -1,22 +1,15 @@
-// Multiplayer mode: public matches with real people, found automatically
-// through the relay server. One player's browser hosts (like "Host a room")
-// and everyone else joins it. Matches loop:
-//   lobby (15 s, everyone parked) -> match (10 min) -> top 5 (10 s) -> lobby…
-// Real people are tagged [PLAYER] and bots [BOTS] (Multiplayer only).
 (function () {
     const O = window.BitOnline;
     const LOBBY_MS = 15000, MATCH_MS = 10 * 60 * 1000, RESULTS_MS = 10000;
     const TAG_PLAYER = "[PLAYER] ", TAG_BOT = "[BOTS] ";
     const PHASES = ["lobby", "playing", "results"];
-    const ROOM_SIZE = 10; // planes per room: real people plus bots
-    const ROOM_HUMANS = 10; // a new room starts only when every room has 10 real people
+    const ROOM_SIZE = 10;
+    const ROOM_HUMANS = 10;
 
     const m = {phase: null, endsAt: 0, results: [], world: null};
     let timerEl, overlayEl;
 
-    // --------------------------------------------------------- matchmaking
 
-    // Talk to the relay server: resolves {ws, v (server version), rtt (ms)}.
     function connect() {
         const url = O.serverUrl();
         return new Promise((resolve, reject) => {
@@ -66,7 +59,6 @@
         }
     }
 
-    // Send a request and wait for the answer with the given op.
     function ask(ws, req, op) {
         return new Promise(resolve => {
             ws.addEventListener("message", function on(ev) {
@@ -79,8 +71,6 @@
         });
     }
 
-    // Public matches with a free spot, best first: lowest estimated ping
-    // (yours to the server + the host's), then the fuller match.
     async function listRooms(ws, rtt) {
         const {rooms} = await ask(ws, {op: "list"}, "list");
         const at = performance.now();
@@ -102,8 +92,6 @@
         O.startHost();
     }
 
-    // Start (Multiplayer): join the best public match, or host a new one when
-    // every match has 10 real people.
     async function quickMatch(tries = 0) {
         if (O.role) return;
         O.mode = "multiplayer";
@@ -122,7 +110,6 @@
                 open.sort((a, b) => (a.ping || 0) - (b.ping || 0) || b.players - a.players);
                 if (open.length) return joinRoom(open[0].id);
             }
-            // Nobody to join: ask the server, which makes sure only one new match starts.
             const msg = await ask(ws, {op: "find"}, "found");
             if (msg.id) return joinRoom(msg.id);
             if (msg.retry && tries < 4) return setTimeout(() => quickMatch(tries + 1), msg.retry);
@@ -132,7 +119,6 @@
         }
     }
 
-    // -------------------------------------------------------- server browser
 
     let browser, browserLink = null;
 
@@ -232,7 +218,6 @@
         document.addEventListener("keydown", ev => ev.key === "Escape" && (browser.hidden = true));
     }
 
-    // ---------------------------------------------------------------- host
 
     function isBot(p) {
         return !p.isHuman && !p.remote;
@@ -243,7 +228,6 @@
         p.name = (isBot(p) ? TAG_BOT : TAG_PLAYER) + name;
     }
 
-    // Called by host.js once the death match world exists.
     function onHostWorld(world) {
         if (O.mode !== "multiplayer") return;
         m.world = world;
@@ -255,8 +239,6 @@
         publishMeta();
     }
 
-    // Every room has 10 planes: each real person takes a bot's place, and a
-    // bot comes back when someone leaves.
     function fitBots() {
         const world = m.world;
         if (!world) return;
@@ -300,7 +282,6 @@
         tag(p);
     }
 
-    // Room info for the server browser (sent to the relay server).
     function publishMeta() {
         const world = m.world, peer = O.hostState && O.hostState.peer;
         if (!world || !peer || !peer.setMeta) return;
@@ -336,7 +317,6 @@
         } else startLobby();
     }
 
-    // New map and weather, scores back to 0, everyone parked in a new plane.
     function startLobby() {
         const world = m.world, e = O.engine(), {Plane, vec, consts} = e;
         const C = O.engineClasses();
@@ -366,14 +346,13 @@
             world.terrainEntities.clear();
             world.atmosphere.length = 0;
             e.decorate(world);
-            window.BitMaps.announce(world.map); // also rolls the weather
+            window.BitMaps.announce(world.map);
         }
         O.hostBroadcast({t: "map", map: world.map && world.map.id, weather: window.BitWeather ? window.BitWeather.current() : "clear"});
         m.endsAt = performance.now() + LOBBY_MS;
         publishMeta();
     }
 
-    // A player's plane as [color, skin, pattern] and its name, for the top 5.
     function planeOf(p) {
         const plane = p.hasPlane() || p.lastPlane;
         if (plane) p.lastPlane = plane;
@@ -389,13 +368,11 @@
             .map(p => Object.assign({name: p.name, kills: p.kills, deaths: p.deaths}, planeOf(p)));
     }
 
-    // Sent with every snapshot: [phase, ms left].
     function wire() {
         if (!m.phase) return undefined;
         return [PHASES.indexOf(m.phase), Math.max(0, Math.round(m.endsAt - performance.now()))];
     }
 
-    // --------------------------------------------------------------- guest
 
     function onGuestState(w) {
         if (!Array.isArray(w)) return;
@@ -420,7 +397,6 @@
         if (Array.isArray(rows)) m.results = rows.slice(0, 5);
     }
 
-    // ------------------------------------------------------------------ UI
 
     function clock(ms) {
         const s = Math.ceil(ms / 1000);
@@ -444,8 +420,6 @@
     function render() {
         const ui = document.querySelector(".ui");
         const playing = !!ui && ui.style.display === "block";
-        // Bottom left timer: Multiplayer counts the match down; other modes
-        // show how long you've been flying.
         if (playing && !m.phase) {
             if (!m.localStart) m.localStart = performance.now();
             const t = Math.floor((performance.now() - m.localStart) / 1000);
@@ -505,7 +479,6 @@
         setInterval(render, 200);
         const srv = document.querySelector(".open-servers");
         if (srv) srv.addEventListener("click", openBrowser);
-        // Start screen: the Multiplayer mode starts matchmaking instead of a local match.
         document.addEventListener("submit", ev => {
             const form = ev.target;
             if (!form || form.id !== "activity") return;
@@ -515,7 +488,6 @@
             ev.stopImmediatePropagation();
             quickMatch();
         }, true);
-        // After a host leaves, guests come back here and look for a new match.
         if (new URLSearchParams(location.search).get("multiplayer") === "1") {
             const radio = document.querySelector('input[name="mode"][value="multiplayer"]');
             if (radio) radio.checked = true;
@@ -529,7 +501,6 @@
     O.match = {
         quickMatch, onHostWorld, wire, onGuestState, onGuestMap, onGuestResults, tag, fitBots, openBrowser,
         frozen: () => !!m.phase && m.phase !== "playing",
-        // Console: end the current phase now (the host decides).
         skip: () => {
             if (!m.world) return false;
             m.endsAt = 0;

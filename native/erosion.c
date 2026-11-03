@@ -1,21 +1,9 @@
-// Hydraulic erosion for the Air Battle terrain, compiled to WebAssembly
-// (js/airbattle/erosion.wasm, built by native/build.sh).
-//
-// Thousands of raindrops roll down the heightmap. Each one picks up soil
-// where it speeds up downhill and drops it where it slows down or the
-// ground flattens out, then evaporates. The result is what real mountains
-// look like: gullies and ravines cut into the slopes, sharp ridges between
-// them, and smooth valley floors and fans of sediment below.
-//
-// No C library: everything here is plain arithmetic, so the module is tiny
-// and needs no imports.
 
 typedef unsigned int u32;
 
 static u32 rng;
 
 static float rnd(void) {
-    // xorshift32: a fast, good enough random number in [0, 1).
     rng ^= rng << 13;
     rng ^= rng >> 17;
     rng ^= rng << 5;
@@ -34,8 +22,6 @@ static inline float fminf_(float a, float b) {
     return a < b ? a : b;
 }
 
-// A tiny bump allocator over the module's memory, so JavaScript can ask
-// for a buffer to copy the heightmap into.
 extern unsigned char __heap_base;
 static unsigned long heap_top = 0;
 
@@ -58,7 +44,6 @@ void reset(void) {
     heap_top = 0;
 }
 
-// Height and slope at a point between grid points (bilinear).
 static void sample(const float *h, int w, float x, float y, float *height, float *gx, float *gy) {
     int ix = (int)x, iy = (int)y;
     float u = x - ix, v = y - iy;
@@ -69,7 +54,6 @@ static void sample(const float *h, int w, float x, float y, float *height, float
     *height = a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
 }
 
-// Takes soil from around a point (a 3x3 brush, weighted toward the middle).
 static void take(float *h, int w, int x, int y, float amount) {
     static const float k[9] = {0.05f, 0.1f, 0.05f, 0.1f, 0.4f, 0.1f, 0.05f, 0.1f, 0.05f};
     int n = 0;
@@ -81,8 +65,6 @@ static void take(float *h, int w, int x, int y, float amount) {
         }
 }
 
-// h: w * w heights, in grid cells (meters divided by the grid spacing).
-// strength 0..1 scales how much soil moves.
 __attribute__((export_name("erode")))
 void erode(float *h, int w, int drops, u32 seed, float strength, float seaLevel) {
     const float inertia = 0.05f, capacityK = 4.0f, minCapacity = 0.01f;
@@ -97,7 +79,6 @@ void erode(float *h, int w, int drops, u32 seed, float strength, float seaLevel)
             float u = x - ix, v = y - iy;
             float height, gx, gy;
             sample(h, w, x, y, &height, &gx, &gy);
-            // In the sea, the drop stops and leaves its load.
             if (height < seaLevel) {
                 if (sediment > 0) {
                     int i = iy * w + ix;
@@ -105,13 +86,11 @@ void erode(float *h, int w, int drops, u32 seed, float strength, float seaLevel)
                 }
                 break;
             }
-            // Roll downhill, keeping a little of the old direction.
             dx = dx * inertia - gx * (1 - inertia);
             dy = dy * inertia - gy * (1 - inertia);
             float len = fsqrt(dx * dx + dy * dy);
             if (len < 1e-6f) {
                 float a = rnd() * 6.2831853f;
-                // A cheap direction from the random angle (no trig library).
                 dx = a < 3.14159f ? 1 - a / 1.5708f : -3 + a / 1.5708f;
                 dy = 1 - (dx < 0 ? -dx : dx);
                 len = fsqrt(dx * dx + dy * dy);
@@ -126,7 +105,6 @@ void erode(float *h, int w, int drops, u32 seed, float strength, float seaLevel)
             float capacity = fmaxf_(-drop * speed * water * capacityK, minCapacity);
             int i = iy * w + ix;
             if (sediment > capacity || drop > 0) {
-                // Uphill or overloaded: drop soil (fill the pit when going uphill).
                 float amount = drop > 0 ? fminf_(drop, sediment) : (sediment - capacity) * depositK;
                 sediment -= amount;
                 h[i] += amount * (1 - u) * (1 - v);
@@ -134,7 +112,6 @@ void erode(float *h, int w, int drops, u32 seed, float strength, float seaLevel)
                 h[i + w] += amount * (1 - u) * v;
                 h[i + w + 1] += amount * u * v;
             } else {
-                // Downhill with room to carry more: dig, never deeper than the drop.
                 float amount = fminf_((capacity - sediment) * erodeK, -drop);
                 take(h, w, ix, iy, amount);
                 sediment += amount;
@@ -148,8 +125,6 @@ void erode(float *h, int w, int drops, u32 seed, float strength, float seaLevel)
     }
 }
 
-// Softens sharp single-cell spikes left behind (one light blur pass,
-// keeping 70% of the original).
 __attribute__((export_name("smooth")))
 void smooth(float *h, float *tmp, int w) {
     for (int y = 1; y < w - 1; y++)

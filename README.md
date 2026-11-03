@@ -162,7 +162,7 @@ when they pass close by. Countermeasures still fool them, like any other guided 
 ◆ Exclusive planes have a gold border in Aircraft Selection.
 
 ★ Special jets have a black border in Aircraft Selection and carry countermeasures: press
-<kbd>Q</kbd> and guided missiles chasing you turn toward the countermeasures and explode on them. Each press fires 16 countermeasures in pairs over about a second, and
+<kbd>Q</kbd> and guided missiles chasing you turn toward the countermeasures and explode on them. Each press fires 24 countermeasures in quick pairs, all out in under a second, and
 they burn for 4 to 5 seconds (about 6 in Flight Sessions), so guided missiles stay fooled
 longer.
 
@@ -576,5 +576,5 @@ render.yaml             One-click deploy of the relay server on Render
 
 The engine files come from the original minified webpack build of
 [antonmedv/bit-planes](https://github.com/antonmedv/bit-planes), split into
-modules and formatted, so variable names are short. Each file starts with a
-comment saying what it does.
+modules and formatted, so variable names are short. The code has no comments;
+the project layout above says what each file does.

@@ -1,4 +1,3 @@
-// Start screen and activity modes. Entry point.
 BitModules[87] = function (M, j, t) {
     "use strict";
     t.r(j);

@@ -1,4 +1,3 @@
-// Particle effects: smoke, explosions, ground hits.
 BitModules[6] = function (M, j, t) {
     "use strict";
     (t.d(j, "g", function () {
@@ -28,8 +27,6 @@ BitModules[6] = function (M, j, t) {
         u = t(3),
         e = t(0);
 
-    // A damaged plane trails smoke: more and darker the more damage it has
-    // taken, and badly damaged planes burn with flames too.
     function I(M, j) {
         const t = Object(u.g)(),
             max = j.maxLife || L.h,
@@ -43,7 +40,6 @@ BitModules[6] = function (M, j, t) {
                 (s.scale = 1 + 0.5 * Math.random() + 0.7 * dmg),
                 (s.opacity = 0.1 + 0.65 * dmg + 0.2 * Math.random()),
                 M.effects.add(s));
-            // Half its armor gone: flames. Three quarters: big flames.
             for (let k = dmg >= 0.75 ? 2 : dmg >= 0.5 ? 1 : 0; k > 0; k--) {
                 const f = new N.f(i.b.flare);
                 ((f.position = Object(e.a)(j.position, Object(e.e)(j.forward, -6 - 6 * Math.random()), Object(e.s)(4 * Math.random() - 2, 4 * Math.random() - 2))),

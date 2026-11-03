@@ -1,29 +1,14 @@
-// Loads the whole activity from wherever this script is hosted, for example
-// jsDelivr serving the GitHub repo:
-//
-//   <script src="https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js"></script>
-//
-// It reads index.html from the same place, adds its page markup and styles to
-// this page, then loads every script in the same order. So a page with just
-// that one line always runs the latest activity from GitHub (see play.html).
 (function () {
-    // Where this script was loaded from. Some editors add scripts in ways where
-    // document.currentScript is empty, so fall back to searching for it.
     const DEFAULT = "https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js";
     const me = document.currentScript ||
         [...document.querySelectorAll("script[src]")].find(s => /js\/loader\.js(\?.*)?$/.test(s.src));
     let base = ((me && me.src) || DEFAULT).replace(/js\/loader\.js(\?.*)?$/, "");
 
-    // Everything loads from the same place as this script (jsDelivr's copy of
-    // the repo), with no GitHub lookups. jsDelivr refreshes its copy of a
-    // branch like @main within about 12 hours of a push.
 
     function loadOnce(src) {
         return new Promise((resolve, reject) => {
             const s = document.createElement("script");
             s.src = src;
-            // A script can't safely be fetched twice at once, so a slow file is
-            // waited for (and the screen says so) rather than restarted.
             const name = src.replace(/^.*\//, "").replace(/\?.*$/, "");
             const slowTimer = setTimeout(() => slow(`Slow connection: still downloading ${name}…`), 8000);
             s.onload = () => {
@@ -41,8 +26,6 @@
         });
     }
 
-    // A download can fail now and then (a busy CDN, a dropped connection):
-    // try each file up to three times before giving up.
     async function loadScript(src) {
         for (let attempt = 1; ; attempt++) {
             try {
@@ -55,8 +38,6 @@
         }
     }
 
-    // Files only the Flight Sessions (3D) mode needs. If one of them won't load,
-    // the rest of Bit Planes still starts, with Flight Sessions switched off.
     const OPTIONAL = /js\/airbattle\//;
 
     function dropAirBattle(missing) {
@@ -73,7 +54,6 @@
         if (note) note.textContent = "Flight Sessions (3D) couldn't load here. Bit Planes works as usual.";
     }
 
-    // The page body may not exist yet if this script is in <head>.
     function bodyReady() {
         if (document.body) return Promise.resolve();
         return new Promise(r => document.addEventListener("DOMContentLoaded", r, {once: true}));
@@ -85,7 +65,6 @@
         p.style.cssText = "font: bold 16px sans-serif; padding: 20px; color: #b3261e";
         const msg = err && err.name === "AbortError" ? "the download took too long" : (err && err.message) || String(err);
         p.textContent = "Bit Planes could not load: " + msg;
-        // Show it on the loading screen if that's up, so the error isn't hidden behind it.
         const box = document.querySelector(".bit-load-box");
         if (box) {
             p.style.padding = "12px 0 0";
@@ -94,10 +73,6 @@
         } else (document.body || document.documentElement).appendChild(p);
     }
 
-    // Until every script has loaded, hide the activity and show a loading
-    // screen with real progress: a checklist of the stages, which file it's
-    // on, how long it has taken and roughly how long is left (clicking Start
-    // too early would just reload the page).
     const TIPS = [
         "Press <b>Space</b> to fire and <b>X</b> for a guided missile.",
         "Press <b>Q</b> to drop countermeasures when a guided missile is on your tail.",
@@ -191,14 +166,12 @@
         const $ = c => el.querySelector(c);
         let pct = 0;
         const began = performance.now();
-        // Elapsed time, and an estimate of what's left once there's enough to go on.
         const clock = setInterval(() => {
             const secs = (performance.now() - began) / 1000;
             $(".bit-load-elapsed").textContent = `${Math.floor(secs)} s`;
             const left = pct >= 15 && pct < 100 ? secs * (100 - pct) / pct : 0;
             $(".bit-load-left").textContent = left ? `about ${left < 60 ? Math.max(1, Math.round(left)) + " s" : Math.round(left / 60) + " min"} left` : "";
         }, 250);
-        // A new tip every few seconds.
         let tip = Math.floor(Math.random() * TIPS.length);
         const showTip = () => {
             $(".bit-load-tip").innerHTML = "💡 " + TIPS[tip++ % TIPS.length];
@@ -217,7 +190,6 @@
                 $(".bit-load-step").textContent = text;
                 $(".bit-load-file").textContent = file || "";
             },
-            // Never goes backwards, so a retry doesn't make the bar jump back.
             progress(p) {
                 pct = Math.max(pct, Math.min(100, Math.round(p)));
                 $(".bit-load-fill").style.width = pct + "%";
@@ -225,7 +197,6 @@
                 $(".bit-load-pct").textContent = pct + "%";
                 $(".bit-load-box").setAttribute("aria-valuenow", pct);
             },
-            // stage: "page" | "core" | "air"; state: "active" | "done" | "failed"
             stage(name, state, note) {
                 const li = el.querySelector(`[data-stage="${name}"]`);
                 if (!li) return;
@@ -245,7 +216,6 @@
             ui = null;
             document.documentElement.classList.remove("bit-loading");
             document.removeEventListener("submit", block, true);
-            // Fade out, then remove.
             el.classList.add("bit-load-out");
             setTimeout(() => el.remove(), 380);
         };
@@ -255,7 +225,6 @@
     const progress = p => ui && ui.progress(p);
     const slow = text => ui && ui.slow(text);
 
-    // fetch() that gives up after a while instead of hanging forever.
     async function fetchWithin(url, ms, opts) {
         const ctrl = typeof AbortController === "function" ? new AbortController() : null;
         const timer = ctrl && setTimeout(() => ctrl.abort(), ms);
@@ -269,7 +238,7 @@
     async function start() {
         await bodyReady();
         const done = showLoading();
-        window.BitBase = base; // asset paths (sprites, maps) are resolved against this
+        window.BitBase = base;
         step("Downloading the page…", "index.html");
         stage("page", "active");
         progress(5);
@@ -290,15 +259,12 @@
             if (vp) document.head.appendChild(document.importNode(vp, true));
         }
 
-        // Page markup (start screen, HUD, menus), without index.html's scripts.
-        // Goes straight into <body>, wherever the loader's own script tag sits.
         const before = me && me.parentNode === document.body ? me : null;
         for (const node of [...doc.body.childNodes]) {
             if (node.nodeName === "SCRIPT") continue;
             document.body.insertBefore(document.importNode(node, true), before);
         }
 
-        // The activity's scripts, one after another like in index.html.
         const missing = [];
         const scripts = [...doc.querySelectorAll("script[src]")];
         const total = {core: 0, air: 0}, loaded = {core: 0, air: 0};
@@ -310,7 +276,6 @@
         for (const [i, s] of scripts.entries()) {
             const src = s.getAttribute("src");
             const part = OPTIONAL.test(src) ? "air" : "core";
-            // Once one Flight Sessions file is missing, skip the rest of them.
             if (part === "air" && missing.length) continue;
             stage(part, "active");
             step(`${part === "air" ? "Flight Sessions (3D)" : "Bit Planes"}: file ${i + 1} of ${scripts.length}`,

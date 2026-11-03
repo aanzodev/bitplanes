@@ -1,10 +1,3 @@
-// Air Battle (3D): guns, missiles, flares and everything that burns. Effects
-// use one particle system per blend mode, drawn by a small GLSL shader (soft
-// round sprites that grow, fade and change color), so a big explosion is
-// hundreds of particles in a single draw call.
-//   Bullets: glowing tracers; hits spark, miss into dust or water splashes.
-//   Missiles: chase a locked target (lead pursuit, limited turn, motor burns
-//   out); without a lock they fly straight. Flares fool most missiles.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
     const MAX_BULLETS = 1400;
@@ -41,7 +34,6 @@
             #include <fog_fragment>
         }`;
 
-    // A pool of particles drawn as one THREE.Points.
     function makeParticles(THREE, scene, max, additive) {
         const pos = new Float32Array(max * 3), tint = new Float32Array(max * 3), size = new Float32Array(max), alpha = new Float32Array(max);
         const geo = new THREE.BufferGeometry();
@@ -53,14 +45,13 @@
             vertexShader: PART_VERT, fragmentShader: PART_FRAG, transparent: true, depthWrite: false, fog: !additive,
             blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
             uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {scale: {value: 600}, soft: {value: additive ? 1.6 : 1.1},
-                // Fire, sparks and flares shine brighter than white on High/Ultra, so they glow.
                 boost: {value: additive ? (D.glow || 1) : 1}}]),
         });
         const points = new THREE.Points(geo, mat);
         points.frustumCulled = false;
         points.renderOrder = additive ? 3 : 2;
         scene.add(points);
-        const list = []; // {x,y,z, vx,vy,vz, life, max, s0, s1, c0:[r,g,b], c1, a0, drag, rise}
+        const list = [];
         const tmp = new THREE.Color(), tmp2 = new THREE.Color();
         return {
             mat,
@@ -121,7 +112,6 @@
         const V = () => new THREE.Vector3();
         const rnd = s => (Math.random() - 0.5) * s;
 
-        // ---- bullets: glowing line segments, bright at the head
         const bullets = [];
         const tracerPos = new Float32Array(MAX_BULLETS * 6), tracerCol = new Float32Array(MAX_BULLETS * 6);
         const tracerGeo = new THREE.BufferGeometry();
@@ -132,7 +122,6 @@
         tracers.renderOrder = 4;
         scene.add(tracers);
 
-        // Guns sit in the wings or nose; tracers come from there.
         function fire(plane) {
             if (bullets.length >= MAX_BULLETS) return false;
             const f = plane.forward, spread = plane.heavyGun ? 0.007 : 0.009;
@@ -149,7 +138,6 @@
             return true;
         }
 
-        // Closest distance from point c to the segment a-b.
         const ab = V(), ac = V();
         function segDist(a, b, c) {
             ab.subVectors(b, a);
@@ -210,7 +198,6 @@
             tracerGeo.attributes.color.needsUpdate = true;
         }
 
-        // ---- missiles and flares
         const missiles = [], flares = [];
         const missileGeo = new THREE.CylinderGeometry(0.3, 0.3, 3.6, 6);
         missileGeo.rotateX(Math.PI / 2);
@@ -237,16 +224,12 @@
             for (let k = 0; k < 6; k++) smoke.add(m.position, {color: 0xdddddd, size: 3, grow: 14, life: 1.5, vx: rnd(10), vy: rnd(10), vz: rnd(10), alpha: 0.7});
         }
 
-        // 16 flares fired in pairs over about a second and a half, each burning
-        // for about 6 seconds.
         function dropFlares(plane, chance = 0.85) {
-            for (let k = 0; k < 16; k++) {
-                // Shot out behind, below and to the sides.
+            for (let k = 0; k < 24; k++) {
                 const out = plane.forward.clone().multiplyScalar(-55).addScaledVector(plane.up, -30).addScaledVector(plane.right, (k % 2 ? 1 : -1) * (25 + Math.random() * 35))
                     .add(V().set(rnd(20), rnd(12), rnd(20)));
-                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.17 + (k % 2) * 0.035});
+                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.07 + (k % 2) * 0.02});
             }
-            // Missiles chasing this plane go for the flares instead (most of the time).
             let fooled = 0;
             for (const m of missiles) {
                 if (m.target !== plane) continue;
@@ -267,7 +250,6 @@
                     f.delay -= dt;
                     continue;
                 }
-                // Leaves the plane when its turn comes (from where the plane is then).
                 if (!f.pos) {
                     const p = f.owner;
                     f.pos = p.pos.clone().addScaledVector(p.forward, -8);
@@ -277,7 +259,7 @@
                 f.vel.y -= 30 * dt;
                 f.vel.multiplyScalar(1 - 0.9 * dt);
                 f.pos.addScaledVector(f.vel, dt);
-                const fade = Math.min(1, f.life / 1.5); // dims as it burns out
+                const fade = Math.min(1, f.life / 1.5);
                 glow.add(f.pos, {color: 0xffffff, to: 0xffd070, size: 8 * fade + 2, grow: 3, life: 0.08});
                 smoke.add(f.pos, {color: 0xf2f2f2, to: 0xcccccc, size: 2, grow: 12, life: 2.6, alpha: 0.55 * fade});
                 if (f.life <= 0) flares.splice(i, 1);
@@ -292,7 +274,6 @@
                 const dir = tmpV.copy(m.vel).normalize();
                 const alive = t && t.pos && (t.alive !== false) && (t.life === undefined || t.life > 0);
                 if (alive) {
-                    // Lead pursuit: aim where the target will be.
                     const tgo = Math.min(2, t.pos.distanceTo(mp) / Math.max(200, speed));
                     lead.copy(t.pos);
                     if (t.velocity) lead.addScaledVector(t.velocity, tgo * 0.8);
@@ -316,10 +297,9 @@
                     events.hit(m.owner, t, 55, "missile", mp);
                 }
                 if (alive && !t.radius && t.pos.distanceTo(mp) < 10) {
-                    boom = true; // a flare
+                    boom = true;
                     if (m.fooledFrom && events.flareSave) events.flareSave(m.fooledFrom, m.owner);
                 }
-                // Fly into a plane that isn't the target (not your own team, armed).
                 if (!boom && m.armed <= 0 && (!t || t.radius)) {
                     for (const p of planes) if (p.alive && p !== m.owner && !(p.team && p.team === m.owner.team) && p.pos.distanceTo(mp) < p.radius * p.scale + 3) {
                         events.hit(m.owner, p, 55, "missile", mp);
@@ -335,7 +315,6 @@
             }
         }
 
-        // ---- explosions, debris, smoke trails and vapor
         const debris = [];
         const debrisGeo = new THREE.BoxGeometry(1, 1, 1);
 
@@ -356,7 +335,6 @@
             events.boom && events.boom(pos, scale);
         }
 
-        // A plane breaks apart: pieces fly off trailing smoke and fire.
         function breakUp(plane) {
             explosion(plane.pos, plane.radius > 12 ? 1.8 : 1.3);
             const color = new THREE.Color(plane.color);
@@ -391,8 +369,6 @@
             }
         }
 
-        // Every frame for every plane: damage smoke and fire, vapor off the
-        // wingtips in hard turns, contrails up high, afterburner glow.
         const tip = V();
         let trailT = 0;
         function trails(dt, planes, camPos) {
@@ -429,7 +405,6 @@
                 updateDebris(dt);
                 trails(dt, planes, camera && camera.position);
                 if (camera) {
-                    // Particle sizes are in meters: scale by the screen height and field of view.
                     const sc = window.innerHeight / (2 * Math.tan(camera.fov * Math.PI / 360));
                     smoke.mat.uniforms.scale.value = sc;
                     glow.mat.uniforms.scale.value = sc;

@@ -1,13 +1,11 @@
-// Online play, guest side: joins a room, draws the host's snapshots and
-// sends key presses back.
 (function () {
     const O = window.BitOnline;
     const {PREFIX, SNAPSHOT_MS, RENDER_DELAY_MS, TIMEOUT_MS, JOIN_TIMEOUT_MS, KEYS, engine, newPeer, errorText, cleanName, status, banner, pingMeter, addLog, engineClasses, indexSprites, applyLook, spawnParticle} = O;
 
     const guest = {conn: null, code: null, world: null, objects: new Map(), me: 0, last: 0, offsets: [], offset: null, input: {},
         lates: [], delay: RENDER_DELAY_MS};
-    const MAX_DELAY_MS = 260; // never draw more than this far in the past
-    const EXTRAPOLATE_MS = 60; // keep things moving this long when a snapshot is late
+    const MAX_DELAY_MS = 260;
+    const EXTRAPOLATE_MS = 60;
 
     function join(code) {
         if (O.role) return;
@@ -22,7 +20,6 @@
         status(relay ? "Contacting the online server…" : "Contacting the matchmaking server…");
         const peer = newPeer();
         peer.on("waking", () => status("Waking up the online server… (can take up to a minute)"));
-        // Give up (and let the player try again) instead of loading forever.
         let failed = false;
         const fail = text => {
             if (guest.world || failed) return;
@@ -33,7 +30,6 @@
             peer.destroy();
         };
         peer.on("open", () => {
-            // The clock starts once the server answers (a sleeping server can take a while).
             guest.joinTimer = setTimeout(() => fail(relay
                 ? "The host didn't answer. Make sure the room is still open and try again."
                 : "Couldn't reach the host. The network is probably blocking player-to-player connections " +
@@ -72,7 +68,6 @@
         }
         guest.gone = true;
         if (O.mode === "multiplayer") {
-            // Multiplayer: find (or host) another match right away.
             const q = new URLSearchParams(location.search);
             q.set("multiplayer", "1");
             location.href = location.pathname + "?" + q;
@@ -112,7 +107,6 @@
         const world = new e.World({width: w.width, height: w.height, ground: 0, stratosphere: w.stratosphere});
         world.ground = w.ground;
         world.participants = [];
-        // Same map as the host.
         world.map = window.BitMaps && window.BitMaps.get(typeof w.map === "string" ? w.map : "countryside");
         e.decorate(world);
         world.remote = {alpha: guestAlpha};
@@ -149,7 +143,6 @@
         sendPing();
     }
 
-    // Ping: the host echoes our timestamp back; the round trip is the ping.
     function sendPing() {
         if (guest.conn && guest.conn.open) guest.conn.send({t: "ping", c: performance.now()});
     }
@@ -166,10 +159,6 @@
         return a + d * t;
     }
 
-    // The host time the guest is currently drawing. It runs with the real clock
-    // and is only nudged gently toward its target, so it never steps backwards
-    // (which made everything twitch back and forth) when the clock estimate or
-    // the delay changes.
     function renderTime() {
         const now = performance.now();
         const target = now - (guest.offset || 0) - guest.delay;
@@ -177,15 +166,12 @@
         else {
             const dt = now - guest.clockAt;
             const drift = target - (guest.clock + dt);
-            // Run between half and one and a half times real speed while catching up.
             guest.clock += dt + Math.max(-dt * 0.5, Math.min(dt * 0.5, drift * 0.1));
         }
         guest.clockAt = now;
         return guest.clock;
     }
 
-    // Called by the render loop every frame: place every object where it was
-    // at renderTime(), blending between the two snapshots around that time.
     function guestAlpha() {
         const t = renderTime();
         for (const [id, o] of guest.objects) {
@@ -199,8 +185,6 @@
             let x, y, a;
             if (t <= h[0][0]) [, x, y, a] = h[0];
             else if (t >= h[h.length - 1][0]) {
-                // The next snapshot is late: keep moving the way it was going for a
-                // moment instead of freezing, then hold still.
                 const [t1, x1, y1, a1] = h[h.length - 1];
                 const prev = h[h.length - 2];
                 if (prev && t1 > prev[0] && !o.goneAt) {
@@ -222,14 +206,10 @@
             o.previous = o.position;
             o.angle = a;
         }
-        // Our own plane: blend between its last two physics steps so it moves
-        // evenly even when frames take uneven time (others are already placed).
         guest.alpha = O.prediction.step();
         return guest.alpha;
     }
 
-    // Estimate (local clock - host clock) as the smallest recent difference,
-    // i.e. the snapshot that arrived fastest.
     function updateOffset(ts, now) {
         guest.offsets.push(now - ts);
         if (guest.offsets.length > 90) guest.offsets.shift();
@@ -237,9 +217,6 @@
         adaptDelay(now - ts - guest.offset);
     }
 
-    // How far in the past to draw: just enough that the next snapshot has
-    // (almost always) arrived. Smooth connections get a short delay (snappy),
-    // bumpy ones (busy Wi-Fi, the relay server) a longer one (no stutter).
     function adaptDelay(late) {
         guest.lates.push(late);
         if (guest.lates.length > 90) guest.lates.shift();
@@ -247,7 +224,6 @@
         const sorted = guest.lates.slice().sort((a, b) => a - b);
         const p95 = sorted[Math.floor(sorted.length * 0.95)];
         const target = Math.max(RENDER_DELAY_MS, Math.min(MAX_DELAY_MS, p95 + SNAPSHOT_MS + 10));
-        // Grow fast (stop stutter now), shrink slowly (don't jump around).
         guest.delay += (target - guest.delay) * (target > guest.delay ? 0.25 : 0.02);
     }
 
@@ -266,7 +242,6 @@
         o.netId = id;
         guest.objects.set(id, o);
         world.add(o);
-        // Sounds for things the host fired (our own bullets are simulated locally).
         const S = window.BitSound;
         if (S && guest.started) {
             if (cls === 2) S.gunAt(o.position, gunNear(o.position));
@@ -281,7 +256,6 @@
         world.structures.delete(o);
     }
 
-    // The gun of the plane that just fired this bullet (the closest plane).
     function gunNear(pos) {
         const Plane = engineClasses().Plane;
         let best = null, bestD = 90;
@@ -302,7 +276,7 @@
         updateOffset(ts, now);
 
         for (const d of msg.d || []) createObject(world, d);
-        guest.started = true; // no sounds for everything already flying when we joined
+        guest.started = true;
         for (const [id, look] of msg.k || []) {
             const o = guest.objects.get(id);
             if (o) applyLook(o, look);
@@ -320,7 +294,6 @@
             o.hist.push([ts, x, y, a]);
             if (o.hist.length > 10) o.hist.shift();
         }
-        // Objects missing from the snapshot are removed once the drawn time catches up.
         for (const o of guest.objects.values()) {
             if (!seen.has(o.netId) && o.goneAt === undefined) o.goneAt = ts;
         }
@@ -346,7 +319,6 @@
 
         if (msg.m && O.match) O.match.onGuestState(msg.m);
 
-        // Our row on the host's scoreboard: count our kills and deaths in the stats.
         const row = guest.me && (msg.p || []).find(r => r[4] === guest.me);
         if (row && window.BitStats) window.BitStats.guestScore(row[2], row[3]);
 
@@ -357,7 +329,6 @@
                 plane.flares, plane.maxFlares] = msg.h;
             e.cockpit(plane);
         }
-        // Particles are delayed like everything else so they line up with the planes.
         if (msg.fx && msg.fx.length) setTimeout(() => msg.fx.forEach(p => spawnParticle(world, p)), guest.delay);
     }
 

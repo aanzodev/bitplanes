@@ -1,11 +1,6 @@
-// Air Battle maps. Each map is a height function (ground height in meters at
-// any x, z), a color function for the ground, what grows on it, and extras
-// (a city, a carrier, icebergs, barns). Maps are 24 km across; the battle
-// area is the circle in the middle.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
 
-    // ------------------------------------------------------------- noise
 
     function makeNoise(seed) {
         function hash(x, z) {
@@ -29,7 +24,6 @@
             }
             return s / norm;
         }
-        // Sharp ridges: 1 on the ridge line, falling off either side.
         const ridge = (x, z, o = 5) => 1 - Math.abs(fbm(x, z, o) * 2 - 1);
         return {fbm, ridge, hash, noise};
     }
@@ -40,20 +34,17 @@
     };
     const mix = (a, b, t) => a + (b - a) * t;
 
-    // A color helper: hex -> [r, g, b] 0..1
     function rgb(hex) {
         return [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
     }
 
     const SIZE = 24000;
 
-    // Rising walls of mountains around the edge keep the fight inside.
     function rim(x, z, start = 0.8, height = 1600) {
         const d = Math.hypot(x, z) / (SIZE / 2);
         return d > start ? Math.pow((d - start) / (1 - start), 1.6) * height : 0;
     }
 
-    // ------------------------------------------------------------- maps
 
     const MAPS = [
         {
@@ -63,7 +54,6 @@
                 const rolling = n.fbm(x / 2600, z / 2600);
                 const r = n.ridge(x / 4600 + 40, z / 4600 + 40, 5);
                 let h = (rolling - 0.42) * 800 + Math.pow(r, 2.8) * 1900;
-                // Valley floors with lakes.
                 h -= smoothstep(0.55, 0.85, n.fbm(x / 7000 + 9, z / 7000 - 3, 3)) * 500;
                 return h + rim(x, z, 0.8, 1900);
             },
@@ -84,7 +74,6 @@
                 let h = 120 + n.fbm(x / 2500, z / 2500) * 160;
                 const m = n.fbm(x / 3400 + 11, z / 3400 + 7, 4);
                 h += smoothstep(0.52, 0.56, m) * 380 + smoothstep(0.64, 0.67, m) * 260;
-                // The canyon: a sinuous groove.
                 const c = n.ridge(x / 9000 + 3, z / 9000 + 3, 3);
                 h -= Math.pow(c, 10) * 520;
                 return h + rim(x, z, 0.8, 1300);
@@ -106,7 +95,6 @@
             height(n, x, z) {
                 const i = n.fbm(x / 2300 + 5, z / 2300 - 5, 5);
                 let h = (i - 0.56) * 2600;
-                // The volcano near the middle.
                 const d = Math.hypot(x + 1500, z - 900);
                 h = Math.max(h, 1700 * Math.exp(-d * d / (2 * 2100 * 2100)) - (d < 380 ? (380 - d) * 1.2 : 0) - 200);
                 const e = Math.hypot(x, z) / (SIZE / 2);
@@ -149,10 +137,9 @@
             },
             height(n, x, z) {
                 const coast = this.coast(n, x);
-                if (z > coast) return -40 - (z - coast) * 0.08; // the sea
-                const back = coast - z; // distance inland
+                if (z > coast) return -40 - (z - coast) * 0.08;
+                const back = coast - z;
                 let h = 6 + smoothstep(0, 60, back) * 6;
-                // Hills rise behind the city.
                 h += smoothstep(5000, 9000, back) * (n.fbm(x / 2400, z / 2400) * 1600 + 200);
                 h += smoothstep(2500, 5500, back) * n.fbm(x / 1800 + 4, z / 1800, 3) * 250;
                 return h + rim(x, z, 0.82, 1500);
@@ -178,7 +165,6 @@
             color(h, slope, n, x, z) {
                 if (h < 2) return 0x8f8460;
                 if (slope > 0.7 || h > 700) return 0x6c7a4a;
-                // Patchwork fields with tracks between them.
                 const cx = Math.floor(x / 340), cz = Math.floor(z / 260);
                 const fx = x / 340 - cx, fz = z / 260 - cz;
                 if (fx < 0.03 || fz < 0.04) return 0x9b8a62;
@@ -188,7 +174,6 @@
         },
     ];
 
-    // Sky and light for each time of day.
     const SKIES = {
         day: {name: "Day", top: 0x3b7fd6, horizon: 0xbfdcf5, fog: 0xb4d3ee, sun: [0.35, 0.62, 0.3], sunColor: 0xfff2d6, sunI: 1.05, hemiSky: 0xcfe6ff, hemiGround: 0x5a6248, hemiI: 0.7, water: 0x1f6fa8},
         dawn: {name: "Dawn", top: 0x4b6fb0, horizon: 0xf7c59a, fog: 0xe8c8ad, sun: [-0.8, 0.16, 0.25], sunColor: 0xffc79a, sunI: 0.95, hemiSky: 0xf2d8c4, hemiGround: 0x4f4a42, hemiI: 0.65, water: 0x3f6f96},

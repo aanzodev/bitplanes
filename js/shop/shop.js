@@ -1,5 +1,3 @@
-// Coins, owned planes and upgrades (saved in localStorage), and applying the
-// chosen plane to the player's aircraft in activity.
 (function () {
     const STORAGE_KEY = "shop";
     const COINS_PER_KILL = 50;
@@ -24,7 +22,6 @@
         return state.upgrades[id] || 0;
     }
 
-    // Top level of an upgrade: higher at player levels 10, 25 and 50.
     function maxOf(u) {
         return u.max + (u.df || !window.BitProgress ? 0 : window.BitProgress.upgradeBonus());
     }
@@ -37,7 +34,6 @@
         return PLANES.find(p => p.id === state.selected) || PLANES[0];
     }
 
-    // A plane's paint pattern ("" for none).
     function patternOf(p) {
         return (state.pattern && state.pattern[p.id]) || "";
     }
@@ -51,12 +47,10 @@
         save();
     }
 
-    // A plane's color: its paint job if it has one, otherwise factory colors.
     function colorOf(p) {
         return (state.paint && state.paint[p.id]) || p.color;
     }
 
-    // Final stats of a plane plus upgrade levels (none for computer pilots).
     function statsOf(p, color, lvl = () => 0) {
         return {
             planeId: p.id,
@@ -75,27 +69,20 @@
         };
     }
 
-    // The selected plane with your upgrades. Sent to the host in online activities.
     function loadout() {
         const p = selectedPlane();
         return Object.assign(statsOf(p, colorOf(p), level), {pattern: patternOf(p),
             pilotSkin: window.BitSkins ? window.BitSkins.selected().id : ""});
     }
 
-    // Computer pilots in single player fly a random plane (never a special or
-    // exclusive one), picked again every time they get a new plane.
     const BOT_PLANES = PLANES.filter(p => !p.exclusive && (!p.special || p.bots));
 
     function botLoadout() {
         const p = BOT_PLANES[Math.floor(Math.random() * BOT_PLANES.length)];
-        // Some bots show off a paint pattern.
         const pattern = Math.random() < 0.3 ? PATTERNS[1 + Math.floor(Math.random() * (PATTERNS.length - 1))].id : "";
         return Object.assign(statsOf(p, p.color), {pattern});
     }
 
-    // Called by the physics loop for every plane; applies the loadout once per pilot.
-    // Local humans use this browser's shop; remote players bring their own loadout;
-    // computer pilots in single player get a random plane.
     function apply(plane) {
         const player = plane.player;
         if (!player) return;
@@ -105,7 +92,6 @@
         if (!l) return;
         plane.shopPlayer = player;
         plane.planeId = l.planeId;
-        // Looked up here (not sent by guests), so only real F-22s get them.
         plane.smartMissiles = !!(PLANES.find(p => p.id === l.planeId) || {}).smartMissiles;
         plane.maxThrust = Math.round(BASE_THRUST * l.thrust);
         plane.turnRate = l.turn;
@@ -122,7 +108,6 @@
         plane.maxFlares = plane.flares = l.flares || 0;
         if (plane.thrust > plane.maxThrust) plane.thrust = plane.maxThrust;
         if (plane.setSkin) {
-            // In team modes the plane keeps its team colors.
             const color = player.team ? plane.color : (player.loadoutColor || l.color);
             const pattern = l.pattern || "";
             if (color !== plane.color || l.skin !== (plane.skin || "") || pattern !== (plane.pattern || "")) plane.setSkin(color, l.skin, pattern);
@@ -130,7 +115,6 @@
         }
     }
 
-    // Repair kit: while damaged, fix 1 hit point every 25s / 20s / 15s.
     function repair(plane) {
         const now = performance.now();
         if (!plane.repairLevel || !(plane.life < plane.maxLife) || plane.life <= 0) {
@@ -170,7 +154,6 @@
         save();
     }
 
-    // Pay for something else (skins). False if there aren't enough coins.
     function spend(amount) {
         amount = Math.floor(Number(amount) || 0);
         if (amount < 0 || state.coins < amount) return false;
@@ -204,7 +187,6 @@
         save();
     }
 
-    // ------------------------------------------------ test commands (console)
 
     function addCoins(amount = 1000) {
         state.coins = Math.max(0, state.coins + Math.floor(Number(amount) || 0));
@@ -224,7 +206,6 @@
         return "Aircraft Market reset";
     }
 
-    // Own a plane for free (console "give").
     function give(id) {
         if (!PLANES.some(p => p.id === id)) return false;
         if (!state.owned.includes(id)) state.owned.push(id);
@@ -246,11 +227,9 @@
     console.info("Shop test commands: addCoins(1000), setCoins(10000), unlockAll(), resetShop(). " +
         "Or open the page with ?coins=10000");
 
-    // ?coins=N adds N coins, e.g. index.html?coins=10000
     const params = new URLSearchParams(location.search);
     if (params.has("coins")) {
         addCoins(params.get("coins"));
-        // Drop the param so a refresh doesn't add the coins again.
         params.delete("coins");
         const query = params.toString();
         history.replaceState(null, "", location.pathname + (query ? "?" + query : "") + location.hash);

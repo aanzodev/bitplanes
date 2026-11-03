@@ -1,34 +1,3 @@
-// How each plane sounds. All sounds are synthesized live with the Web Audio
-// API, so these numbers are the whole "recording".
-//
-// Propeller engines ("prop"):
-//   base, range  engine note in Hz at idle and how much it rises at full throttle
-//   wave         oscillator shape; "sawtooth" is raspy, "triangle" smooth
-//   pulse        cylinder firing rhythm in Hz (more cylinders = faster, smoother)
-//   tone         brightness (low-pass cutoff in Hz)
-//   whistle      optional high whistle in Hz (the P-51's air scoop)
-//   sputter      optional 0..1 chance of a rotary-engine stutter
-// Jet engines ("jet"):
-//   roar         [idle, full] low-pass cutoff of the exhaust roar
-//   whine        [idle, full] turbine whine pitch
-//   whineVol     how loud the turbine whine is
-//   burner       afterburner rumble volume at full throttle (0 = none)
-// Any plane:
-//   volume       overall engine loudness (1 = normal)
-//   idleSilent   engine makes no sound at zero throttle
-// engine: the real engine behind the sound (see audio/engines.js):
-//   piston: type (rotary | radial | inline | v8 | v12 | flat4), cyl (cylinders),
-//     rpm [idle, max], blades and gear (propeller), lump (how lumpy it runs),
-//     rough (timing wobble), exhaust (exhaust resonance Hz), bright, drive,
-//     blower (supercharger / turbo whine), sputter (rotary blip), engines (twins)
-//   jet: type (turbojet | turbofan | tf34 | stealth), whine [Hz], whineVol,
-//     roar [Hz], fan [Hz] and buzz (fan buzzsaw), crackle, burner, engines
-// guns: its real gun loadout [[gun, how many], ...] (mixed calibers play together)
-// mount: where the guns sit: "nose" (heavier thump), "wing" (spread wide),
-//   "sync" (WWI guns firing through the propeller), "side" (jet gun in the wing
-//   root), "internal" (behind doors: muffled)
-// gun: the plane's real (main) gun, from the GUNS table in sound.js (e.g. "vickers",
-//      "m2" .50 cal, "mg151" 20 mm, "m61" Vulcan, "gau8" the A-10's BRRRT)
 window.BitSoundProfiles = {
     classic: {kind: "prop", base: 55, range: 45, wave: "sawtooth", pulse: 18, tone: 900, gun: "vickers", engine: {type: "rotary", cyl: 9, rpm: [650, 1250], blades: 2, gear: 1, lump: 0.25, rough: 0.25, exhaust: 900, sputter: 0.08}, guns: [["vickers", 1]], mount: "sync"},
     cub: {kind: "prop", base: 72, range: 40, wave: "square", pulse: 16, tone: 1300, gun: "lewis", engine: {type: "flat4", cyl: 4, rpm: [800, 2350], blades: 2, gear: 1, lump: 0.35, rough: 0.2, exhaust: 1400, bright: 0.9}, guns: [["lewis", 1]], mount: "nose"},
@@ -60,6 +29,5 @@ window.BitSoundProfiles = {
     su27: {kind: "jet", roar: [330, 2300], whine: [1700, 4000], whineVol: 0.04, burner: 0.3, volume: 0.35, gun: "gsh301", engine: {type: "turbofan", whine: [1800, 4100], whineVol: 0.04, roar: [340, 2300], fan: [100, 220], buzz: 0.05, burner: 1, engines: 2}, guns: [["gsh301", 1]], mount: "side"},
     f35: {kind: "jet", roar: [320, 2200], whine: [1600, 3800], whineVol: 0.035, burner: 0.25, volume: 0.3, idleSilent: true, gun: "gau22", engine: {type: "turbofan", whine: [1600, 3800], whineVol: 0.035, roar: [300, 2000], fan: [90, 200], buzz: 0.06, burner: 1.2, volume: 1.15}, guns: [["gau22", 1]], mount: "internal"},
     f22: {kind: "jet", roar: [300, 2200], whine: [1500, 3600], whineVol: 0.035, burner: 0.2, volume: 0.25, idleSilent: true, gun: "m61", engine: {type: "turbofan", whine: [1500, 3600], whineVol: 0.03, roar: [300, 2100], fan: [95, 210], buzz: 0.04, burner: 0.9, engines: 2}, guns: [["m61", 1]], mount: "internal"},
-    // B-2: four buried turbofans, a deep quiet hum with no afterburner.
     b2: {kind: "jet", roar: [200, 1200], whine: [1100, 2400], whineVol: 0.02, burner: 0, volume: 0.25, idleSilent: true, gun: "m61", engine: {type: "stealth", whine: [1100, 2400], whineVol: 0.02, roar: [180, 1100], burner: 0, engines: 4, volume: 0.7}, guns: [["m61", 1]], mount: "internal"},
 };

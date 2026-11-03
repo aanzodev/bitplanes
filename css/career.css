@@ -1,6 +1,4 @@
-/* Settings, levels, achievements, friends, leaderboard and pop-up notices. */
 
-/* ---- Panels opened from anywhere (also over Air Battle and the pause menu) */
 .settings,
 .achievements,
 .friends-list,
@@ -137,7 +135,6 @@
     color: #f5a623;
 }
 
-/* ---- Lobby: friends, settings, level */
 .lobby-icon {
     position: relative;
     width: 44px;
@@ -236,7 +233,6 @@
     }
 }
 
-/* ---- Achievements */
 .ach-count {
     margin-right: 8px;
     color: #667;
@@ -296,7 +292,6 @@
     color: #a07000;
 }
 
-/* ---- Friends */
 .social-note {
     padding: 8px 12px;
     border-radius: 8px;
@@ -428,7 +423,6 @@
     color: #888;
 }
 
-/* ---- Leaderboard */
 .board-me {
     padding: 8px 12px;
     border-radius: 8px;
@@ -490,7 +484,6 @@
     color: #b87333;
 }
 
-/* ---- Pop-up notices */
 .toasts {
     position: fixed;
     top: 80px;
@@ -597,7 +590,6 @@
     left: 8px;
 }
 
-/* The long top bar: smaller tabs, and the profile drops below it on narrower screens. */
 @media (max-width: 1500px) {
     .nav-tab {
         padding: 9px 11px;

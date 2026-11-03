@@ -1,4 +1,3 @@
-// Sprite files. Paths are relative to assets/sprites/ (set as the public path in boot.js).
 BitModules[25] = function (M, j, t) {
     M.exports = t.p + "scenery/cow.svg";
 };

@@ -1,10 +1,3 @@
-// Friends and the global leaderboard, through the online server.
-//   Friends (👥 in the lobby): your friend code, add friends by code, accept
-//   requests, see who is online and where, join their room, invite them to yours.
-//   Leaderboard tab: the top 50 pilots worldwide by XP, kills, Air Battle kills
-//   or best kill streak, and your own rank.
-// Your secret id (localStorage "uid") stays in this browser; others only see
-// your friend code, name, level and pilot skin.
 window.BitSocial = (function () {
     const O = window.BitOnline || {};
     const BOARDS = [
@@ -14,8 +7,8 @@ window.BitSocial = (function () {
         {id: "streak", name: "Best streak", unit: "in a row"},
     ];
     let ws = null, ready = false, version = 0, myCode = "", retry = 3000, timer = null, lastHi = "";
-    let friends = load("friendsCache", []); // [{code, name, level, skin, online, room, seen}]
-    let requests = [];                      // [{from, name, level}]
+    let friends = load("friendsCache", []);
+    let requests = [];
     let outgoing = [];
     let board = {by: "xp", rows: null, me: null, total: 0};
     let friendsEl, boardEl, notice = "";
@@ -63,7 +56,6 @@ window.BitSocial = (function () {
         return n || "Pilot";
     }
 
-    // --------------------------------------------------------- connection
 
     function serverUrl() {
         return O.serverUrl ? O.serverUrl() : window.BitOnlineServer || "";
@@ -117,7 +109,6 @@ window.BitSocial = (function () {
         };
     }
 
-    // Say who we are (again when something changed, e.g. a new level or name).
     function hi(force) {
         if (!ws || ws.readyState !== 1 || version < 5) return;
         const p = profile(), key = JSON.stringify(p);
@@ -141,8 +132,6 @@ window.BitSocial = (function () {
             notice = "";
             myCode = msg.code;
             store("friendCode", myCode);
-            // Friends from the server plus the ones this browser remembers (the
-            // server restores those once the friend comes back online too).
             const known = new Map(friends.map(f => [f.code, f]));
             const codes = [...new Set((msg.friends || []).concat(friends.map(f => f.code)))];
             friends = codes.map(c => known.get(c) || {code: c, name: c, level: 1});
@@ -193,7 +182,6 @@ window.BitSocial = (function () {
         refresh();
     }
 
-    // Where we are right now, for friends' lists.
     let lastWhere = "";
 
     function whereNow(force) {
@@ -215,7 +203,6 @@ window.BitSocial = (function () {
         render();
     }
 
-    // ------------------------------------------------------------ actions
 
     function say(text) {
         notice = text;
@@ -227,7 +214,6 @@ window.BitSocial = (function () {
         return (ui && ui.style.display === "block") || !!(window.BitAirBattle && window.BitAirBattle.state && window.BitAirBattle.state());
     }
 
-    // Join a friend's room. From inside an activity the page reloads into it.
     function joinRoom(room, mode) {
         if (!/^[A-Z0-9]{5}$/.test(room || "")) return;
         if (inActivity() || O.role) {
@@ -414,7 +400,6 @@ window.BitSocial = (function () {
         document.addEventListener("keydown", ev => ev.key === "Escape" && hide());
         document.querySelectorAll(".open-friends-list").forEach(b => b.addEventListener("click", openFriends));
         document.querySelectorAll(".open-leaderboard").forEach(b => b.addEventListener("click", () => openBoard()));
-        // Ready answers to the leaderboard once connected.
         setInterval(() => {
             hi();
             whereNow();
@@ -424,7 +409,6 @@ window.BitSocial = (function () {
         setInterval(() => friendsEl && !friendsEl.hidden && refresh(), 5000);
         setTimeout(connect, 1500);
 
-        // Arrived from an invite while flying: ?join=CODE&jm=multiplayer|room
         const q = new URLSearchParams(location.search), room = (q.get("join") || "").toUpperCase();
         if (/^[A-Z0-9]{5}$/.test(room)) {
             q.delete("join");

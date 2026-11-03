@@ -1,4 +1,3 @@
-/* Daily reward and Stats windows (same look as the Hangar). */
 .panel-backdrop {
     position: fixed;
     inset: 0;
@@ -30,7 +29,6 @@
     margin: 18px 0 8px;
 }
 
-/* Daily reward */
 .daily-panel {
     max-width: 620px;
     margin-top: 10vh;
@@ -83,7 +81,6 @@
     color: #d4a017;
 }
 
-/* Stats */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -174,7 +171,6 @@
     }
 }
 
-/* Multiplayer server browser */
 .srv-tools {
     display: flex;
     flex-wrap: wrap;
@@ -259,7 +255,6 @@
     }
 }
 
-/* Daily quests */
 .quest {
     display: flex;
     align-items: center;
@@ -307,7 +302,6 @@
     font-size: 15px;
 }
 
-/* Skins */
 .skins-panel {
     max-width: 900px;
 }

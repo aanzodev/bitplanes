@@ -1,20 +1,13 @@
-// Air Battle (3D): builds a map. Terrain from the map's height function
-// (colored by height and steepness), a sky dome and water drawn by small GLSL
-// shaders, forests, clouds, and each map's extras: a city of skyscrapers whose
-// windows light up at dusk, an aircraft carrier, icebergs, farms.
-// ground(x, z) gives the height of whatever is there (terrain, building roof,
-// carrier deck) so planes crash into it and computer pilots avoid it.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
 
-    // ------------------------------------------------------------ shaders
 
     const SKY_VERT = `
         varying vec3 vDir;
         void main() {
             vDir = normalize(position);
             vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            gl_Position = p.xyww; // always at the far plane
+            gl_Position = p.xyww;
         }`;
     const SKY_FRAG = `
         uniform vec3 top, horizon, sunColor, sunDir, ground;
@@ -24,7 +17,6 @@
             vec3 d = normalize(vDir);
             float h = max(d.y, 0.0);
             vec3 col = mix(horizon, top, pow(h, 0.55));
-            // below the horizon: a little darker haze
             col = mix(col, horizon * 0.82, smoothstep(0.0, -0.25, d.y));
             col = mix(col, ground, smoothstep(0.0, -0.2, d.y) * groundMix);
             float s = max(dot(d, normalize(sunDir)), 0.0);
@@ -61,11 +53,9 @@
         }
         void main() {
             vec2 p = vWorld.xz;
-            // How deep the water is here (the terrain's height map, as a texture).
             vec2 huv = p / mapSize + 0.5;
             float ground = (huv.x < 0.0 || huv.y < 0.0 || huv.x > 1.0 || huv.y > 1.0) ? -200.0 : texture2D(heights, huv).r * 260.0 - 200.0;
             float depth = max(0.0, seaLevel - ground);
-            // A few moving waves, summed as slopes for the normal.
             vec2 g = vec2(0.0);
             g += 0.06 * cos(dot(p, vec2(0.021, 0.013)) + time * 0.9) * vec2(0.021, 0.013) / 0.025;
             g += 0.05 * cos(dot(p, vec2(-0.017, 0.029)) + time * 1.3) * vec2(-0.017, 0.029) / 0.034;
@@ -74,13 +64,11 @@
             vec3 n = normalize(vec3(-g.x, 1.0, -g.y));
             vec3 v = normalize(cameraPosition - vWorld);
             float fres = pow(1.0 - max(dot(n, v), 0.0), 4.0);
-            // Turquoise in the shallows, deep blue further out.
             vec3 water = mix(shallow, deep, smoothstep(2.0, 45.0, depth));
             vec3 col = mix(water, skyColor, 0.08 + 0.7 * fres);
             vec3 r = reflect(-v, n);
             float spec = pow(max(dot(r, normalize(sunDir)), 0.0), 180.0);
             col += sunColor * spec * 1.4 * sunBoost;
-            // White foam where waves break on the shore.
             float surf = sin(depth * 1.3 - time * 1.6 + wNoise(p * 0.05) * 6.0) * 0.5 + 0.5;
             float foam = smoothstep(4.0, 0.0, depth) * (0.45 + 0.55 * surf) * smoothstep(0.35, 0.75, wNoise(p * 0.35 + time * 0.2));
             col = mix(col, vec3(0.92, 0.96, 1.0) * (0.6 + 0.4 * sunBoost * 0.1 + 0.4), foam * 0.85);
@@ -122,7 +110,6 @@
             float diff = max(dot(n, normalize(sunDir)), 0.0);
             vec3 col = vColor * (ambient + sunColor * diff * 0.9);
             if (abs(n.y) < 0.5) {
-                // Windows on the walls: a grid in floors (3.6 m) and bays (3 m).
                 float u = abs(n.z) > 0.5 ? vWorld.x : vWorld.z;
                 vec2 cell = vec2(floor(u / 3.0), floor(vWorld.y / 3.6));
                 vec2 f = vec2(fract(u / 3.0), fract(vWorld.y / 3.6));
@@ -139,10 +126,7 @@
             #include <fog_fragment>
         }`;
 
-    // ------------------------------------------------------- geometry help
 
-    // Merge simple parts into one geometry with a color per part (for trees,
-    // barns, the carrier). parts: [{geo, color}]
     function merge(THREE, parts) {
         let count = 0;
         const geos = parts.map(p => {
@@ -221,7 +205,6 @@
         ]);
     }
 
-    // Low/Medium clouds: clusters of round puffs, one mesh for all of them.
     function puffyClouds(THREE, map, sky, Q) {
         const SIZE = D.MAP_SIZE;
         const cloudCount = Math.round(110 * (map.cloudAmount || 1) * (0.5 + 0.5 * Q));
@@ -247,8 +230,6 @@
         return clouds;
     }
 
-    // High/Ultra clouds: hundreds of soft billboards (always facing you), lit
-    // from the sun: bright tops, grey bellies, glowing edges against the sun.
     const CLOUD_VERT = `
         varying vec2 vUv;
         varying float vShade;
@@ -295,7 +276,6 @@
         const c = document.createElement("canvas");
         c.width = c.height = 128;
         const x = c.getContext("2d");
-        // A fluffy blob: many soft circles, densest in the middle.
         for (let i = 0; i < 40; i++) {
             const r = 14 + Math.random() * 26, ang = Math.random() * 6.28, d = Math.random() * 30;
             const cx = 64 + Math.cos(ang) * d, cy = 64 + Math.sin(ang) * d * 0.7;
@@ -333,7 +313,6 @@
             const cy = map.cloudHeight + (Math.random() - 0.3) * 900, big = 1 + Math.random() * 1.6;
             for (let j = 0; j < per && k < total; j++) {
                 const r = (260 + Math.random() * 300) * big;
-                // Flat bottoms, piled up in the middle.
                 const up = Math.random() * Math.random() * 160 * big;
                 m.compose(p.set(cx + (Math.random() - 0.5) * 700 * big, cy + up, cz + (Math.random() - 0.5) * 500 * big), q, s.set(r, r * 0.7, 1));
                 clouds.setMatrixAt(k++, m);
@@ -345,7 +324,6 @@
         return clouds;
     }
 
-    // The terrain heights as a small texture, so the water knows how deep it is.
     function heightTexture(THREE, grid, W) {
         const data = new Uint8Array(W * W * 4);
         for (let i = 0; i < W * W; i++) {
@@ -359,16 +337,10 @@
         return t;
     }
 
-    // High/Ultra ground, worked out per pixel: the map's colors from far
-    // away; up close, layers of rock (on steep slopes, with strata and
-    // cracks, the same from every side), soil and grass patches, wet sand at
-    // the waterline and snow that settles on flat ground, plus fine bumps
-    // that catch the light.
     const GROUND_GLSL = `
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform float waterLevel, snowLevel, rockTint, dry;
-        // Colors below are written in sRGB (like hex colors) and turned into light values.
         vec3 lin(vec3 c) { return pow(c, vec3(2.2)); }
         float gHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float gNoise(vec2 p) {
@@ -381,8 +353,6 @@
             for (int i = 0; i < 4; i++) { s += a * gNoise(p); p = p * 2.03 + 17.1; a *= 0.5; }
             return s;
         }
-        // Noise seen from the three main directions, blended by the slope
-        // (so cliffs aren't stretched).
         float gTri(vec3 p, vec3 n, float f) {
             vec3 w = pow(abs(n), vec3(4.0));
             w /= (w.x + w.y + w.z);
@@ -416,27 +386,21 @@
                     float near = smoothstep(2500.0, 300.0, camD);
                     float slope = 1.0 - wn.y;
                     vec3 base = diffuseColor.rgb;
-                    // Big patches of lighter and darker ground, then finer ones.
                     float patches = gFbm(vWPos.xz * 0.0025);
                     float fine = gFbm(vWPos.xz * 0.045);
                     base *= 0.82 + 0.36 * patches;
                     base *= mix(1.0, 0.85 + 0.3 * fine, 0.7);
-                    // Dry soil showing through grass.
                     float soil = smoothstep(0.55, 0.75, gFbm(vWPos.xz * 0.012 + 7.0)) * (1.0 - dry);
                     base = mix(base, lin(vec3(0.36, 0.29, 0.2)), soil * 0.45);
-                    // Rock on steep ground: strata bands and cracks.
                     float rockMask = smoothstep(0.28, 0.5, slope + (fine - 0.5) * 0.25);
                     float strata = gNoise(vec2(vWPos.y * 0.09, gFbm(vWPos.xz * 0.004) * 6.0));
                     float crag = gTri(vWPos, wn, 0.08);
                     vec3 rock = mix(lin(vec3(0.45, 0.43, 0.4)), base, rockTint) * (0.65 + 0.5 * crag) * (0.85 + 0.25 * strata);
                     base = mix(base, rock, rockMask);
-                    // Snow settles on flatter ground up high.
                     float snow = smoothstep(snowLevel - 150.0, snowLevel + 150.0, vWPos.y + (patches - 0.5) * 300.0) * smoothstep(0.55, 0.3, slope);
                     base = mix(base, lin(vec3(0.93, 0.95, 0.98)), snow);
-                    // Wet, darker sand at the waterline.
                     float wet = smoothstep(4.0, 0.5, vWPos.y - waterLevel) * step(waterLevel - 3.0, vWPos.y);
                     base *= 1.0 - wet * 0.35;
-                    // Nature is less saturated than paint.
                     diffuseColor.rgb = mix(vec3(dot(base, vec3(0.2126, 0.7152, 0.0722))), base, 0.78);
                     float bumpH = (crag * 3.0 * rockMask + fine * 0.8 + gNoise(vWPos.xz * 0.7) * 0.25 * near) * (1.0 - snow * 0.7);`)
                 .replace("#include <roughnessmap_fragment>", `#include <roughnessmap_fragment>
@@ -450,7 +414,6 @@
         return mat;
     }
 
-    // Boulders on slopes and rocky ground.
     function boulders(THREE, gridAt, SIZE, count, map, fancy) {
         const geo = new THREE.DodecahedronGeometry(1, 1);
         const p = geo.attributes.position;
@@ -480,10 +443,7 @@
         return rocks;
     }
 
-    // ------------------------------------------------------------- world
 
-    // opts: {quality: "low" | "medium" | "high" | "ultra", sky: "day" | ..., seed,
-    //        renderer (for sky reflections), hdr (the cinematic High/Ultra look)}
     D.makeWorld = function (THREE, scene, map, opts = {}) {
         const seed = opts.seed || ((Math.random() * 1e6) | 0);
         const n = D.makeNoise(seed % 1000 + 1);
@@ -498,15 +458,12 @@
         const step = SIZE / SEG;
         const height = (x, z) => map.height(n, x, z);
 
-        // ---- heights on a grid (the terrain mesh, and ground() reads it back)
         const W = SEG + 1, grid = new Float32Array(W * W);
         for (let j = 0; j < W; j++) for (let i = 0; i < W; i++) grid[j * W + i] = height(-SIZE / 2 + i * step, -SIZE / 2 + j * step);
-        // Rain wears the mountains into gullies, ridges and valley floors.
         if (D.erode && map.erosion !== 0) {
             const flat = map.city ? grid.slice() : null;
             D.erode(grid, W, step, {sea: map.water > -1000 ? map.water : undefined, seed: seed, strength: map.erosion || 1,
                 drops: {low: 0.45, medium: 0.7, high: 0.9, ultra: 1.1}[quality] || 0.9});
-            // Keep the city's ground as it was (flat streets).
             if (flat) for (let k = 0; k < grid.length; k++) if (flat[k] > 0 && flat[k] < 40) grid[k] = flat[k];
         }
         function gridAt(x, z) {
@@ -514,7 +471,6 @@
             if (fx < 0 || fz < 0 || fx >= SEG || fz >= SEG) return height(x, z);
             const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j;
             const a = grid[j * W + i], b = grid[j * W + i + 1], c = grid[(j + 1) * W + i], d = grid[(j + 1) * W + i + 1];
-            // The same two triangles per square as the mesh.
             return u + v < 1 ? a + (b - a) * u + (c - a) * v : d + (c - d) * (1 - u) + (b - d) * (1 - v);
         }
 
@@ -539,7 +495,6 @@
         terrain.receiveShadow = fancy;
         scene.add(terrain);
 
-        // ---- sky, fog and light
         const sunDir = new THREE.Vector3(...sky.sun).normalize();
         const skyMat = new THREE.ShaderMaterial({
             vertexShader: SKY_VERT, fragmentShader: SKY_FRAG, side: THREE.BackSide, depthWrite: false, depthTest: false, fog: false,
@@ -554,13 +509,11 @@
         scene.background = new THREE.Color(sky.horizon);
         const fogFar = {low: 15000, medium: 19000, high: 24000, ultra: 30000}[quality] || 24000;
         scene.fog = new THREE.Fog(new THREE.Color(sky.fog).multiplyScalar(fancy ? 0.85 : 1), fogFar * (fancy ? 0.32 : 0.22), fogFar);
-        // With sky reflections on (High/Ultra), the sky itself lights things too.
         scene.add(new THREE.HemisphereLight(sky.hemiSky, sky.hemiGround, sky.hemiI * (fancy ? 0.55 : 1)));
         const sun = new THREE.DirectionalLight(sky.sunColor, sky.sunI * (fancy ? 1.25 : 1));
         sun.position.copy(sunDir).multiplyScalar(5000);
         scene.add(sun);
         scene.add(sun.target);
-        // Real-time shadows in a box around you (High: 2048, Ultra: 4096 pixels).
         const shadowSize = quality === "ultra" ? 1700 : 1200;
         if (fancy) {
             sun.castShadow = true;
@@ -571,7 +524,6 @@
             sun.shadow.bias = -0.0004;
             sun.shadow.normalBias = 1.2;
         }
-        // Sky reflections (and soft light) for metal, glass and paint.
         if (fancy && opts.renderer) {
             const envScene = new THREE.Scene(), envMat = skyMat.clone();
             envMat.uniforms.groundMix.value = 1;
@@ -597,7 +549,6 @@
             skyDome.add(stars);
         }
 
-        // ---- water
         let water = null;
         if (map.water > -1000) {
             const wm = new THREE.ShaderMaterial({
@@ -615,8 +566,7 @@
             scene.add(water);
         }
 
-        // ---- solid things on the ground: buildings, carriers (for ground())
-        const solids = []; // {x0, x1, z0, z1, top} in world space, axis aligned in their own frame
+        const solids = [];
         const cityCells = new Map();
         let cityCell = 0, cityX0 = 0, cityZ0 = 0;
 
@@ -629,7 +579,7 @@
                 for (let z = coast - 4200; z < coast - 250; z += cell) {
                     const cx = x + cell / 2, cz = z + cell / 2;
                     const center = Math.exp(-((cx * cx) / (2 * 1500 * 1500)) - ((cz - coast + 2000) ** 2) / (2 * 1300 * 1300));
-                    if (n.hash(Math.floor(cx), Math.floor(cz)) < 0.12) continue; // a park
+                    if (n.hash(Math.floor(cx), Math.floor(cz)) < 0.12) continue;
                     const ground = gridAt(cx, cz);
                     if (ground < 2 || ground > 40) continue;
                     const tall = 30 + center * 380 * (0.4 + 0.6 * n.hash(Math.floor(cz), Math.floor(cx)));
@@ -706,7 +656,6 @@
             scene.add(barns);
         }
 
-        // ---- trees
         if (map.trees) {
             const T = map.trees, count = Math.round(T.count * Q);
             const trees = new THREE.InstancedMesh(treeGeometry(THREE, T.kind), new THREE.MeshLambertMaterial({vertexColors: true, flatShading: true}), count);
@@ -715,13 +664,12 @@
             for (let t = 0; t < count * 8 && k < count; t++) {
                 const x = (Math.random() - 0.5) * SIZE * 0.92, z = (Math.random() - 0.5) * SIZE * 0.92, h = gridAt(x, z);
                 if (h < T.min || h > T.max || n.fbm(x / 900 + 9, z / 900 + 9, 3) < 0.48) continue;
-                if (Math.abs(gridAt(x + 20, z) - h) > 14) continue; // not on cliffs
+                if (Math.abs(gridAt(x + 20, z) - h) > 14) continue;
                 if (cityCells.size && cityCells.has(Math.floor((x - cityX0) / cityCell) + "," + Math.floor((z - cityZ0) / cityCell))) continue;
                 const sc = 0.8 + Math.random() * 0.9;
                 q.setFromAxisAngle(up, Math.random() * 6.3);
                 m.compose(p.set(x, h - 1, z), q, s.set(sc, sc * (0.85 + Math.random() * 0.4), sc));
                 trees.setMatrixAt(k, m);
-                // Every tree a slightly different green (or autumn tint now and then).
                 const tint = new THREE.Color(1, 1, 1).multiplyScalar(0.75 + Math.random() * 0.4);
                 if (Math.random() < 0.08) tint.setRGB(1.2, 0.95, 0.6);
                 trees.setColorAt(k++, tint);
@@ -731,14 +679,11 @@
             scene.add(trees);
         }
 
-        // ---- boulders
         scene.add(boulders(THREE, gridAt, SIZE, Math.round(2200 * Q), map, fancy));
 
-        // ---- clouds: soft lit billboards (High/Ultra), or puffy clusters
         const clouds = fancy ? softClouds(THREE, map, sky, Q, sunDir, hdr) : puffyClouds(THREE, map, sky, Q);
         scene.add(clouds);
 
-        // ---- ground(): the top of whatever is at x, z
         function ground(x, z) {
             let h = Math.max(map.water > -1000 ? map.water : -1e9, gridAt(x, z));
             if (cityCell) {
@@ -758,8 +703,6 @@
             map, sky, size: SIZE, theme: {name: map.name + " · " + sky.name},
             height: gridAt, ground, water: map.water,
             sunDir,
-            // Each frame: the sky follows the camera, the water moves, and the
-            // shadow box follows what you're looking at.
             update(dt, camera, focus) {
                 if (sun.castShadow && focus) {
                     const texel = (2 * shadowSize) / sun.shadow.mapSize.x;

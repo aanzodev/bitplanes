@@ -1,21 +1,10 @@
-// Online play: shared settings and helpers.
-//
-// One browser hosts: it runs the real activity (a death match) and gets a room
-// code. Friends join with that code over a direct WebRTC connection (PeerJS).
-// Guests send their key presses to the host; the host simulates their planes
-// and sends back snapshots of the world ~20 times a second, which guests draw.
-//
-// Files: common.js (this), sync.js (turning activity objects into messages),
-// host.js, guest.js and lobby.js (the buttons on the start screen).
 (function () {
     const O = window.BitOnline = {};
-    O.role = null; // "host" | "guest"
+    O.role = null;
 
     const PREFIX = "bitplanes-room-";
-    const SNAPSHOT_MS = 33; // ~30 snapshots per second
-    // Guests draw the world this far in the past so there are always two
-    // snapshots to blend between, even when one arrives a bit late.
-    const RENDER_DELAY_MS = 45; // minimum; grows on bumpy connections
+    const SNAPSHOT_MS = 33;
+    const RENDER_DELAY_MS = 45;
     const TIMEOUT_MS = 6000;
     const JOIN_TIMEOUT_MS = 20000;
     const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -35,11 +24,6 @@
         return window.BitEngine;
     }
 
-    // How two browsers find a way to each other. STUN servers tell each browser
-    // its public address; when a network blocks direct connections (school or
-    // office Wi-Fi, some home routers) the traffic goes through a TURN relay.
-    // Relays on port 443 (the same port as websites) get through most networks.
-    // Your own relay: ?turn=turn:example.com:3478&turnuser=name&turnpass=secret
     function iceServers(q) {
         const servers = [
             {urls: ["stun:stun.l.google.com:19302", "stun:stun.cloudflare.com:3478"]},
@@ -54,8 +38,6 @@
     }
 
     function peerOptions() {
-        // ?peerhost=192.168.1.10&peerport=9000 uses your own PeerJS server,
-        // e.g. one running on your local network. Default: the free PeerJS cloud.
         const q = new URLSearchParams(location.search);
         const options = {debug: 1, config: {iceServers: iceServers(q)}};
         const host = q.get("peerhost");
@@ -68,15 +50,12 @@
         });
     }
 
-    // The relay server to use (config.js or ?server=), or "" for direct connections.
     function serverUrl() {
         const q = new URLSearchParams(location.search).get("server");
         if (q === "off") return "";
         return q || window.BitOnlineServer || "";
     }
 
-    // How to connect. Pass an id to host. With a relay server set: direct first,
-    // the server as backup (?direct=off: server only). Without one: direct only.
     function newPeer(id) {
         const url = serverUrl();
         const direct = typeof Peer !== "undefined" && new URLSearchParams(location.search).get("direct") !== "off";
@@ -95,10 +74,6 @@
         return "Couldn't connect (" + type + "). Check your internet connection and try again.";
     }
 
-    // Plays back timestamped updates from another computer smoothly: estimates
-    // the clock difference, picks a delay that covers the usual lateness, and
-    // runs a clock that never steps backwards. Hosts use it for the planes
-    // guests fly (guest.js has the same logic for snapshots).
     function makeTimeline(minDelay = 40, maxDelay = 250, interval = SNAPSHOT_MS) {
         const tl = {offsets: [], lates: [], offset: 0, delay: minDelay, clock: undefined, clockAt: 0};
         tl.add = (ts, now) => {
@@ -132,7 +107,7 @@
     }
 
     function cleanName(name) {
-        return String(name || "").replace(/[<>&"'`\\]/g, "").trim().slice(0, 26) || "Guest"; // room for a [PLAYER] tag + 16 letters
+        return String(name || "").replace(/[<>&"'`\\]/g, "").trim().slice(0, 26) || "Guest";
     }
 
     function round(v, digits) {
@@ -145,7 +120,6 @@
         if (el) el.textContent = text;
     }
 
-    // Ping meter (online activities, players who joined a room). rows: [{name, ms}], name empty for your own ping.
     function pingMeter(rows) {
         let el = document.querySelector(".ping-meter");
         if (!el) {
@@ -173,7 +147,6 @@
         el.textContent = text;
     }
 
-    // Only allow simple markup in kill messages coming from the host.
     function safeHtml(html) {
         const tpl = document.createElement("template");
         tpl.innerHTML = html;

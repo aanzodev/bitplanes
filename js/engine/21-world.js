@@ -1,4 +1,3 @@
-// The world: holds every body, pilot, bullet and particle.
 BitModules[21] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

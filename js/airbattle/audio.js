@@ -1,19 +1,6 @@
-// Air Battle (3D): sound. Everything is synthesized live with the Web Audio
-// API and placed in 3D around you (HRTF panning), sharing Bit Planes' audio
-// output, volume and mute.
-//   Your engine: piston engines rumble and pop in time with the RPM and the
-//   propeller whops; jets whine and roar, and the afterburner thunders. Wind
-//   rushes louder with speed and screams in hard turns.
-//   Other planes: their own engine note, pitched by the Doppler effect as they
-//   pass, with a whoosh on close flybys.
-//   Guns: each plane's real gun sound, from where it is. Hits on you clang.
-//   Missiles: the seeker growl while locking, a solid tone when locked, the
-//   rocket roar, and warning beeps when someone locks onto you or fires.
-//   Explosions: heard late when far away (sound travels 343 m/s) and duller.
-//   In the cockpit the outside world is muffled.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
-    const C = 343; // speed of sound, m/s
+    const C = 343;
 
     D.makeAudio = function () {
         const S = window.BitSound;
@@ -26,7 +13,6 @@
         master.gain.setTargetAtTime(1, ctx.currentTime, 0.4);
         const noiseBuf = S.noiseBuffer();
 
-        // Buses: the outside world goes through a filter that closes in the cockpit.
         const extFilter = ctx.createBiquadFilter();
         extFilter.type = "lowpass";
         extFilter.frequency.value = 18000;
@@ -39,7 +25,6 @@
         ui.gain.value = 0.7;
         ui.connect(master);
 
-        // ---- building blocks
         const now = () => ctx.currentTime;
         function noise(loop = true) {
             const n = ctx.createBufferSource();
@@ -100,7 +85,6 @@
             g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t0 + a);
             g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + d);
         }
-        // A wave shaper for engine grit.
         function shaper(amount) {
             const ws = ctx.createWaveShaper(), n = 1024, curve = new Float32Array(n);
             for (let i = 0; i < n; i++) {
@@ -111,13 +95,10 @@
             return ws;
         }
 
-        // ---------------------------------------------------- your engine
 
-        // Every plane's engine is modelled on its real one (audio/engines.js).
         const PROFILES = window.BitSoundProfiles || {};
         const profileOf = p => PROFILES[p.planeId] || PROFILES.classic || {kind: p.shape === "jet" ? "jet" : "prop"};
 
-        // Wind and the scream of air in hard turns (your plane only).
         const wind = noise(), windF = filt("bandpass", 500, 0.6), windG = gain(0);
         chain(wind, windF, windG, own);
         const scream = noise(), screamF = filt("bandpass", 2600, 6), screamG = gain(0);
@@ -142,7 +123,6 @@
                 engine = window.BitEngines.create(ctx, engineBus, profileOf(p), noiseBuf);
                 enginePlane = p.planeId;
             }
-            // Louder and bassier from the seat; a damaged engine misfires.
             const ev = S.mix ? S.mix("engineVolume") : 0.6;
             engineBus.gain.setTargetAtTime((cockpit ? 0.42 : 0.28) * ev * (p.burning && Math.random() < 0.25 ? 0.35 : 1), t, 0.05);
             engine.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed});
@@ -154,10 +134,7 @@
             screamF.frequency.setTargetAtTime(1800 + p.speed * 6, t, k);
         }
 
-        // ---------------------------------------------- other planes' engines
 
-        // The four nearest planes each get their own engine sound, placed where
-        // they are and pitched by the Doppler effect as they pass.
         const VOICES = 4;
         const voices = [];
         for (let i = 0; i < VOICES; i++) {
@@ -184,7 +161,6 @@
                     v.planeId = p.planeId;
                 }
                 place(v.p, p.pos);
-                // Doppler: higher when coming at you, lower going away.
                 const dir = tmp;
                 dir.x = (listenerPos.x - p.pos.x) / (o.d || 1);
                 dir.y = (listenerPos.y - p.pos.y) / (o.d || 1);
@@ -194,7 +170,6 @@
                 const dop = Math.max(0.5, Math.min(2.2, (C + vl) / Math.max(60, C - vs)));
                 v.eng.set(p.throttle, {boost: p.boosting, speed: p.speed / p.topSpeed, pitch: dop});
                 v.bus.gain.setTargetAtTime((jet ? 0.5 : 0.8) * (S.mix ? S.mix("engineVolume") : 0.6), t, 0.1);
-                // A close pass: a whoosh as it goes by.
                 if (v.plane === p && o.d < 160 && (!p._whooshAt || t - p._whooshAt > 2.5) && vs - vl < -40) {
                     p._whooshAt = t;
                     flyby(p.pos, jet);
@@ -213,11 +188,8 @@
             shot([n], 1.3);
         }
 
-        // ------------------------------------------------------------- guns
 
         let lastOther = 0;
-        // A plane's whole gun loadout (its real guns, see profiles.js) for one
-        // firing interval, from where it is.
         function gun(plane, mine, listenerPos, interval = 0.07) {
             if (muted()) return;
             const vol = S.volleyInto ? (id, node, v, d) => S.volleyInto(id, node, v, d, interval) : (id, node, v, d) => S.playGunInto(plane.gun, node, v, d);
@@ -230,7 +202,6 @@
             setTimeout(() => p.disconnect(), 1500);
         }
 
-        // Bullets hitting you: metal clangs. Your hits on others: a crisp tick.
         function clang() {
             const t = now(), n = noise(false), f = filt("highpass", 1800, 0.7), g = gain(0);
             chain(n, f, g, own);
@@ -250,7 +221,6 @@
             env(g, 0.18, 0.001, 0.05, t);
             shot([o], 0.08);
         }
-        // The kill confirm: a bright ding over a bass thump.
         function killConfirm() {
             const t = now();
             [[1320, 0.22], [1980, 0.12]].forEach(([f, v]) => {
@@ -266,7 +236,6 @@
             shot([b], 0.35);
         }
 
-        // ---------------------------------------------------- missiles, flares
 
         function missileLaunch(pos, mine) {
             const out = mine ? own : panner(pos);
@@ -287,9 +256,8 @@
 
         function flares(pos, mine) {
             const out = mine ? own : panner(pos);
-            // A long string of pops as the flares are fired in pairs.
-            for (let k = 0; k < 16; k++) {
-                const t = now() + Math.floor(k / 2) * 0.17 + (k % 2) * 0.035, o = osc("sine", 900), g = gain(0);
+            for (let k = 0; k < 24; k++) {
+                const t = now() + Math.floor(k / 2) * 0.07 + (k % 2) * 0.02, o = osc("sine", 900), g = gain(0);
                 chain(o, g, out);
                 o.frequency.setValueAtTime(900, t);
                 o.frequency.exponentialRampToValueAtTime(180, t + 0.08);
@@ -303,9 +271,7 @@
             shot([n], 2.7);
         }
 
-        // ------------------------------------------------- tones and warnings
 
-        // Continuous tones: the seeker growl / lock tone, and the warning beeps.
         const seek = osc("sine", 900), seekG = gain(0), seekAM = osc("sine", 18), seekAMg = gain(0);
         chain(seek, seekG, ui);
         chain(seekAM, seekAMg, seekG.gain);
@@ -319,7 +285,6 @@
         horn.start();
         let beepT = 0;
 
-        // lock: 0 none, 0..1 locking, 1 locked. threat: "" | "lock" | "missile". alarm: stall/pull up.
         function tones(dt, lock, threat, alarm) {
             const t = now();
             if (lock >= 1) {
@@ -346,7 +311,6 @@
             hornG.gain.setTargetAtTime(alarm && Math.floor(t * 4) % 2 ? 0.035 : 0, t, 0.01);
         }
 
-        // ------------------------------------------------------- explosions
 
         function boom(pos, scale, listenerPos) {
             if (muted()) return;
@@ -375,7 +339,6 @@
             });
         }
 
-        // ------------------------------------------------------------ frame
 
         function listen(camera, vel) {
             const L = ctx.listener, p = camera.position;
@@ -435,7 +398,6 @@
         };
     };
 
-    // No sound available (old browser, or sound not allowed yet): do nothing.
     function dummy() {
         const nop = () => {};
         return {frame: nop, gun: nop, clang: nop, hitTick: nop, killConfirm: nop, missileLaunch: nop, flares: nop, boom: nop, stop: nop};

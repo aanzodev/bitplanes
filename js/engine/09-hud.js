@@ -1,4 +1,3 @@
-// HUD: scoreboards, kill log, cockpit, minimap.
 BitModules[9] = function (M, j, t) {
     "use strict";
     (t.d(j, "f", function () {
@@ -175,7 +174,6 @@ BitModules[9] = function (M, j, t) {
             for (let t = 0; t < M.ammo; t++) j[t].classList.remove("hidden");
             for (let t = M.ammo; t < M.maxAmmo; t++) j[t].classList.add("hidden");
         }
-        // Flares (Q), only on planes that carry them.
         const f = document.querySelector(".flare-capacity");
         f &&
             ((f.hidden = !(M.maxFlares > 0)),
