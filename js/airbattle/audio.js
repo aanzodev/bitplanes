@@ -1,4 +1,4 @@
-// Dogfights (3D): sound. Everything is synthesized live with the Web Audio
+// Air Battle (3D): sound. Everything is synthesized live with the Web Audio
 // API and placed in 3D around you (HRTF panning), sharing Bit Planes' audio
 // output, volume and mute.
 //   Your engine: piston engines rumble and pop in time with the RPM and the
@@ -12,7 +12,7 @@
 //   Explosions: heard late when far away (sound travels 343 m/s) and duller.
 //   In the cockpit the outside world is muffled.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
     const C = 343; // speed of sound, m/s
 
     D.makeAudio = function () {

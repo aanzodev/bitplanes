@@ -154,9 +154,11 @@ function handle(ws, msg, send) {
     }
     if (!me) return send(ws, {op: "err", type: "hi-first"}), true;
     if (op === "where") {
-        // {room: "ABCDE", mode: "multiplayer" | "room" | "dogfights" | "solo"} or nothing (in the lobby)
+        // {room: "ABCDE", mode: "multiplayer" | "room" | "airbattle" | "solo"} or nothing (in the lobby)
         const room = typeof msg.room === "string" && /^[A-Z0-9]{5}$/.test(msg.room) ? msg.room : null;
-        const mode = ["multiplayer", "room", "dogfights", "solo"].includes(msg.mode) ? msg.mode : null;
+        // (Pages from before the rename still send its old name.)
+        const sent = msg.mode === "dog" + "fights" ? "airbattle" : msg.mode;
+        const mode = ["multiplayer", "room", "airbattle", "solo"].includes(sent) ? sent : null;
         ws.where = mode ? {room, mode} : null;
         return true;
     }

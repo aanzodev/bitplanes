@@ -1,4 +1,4 @@
-// Dogfights (3D): realistic plane models, built in code (no model files).
+// Air Battle (3D): realistic plane models, built in code (no model files).
 // Each real plane gets its own shape: lofted fuselages (smooth, with flat
 // stealth chines where the real one has them), wings with rounded edges that
 // thin toward the tips, canted or upright twin tails, intakes, engine nozzles
@@ -8,7 +8,7 @@
 // On High/Ultra the paint gets panel lines, a little grime and the Hangar
 // paint pattern (camo, tiger stripes, checkers), drawn by a GLSL shader.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
     let T;
 
     // ------------------------------------------------------------ materials

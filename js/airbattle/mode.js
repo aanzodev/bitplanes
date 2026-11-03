@@ -1,4 +1,4 @@
-// Dogfights (3D beta): pick "Dogfights" on the mode card and press PLAY.
+// Air Battle (3D beta): pick "Air Battle" on the mode card and press PLAY.
 // The deploy screen picks the map and match; then this loads three.js (only
 // for this mode), builds the world and runs the match: blue team vs red team
 // (or free for all), first to the kill goal or the most kills in 10 minutes.
@@ -9,7 +9,7 @@
 //   Scoring: kills, assists, missile and revenge bonuses as score ribbons;
 //   coins per kill and XP at the end. Killcam when you're shot down.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
     const COINS_PER_KILL = 50;
     const MATCH_S = 600;
     const PLAYER_RESPAWN = 5, AI_RESPAWN = 6;
@@ -75,7 +75,7 @@
 
     // ------------------------------------------------------------- start
 
-    // Dogfights opens up at player level 10, or as soon as you own a special
+    // Air Battle opens up at player level 10, or as soon as you own a special
     // plane (the black or gold bordered ones in the Hangar: the jets and the B-2).
     const UNLOCK_LEVEL = 10;
 
@@ -1064,12 +1064,12 @@
     // ------------------------------------------------------------- lobby
 
     function init() {
-        // PLAY with "Dogfights" chosen opens the deploy screen instead of the 2D activity.
+        // PLAY with "Air Battle" chosen opens the deploy screen instead of the 2D activity.
         document.addEventListener("submit", ev => {
             const form = ev.target;
             if (!form || form.id !== "activity") return;
             const mode = form.querySelector('input[name="mode"]:checked');
-            if (!mode || mode.value !== "dogfights") return;
+            if (!mode || mode.value !== "airbattle") return;
             ev.preventDefault();
             ev.stopImmediatePropagation();
             open();

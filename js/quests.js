@@ -1,6 +1,6 @@
 // Quests: three daily goals (new every day) and three bigger weekly goals
 // (new every Monday), the same for everyone on a given date, tracked from
-// your stats in Bit Planes and Dogfights. Finish one and claim its coins and
+// your stats in Bit Planes and Air Battle. Finish one and claim its coins and
 // XP in the Quests tab of the lobby.
 window.BitQuests = (function () {
     const KEY = "quests";

@@ -95,7 +95,7 @@
 
     // Output for a one-shot sound at a world position (or right here if pos is null).
     // Returns null when the sound is too far away or we are not in an activity.
-    // dest: {node, dist} plays into that node instead (the 3D Dogfights mode
+    // dest: {node, dist} plays into that node instead (the 3D Air Battle mode
     // places sounds itself); dist 0..1 makes it duller with distance.
     function output(pos, volume, muffle, dest) {
         if (dest) {
@@ -491,11 +491,11 @@
         gunAt: (pos, type) => throttle("gun", 35) && playGun(type || "mg", pos, 0.6),
         // Online guests only know the shooter's plane shape.
         gunForShape: shape => SHAPE_GUN[shape || ""] || "vickers",
-        // A gun sound right here (no position), e.g. for the 3D Dogfights beta.
+        // A gun sound right here (no position), e.g. for the 3D Air Battle beta.
         playGun: (type, volume = 1) => playGun(type, null, volume),
-        // A gun sound into a node of your own (3D Dogfights), dist 0..1 for distance.
+        // A gun sound into a node of your own (3D Air Battle), dist 0..1 for distance.
         playGunInto: (type, node, volume = 1, dist = 0) => playGun(type, null, volume * mix("gunVolume"), {node, dist}),
-        // A plane's whole gun loadout for one firing interval, into a node of your own (3D Dogfights).
+        // A plane's whole gun loadout for one firing interval, into a node of your own (3D Air Battle).
         volleyInto: (planeId, node, volume = 1, dist = 0, interval = 0.08) =>
             volley(Object.assign({id: planeId}, PROFILES[planeId] || PROFILES.classic), null, volume * mix("gunVolume"), {node, dist}, interval),
         mix,

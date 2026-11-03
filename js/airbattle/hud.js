@@ -1,4 +1,4 @@
-// Dogfights (3D): the on-screen display, Battlefield style.
+// Air Battle (3D): the on-screen display, Battlefield style.
 //   Middle: gunsight, the lead indicator (where to aim to hit the target),
 //   the missile lock diamond, hit and kill markers, damage direction.
 //   Planes: red diamonds for enemies, blue for your team, arrows off screen.
@@ -8,7 +8,7 @@
 //   Score ribbons ("+100 ENEMY DOWN"), warnings, killcam card, scoreboard
 //   (Tab), pause menu, and the end of match results.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
 
     function esc(s) {
         return String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));

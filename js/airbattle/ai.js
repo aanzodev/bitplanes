@@ -1,11 +1,11 @@
-// Dogfights (3D): computer pilots. Each one picks an enemy to hunt (the one
+// Air Battle (3D): computer pilots. Each one picks an enemy to hunt (the one
 // that shot at it, the closest, or you), flies a lead pursuit, fires short
 // bursts when lined up, locks on and launches missiles, drops flares and
 // breaks hard when a missile comes, uses the afterburner to catch up or
 // escape, and never flies into hills, buildings or other planes. skill (0..1)
 // sets how well it aims, how fast it reacts and how often it gets it right.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
 
     D.makePilot = function (THREE, plane, skill = 0.7) {
         // Good pilots get a little more out of the same plane.

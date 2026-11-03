@@ -1,6 +1,6 @@
 // Settings (gear button in the lobby, and in both pause menus): sound
-// volume, Dogfights graphics / camera / mouse options, and key bindings for
-// Bit Planes (2D) and Dogfights (3D). Saved in localStorage under "settings".
+// volume, Air Battle graphics / camera / mouse options, and key bindings for
+// Bit Planes (2D) and Air Battle (3D). Saved in localStorage under "settings".
 //
 // 2D key bindings work by translating: the engine listens for its usual keys
 // (arrows, W/A/S/D, Space, X, Q, C), so a key you bound is passed on as the
@@ -141,7 +141,7 @@ window.BitSettings = (function () {
 
     function in2D() {
         const ui = document.querySelector(".ui");
-        return ui && ui.style.display === "block" && !(window.BitDogfight && window.BitDogfight.state && window.BitDogfight.state());
+        return ui && ui.style.display === "block" && !(window.BitAirBattle && window.BitAirBattle.state && window.BitAirBattle.state());
     }
 
     function translate(ev) {

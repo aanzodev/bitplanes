@@ -1,11 +1,11 @@
-// Dogfights (3D): builds a map. Terrain from the map's height function
+// Air Battle (3D): builds a map. Terrain from the map's height function
 // (colored by height and steepness), a sky dome and water drawn by small GLSL
 // shaders, forests, clouds, and each map's extras: a city of skyscrapers whose
 // windows light up at dusk, an aircraft carrier, icebergs, farms.
 // ground(x, z) gives the height of whatever is there (terrain, building roof,
 // carrier deck) so planes crash into it and computer pilots avoid it.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
 
     // ------------------------------------------------------------ shaders
 

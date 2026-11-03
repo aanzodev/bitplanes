@@ -497,7 +497,7 @@ To run them yourself:
 ```sh
 npm install && npx playwright install chromium   # once
 cd server && npm install && cd ..                # once, for the online tests
-npm test                                         # or: npm test -- dogfights sound
+npm test                                         # or: npm test -- airbattle sound
 ```
 
 ## Project layout
@@ -508,7 +508,7 @@ css/
   base.css              Page, buttons, keys
   menu.css              Start screen
   career.css            Settings, levels, milestones, friends, rankings
-  dogfight.css          Flight Sessions
+  airbattle.css         Flight Sessions
   hangar.css            Aircraft Selection
   online.css            Online play
   activity.css              In-activity HUD
@@ -551,7 +551,7 @@ js/
     87-main.js          controls, physics, rendering, AI, activity modes…
     assets.js           Sprite file paths
     boot.js             …and boot.js starts the activity
-  dogfight/             Flight Sessions (3D beta):
+  airbattle/            Flight Sessions (3D beta):
     maps.js             The six environments and their lighting
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
     erosion.js          Loads erosion.wasm (rain wearing the terrain), JavaScript fallback

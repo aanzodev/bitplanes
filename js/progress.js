@@ -1,7 +1,7 @@
 // Career progress: XP and levels, achievements, and the pop-up notices
 // ("LEVEL UP!", "Milestone unlocked"). XP comes from your stats as they
-// grow (kills, hits, matches, time flying) in Bit Planes and in Dogfights,
-// plus bonuses (quests, achievements, Dogfights medals). Every level pays
+// grow (kills, hits, matches, time flying) in Bit Planes and in Air Battle,
+// plus bonuses (quests, achievements, Air Battle medals). Every level pays
 // coins, and levels 10, 25 and 50 raise every Hangar upgrade's top level by one.
 window.BitProgress = (function () {
     const KEY = "progress";

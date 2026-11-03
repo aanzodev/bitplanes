@@ -4,7 +4,7 @@
     const MODES = {
         "death-match": {name: "Competitive Flight", desc: "Everyone against everyone"},
         "multiplayer": {name: "Multiplayer", desc: "Real players online · 10 min sessions"},
-        "dogfights": {name: "Flight Sessions", desc: "BETA · 3D flights over real terrain", beta: true},
+        "airbattle": {name: "Flight Sessions", desc: "BETA · 3D flights over real terrain", beta: true},
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
 
@@ -63,8 +63,8 @@
         const r = radios().find(x => x.checked) || radios()[0];
         if (!r) return;
         const m = MODES[r.value] || {name: r.value, desc: ""};
-        const D = window.BitDogfight;
-        const locked = r.value === "dogfights" && D && D.access && !D.access().ok;
+        const D = window.BitAirBattle;
+        const locked = r.value === "airbattle" && D && D.access && !D.access().ok;
         document.querySelector(".mode-title").innerHTML = (locked ? "🔒 " : "") + m.name + (m.beta ? ' <span class="beta-tag">Beta</span>' : "");
         document.querySelector(".mode-name").textContent = m.name;
         document.querySelector(".mode-desc").textContent = locked ? "Unlocks at level 10, or with a special plane" : m.desc;

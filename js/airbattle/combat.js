@@ -1,4 +1,4 @@
-// Dogfights (3D): guns, missiles, flares and everything that burns. Effects
+// Air Battle (3D): guns, missiles, flares and everything that burns. Effects
 // use one particle system per blend mode, drawn by a small GLSL shader (soft
 // round sprites that grow, fade and change color), so a big explosion is
 // hundreds of particles in a single draw call.
@@ -6,7 +6,7 @@
 //   Missiles: chase a locked target (lead pursuit, limited turn, motor burns
 //   out); without a lock they fly straight. Flares fool most missiles.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
     const MAX_BULLETS = 1400;
 
     const PART_VERT = `

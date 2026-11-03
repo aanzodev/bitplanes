@@ -1,5 +1,5 @@
-// Hydraulic erosion for the Dogfights terrain, compiled to WebAssembly
-// (js/dogfight/erosion.wasm, built by native/build.sh).
+// Hydraulic erosion for the Air Battle terrain, compiled to WebAssembly
+// (js/airbattle/erosion.wasm, built by native/build.sh).
 //
 // Thousands of raindrops roll down the heightmap. Each one picks up soil
 // where it speeds up downhill and drops it where it slows down or the

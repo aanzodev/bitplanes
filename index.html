@@ -14,13 +14,13 @@
     <link href="css/pause.css" rel="stylesheet">
     <link href="css/console.css" rel="stylesheet">
     <link href="css/panels.css" rel="stylesheet">
-    <link href="css/dogfight.css" rel="stylesheet">
+    <link href="css/airbattle.css" rel="stylesheet">
     <link href="css/career.css" rel="stylesheet">
 </head>
 <body>
 <main>
     <section class="lobby">
-        <!-- The bots' dogfight flies behind the lobby. -->
+        <!-- The bots' air battle flies behind the lobby. -->
         <canvas class="demo"></canvas>
         <div class="lobby-shade"></div>
 
@@ -74,7 +74,7 @@
                         <label title="Play with real people online: 10 minute sessions, top 5 rankings."><input type="radio" name="mode" value="multiplayer"> Multiplayer</label>
                     </div>
                     <div>
-                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="dogfights"> Flight Sessions (Beta)</label>
+                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="airbattle"> Flight Sessions (Beta)</label>
                     </div>
                 </div>
             </div>
@@ -219,19 +219,19 @@
 <script src="js/online/lobby.js"></script>
 <script src="js/social.js"></script>
 <script src="js/menu.js"></script>
-<!-- Dogfights (3D beta): three.js itself loads only when you start it -->
-<script src="js/dogfight/maps.js"></script>
-<script src="js/dogfight/erosion.js"></script>
-<script src="js/dogfight/world.js"></script>
-<script src="js/dogfight/post.js"></script>
-<script src="js/dogfight/models.js"></script>
-<script src="js/dogfight/aircraft.js"></script>
-<script src="js/dogfight/combat.js"></script>
-<script src="js/dogfight/ai.js"></script>
-<script src="js/dogfight/audio.js"></script>
-<script src="js/dogfight/hud.js"></script>
-<script src="js/dogfight/deploy.js"></script>
-<script src="js/dogfight/mode.js"></script>
+<!-- Air Battle (3D beta): three.js itself loads only when you start it -->
+<script src="js/airbattle/maps.js"></script>
+<script src="js/airbattle/erosion.js"></script>
+<script src="js/airbattle/world.js"></script>
+<script src="js/airbattle/post.js"></script>
+<script src="js/airbattle/models.js"></script>
+<script src="js/airbattle/aircraft.js"></script>
+<script src="js/airbattle/combat.js"></script>
+<script src="js/airbattle/ai.js"></script>
+<script src="js/airbattle/audio.js"></script>
+<script src="js/airbattle/hud.js"></script>
+<script src="js/airbattle/deploy.js"></script>
+<script src="js/airbattle/mode.js"></script>
 <!-- Activity engine: each file registers a module, boot.js starts the activity -->
 <script src="js/engine/registry.js"></script>
 <script src="js/engine/00-vector.js"></script>
