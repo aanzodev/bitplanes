@@ -182,12 +182,40 @@ async function run() {
         }
     });
 
-    await test("one-line", "a blocked Dogfights file doesn't stop Bit Planes", async () => {
+    await test("one-line", "the loading screen shows real progress", async () => {
+        const ctx = await browser.newContext({viewport: {width: 1100, height: 700}});
+        try {
+            await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
+                body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
+            // Slow every script down a little so the screen can be watched.
+            await ctx.route(/\/js\/(?!loader).*\.js/, async r => { await new Promise(t => setTimeout(t, 40)); await r.continue(); });
+            const p = await ctx.newPage();
+            await p.goto(base + "one-line-test.html?server=off");
+            const seen = [];
+            for (let i = 0; i < 400 && await p.$(".bit-load"); i++) {
+                seen.push(await p.evaluate(() => {
+                    const el = document.querySelector(".bit-load");
+                    return el ? [parseInt(el.querySelector(".bit-load-pct").textContent), el.querySelector(".bit-load-step").textContent] : null;
+                }));
+                await p.waitForTimeout(25);
+            }
+            const pcts = seen.filter(Boolean).map(x => x[0]);
+            const steps = new Set(seen.filter(Boolean).map(x => x[1]));
+            const rising = pcts.every((v, i) => !i || v >= pcts[i - 1]);
+            const ended = await p.evaluate(() => !document.querySelector(".bit-load") && !document.documentElement.classList.contains("bit-loading"));
+            check(rising && new Set(pcts).size >= 5 && [...steps].some(x => /file \d+ of \d+/.test(x)) && ended,
+                JSON.stringify({pcts: [...new Set(pcts)], steps: [...steps].slice(0, 4), ended}));
+        } finally {
+            await ctx.close();
+        }
+    });
+
+    await test("one-line", "a blocked Flight Sessions file doesn't stop Bit Planes", async () => {
         const p = await oneLine(true);
         try {
             const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
                 modes: [...document.querySelectorAll('input[name="mode"]')].map(x => x.value), note: document.querySelector(".online-status").textContent}));
-            check(!r.failed && r.shop && !r.modes.includes("dogfights") && /Dogfights/.test(r.note), JSON.stringify(r));
+            check(!r.failed && r.shop && !r.modes.includes("dogfights") && /Flight Sessions/.test(r.note), JSON.stringify(r));
             await p.click(".play-btn");
             await p.waitForTimeout(800);
             check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "Bit Planes didn't start");

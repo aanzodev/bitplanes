@@ -95,35 +95,35 @@ window.BitStats = (function () {
             ${lv ? `<div class="stat-level"><b>Level ${lv.level}</b><div class="level-track"><span style="width: ${lv.frac * 100}%"></span></div>
                 <small>${lv.need ? `${n(lv.into)} / ${n(lv.need)} XP to level ${lv.level + 1}` : "Max level"} · ${n(lv.xp)} XP in total</small></div>` : ""}
             <div class="stat-grid">
-                ${card("Kills", n(s.killed))}
+                ${card("Points", n(s.killed))}
                 ${card("Deaths", n(s.deaths))}
                 ${card("K/D ratio", kd)}
-                ${card("Best kill streak", n(s.bestStreak), s.streak ? `now: ${s.streak}` : "")}
+                ${card("Best score streak", n(s.bestStreak), s.streak ? `now: ${s.streak}` : "")}
                 ${card("Accuracy", acc, `${n(s.hits)} hits / ${n(s.bullets)} shots`)}
-                ${card("Missiles fired", n(s.missiles))}
-                ${card("Matches", n(s.matches), `${n(s.onlineMatches)} online`)}
+                ${card("Guided missiles fired", n(s.missiles))}
+                ${card("Sessions", n(s.matches), `${n(s.onlineMatches)} online`)}
                 ${card("Time flying", time(s.flySeconds))}
-                ${card("Coins earned", n(s.coinsEarned))}
+                ${card("Credits earned", n(s.coinsEarned))}
                 ${card("Daily streak", n(daily.streak), `best: ${n(daily.best)}`)}
                 ${card("Cows hit", n(s.cowKilled), "oops")}
             </div>
-            <h3>Dogfights (3D)</h3>
+            <h3>Flight Sessions (3D)</h3>
             <div class="stat-grid">
-                ${card("Kills", n(s.dfKills), `${n(s.dfGunKills)} guns · ${n(s.dfMissileKills)} missiles`)}
+                ${card("Points", n(s.dfKills), `${n(s.dfGunKills)} guns · ${n(s.dfMissileKills)} guided missiles`)}
                 ${card("Deaths", n(s.dfDeaths))}
                 ${card("K/D ratio", s.dfDeaths ? (s.dfKills / s.dfDeaths).toFixed(2) : n(s.dfKills))}
                 ${card("Matches", n(s.dfMatches), `${n(s.dfWins)} won`)}
-                ${card("Missiles dodged", n(s.dfFlareSaves), "with flares")}
+                ${card("Guided missiles dodged", n(s.dfFlareSaves), "with countermeasures")}
                 ${card("Maps flown", n(Object.keys(s.dfMaps || {}).length) + " / 6")}
             </div>
             ${fav ? `<h3>Favorite plane</h3>
             <div class="stat-fav"><img src="${planeImg(fav.p)}" alt=""><div><b>${fav.p.name}</b>
-                <span>${time(fav.sec)} flown · ${n(fav.kills)} kills</span></div></div>
+                <span>${time(fav.sec)} flown · ${n(fav.kills)} points</span></div></div>
             <h3>Your planes</h3>
-            <table class="stat-planes"><tr><th></th><th>Plane</th><th>Time</th><th>Kills</th></tr>
+            <table class="stat-planes"><tr><th></th><th>Plane</th><th>Time</th><th>Points</th></tr>
                 ${planes.slice(0, 8).map(x => `<tr><td><img src="${planeImg(x.p)}" alt=""></td><td>${x.p.name}</td><td>${time(x.sec)}</td><td>${n(x.kills)}</td></tr>`).join("")}
-            </table>` : `<p class="shop-note">Fly a few matches and your favorite planes show up here.</p>`}
-            <p class="shop-note">Accuracy and missiles count single player and hosting.</p>`;
+            </table>` : `<p class="shop-note">Fly a few sessions and your favorite planes show up here.</p>`}
+            <p class="shop-note">Accuracy and guided missiles count single player and hosting.</p>`;
     }
 
     function reset() {
@@ -147,7 +147,7 @@ window.BitStats = (function () {
         document.body.appendChild(el);
         el.addEventListener("click", ev => {
             if (ev.target === el || ev.target.closest(".stats-close")) el.hidden = true;
-            if (ev.target.closest(".stats-reset") && confirm("Reset all your stats? Coins, planes, level and achievements stay.")) {
+            if (ev.target.closest(".stats-reset") && confirm("Reset all your stats? Credits, planes, level and milestones stay.")) {
                 reset();
                 render();
             }

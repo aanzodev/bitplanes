@@ -1,5 +1,5 @@
 // Career progress: XP and levels, achievements, and the pop-up notices
-// ("LEVEL UP!", "Achievement unlocked"). XP comes from your stats as they
+// ("LEVEL UP!", "Milestone unlocked"). XP comes from your stats as they
 // grow (kills, hits, matches, time flying) in Bit Planes and in Dogfights,
 // plus bonuses (quests, achievements, Dogfights medals). Every level pays
 // coins, and levels 10, 25 and 50 raise every Hangar upgrade's top level by one.
@@ -74,7 +74,7 @@ window.BitProgress = (function () {
                 window.BitShop && window.BitShop.addCoins(coins);
                 window.BitStats && window.BitStats.addEarned(coins);
             }
-            const tier = UPGRADE_TIERS.includes(after) ? "<br><small>New upgrade levels unlocked in the Hangar!</small>" : "";
+            const tier = UPGRADE_TIERS.includes(after) ? "<br><small>New upgrade levels unlocked in the Aircraft Market!</small>" : "";
             toast(`<span class="toast-big">LEVEL UP!</span> Level ${after}${coins ? ` · +${coins.toLocaleString()} <i class="coin"></i>` : ""}${tier}`, "level", 4200);
             window.BitSoundFx && window.BitSoundFx.fanfare();
         }
@@ -128,30 +128,30 @@ window.BitProgress = (function () {
         {id: "k50", group: "Combat", icon: "✈", name: "Ace", desc: "Shoot down 50 planes", value: () => st("killed"), goal: 50, coins: 1000, xp: 500},
         {id: "k250", group: "Combat", icon: "🎖", name: "Double Ace", desc: "Shoot down 250 planes", value: () => st("killed"), goal: 250, coins: 3000, xp: 1500},
         {id: "k1000", group: "Combat", icon: "🏆", name: "Legend of the Skies", desc: "Shoot down 1,000 planes", value: () => st("killed"), goal: 1000, coins: 10000, xp: 5000},
-        {id: "s5", group: "Combat", icon: "🔥", name: "On Fire", desc: "Get a 5 kill streak", value: () => st("bestStreak"), goal: 5, coins: 600, xp: 300},
-        {id: "s10", group: "Combat", icon: "☄", name: "Unstoppable", desc: "Get a 10 kill streak", value: () => st("bestStreak"), goal: 10, coins: 2000, xp: 1000},
-        {id: "s20", group: "Combat", icon: "👑", name: "Untouchable", desc: "Get a 20 kill streak", value: () => st("bestStreak"), goal: 20, coins: 6000, xp: 3000},
+        {id: "s5", group: "Combat", icon: "🔥", name: "On Fire", desc: "Get a 5 score streak", value: () => st("bestStreak"), goal: 5, coins: 600, xp: 300},
+        {id: "s10", group: "Combat", icon: "☄", name: "Unstoppable", desc: "Get a 10 score streak", value: () => st("bestStreak"), goal: 10, coins: 2000, xp: 1000},
+        {id: "s20", group: "Combat", icon: "👑", name: "Untouchable", desc: "Get a 20 score streak", value: () => st("bestStreak"), goal: 20, coins: 6000, xp: 3000},
         {id: "hits500", group: "Combat", icon: "🔫", name: "Sharpshooter", desc: "Land 500 hits with your guns", value: () => st("hits"), goal: 500, coins: 800, xp: 400},
         {id: "hits5000", group: "Combat", icon: "💥", name: "Bullet Storm", desc: "Land 5,000 hits", value: () => st("hits"), goal: 5000, coins: 4000, xp: 2000},
-        {id: "m100", group: "Combat", icon: "🚀", name: "Rocket Man", desc: "Fire 100 missiles", value: () => st("missiles"), goal: 100, coins: 800, xp: 400},
+        {id: "m100", group: "Combat", icon: "🚀", name: "Rocket Man", desc: "Fire 100 guided missiles", value: () => st("missiles"), goal: 100, coins: 800, xp: 400},
         {id: "cow", group: "Combat", icon: "🐄", name: "Moo-ve Out of the Way", desc: "Hit a cow", value: () => st("cowKilled"), goal: 1, coins: 100, xp: 50},
         {id: "cow25", group: "Combat", icon: "🥩", name: "Farmer's Nightmare", desc: "Hit 25 cows", value: () => st("cowKilled"), goal: 25, coins: 500, xp: 250},
 
         {id: "fly1h", group: "Flying", icon: "⏱", name: "Frequent Flyer", desc: "Fly for 1 hour", value: () => st("flySeconds"), goal: 3600, time: true, coins: 1000, xp: 500},
         {id: "fly10h", group: "Flying", icon: "🌍", name: "Around the World", desc: "Fly for 10 hours", value: () => st("flySeconds"), goal: 36000, time: true, coins: 6000, xp: 3000},
-        {id: "matches10", group: "Flying", icon: "🛫", name: "Regular", desc: "Play 10 matches", value: () => st("matches"), goal: 10, coins: 500, xp: 250},
-        {id: "matches100", group: "Flying", icon: "🛬", name: "Veteran", desc: "Play 100 matches", value: () => st("matches"), goal: 100, coins: 3000, xp: 1500},
-        {id: "mp10", group: "Flying", icon: "🌐", name: "Online Pilot", desc: "Play 10 Multiplayer matches", value: () => st("onlineMatches"), goal: 10, coins: 1500, xp: 750},
+        {id: "matches10", group: "Flying", icon: "🛫", name: "Regular", desc: "Play 10 sessions", value: () => st("matches"), goal: 10, coins: 500, xp: 250},
+        {id: "matches100", group: "Flying", icon: "🛬", name: "Veteran", desc: "Play 100 sessions", value: () => st("matches"), goal: 100, coins: 3000, xp: 1500},
+        {id: "mp10", group: "Flying", icon: "🌐", name: "Online Pilot", desc: "Play 10 Multiplayer sessions", value: () => st("onlineMatches"), goal: 10, coins: 1500, xp: 750},
 
-        {id: "df1", group: "Dogfights", icon: "🗻", name: "Into the Third Dimension", desc: "Shoot down a plane in Dogfights", value: () => st("dfKills"), goal: 1, coins: 300, xp: 150},
-        {id: "df100", group: "Dogfights", icon: "🦅", name: "Top Gun", desc: "Shoot down 100 planes in Dogfights", value: () => st("dfKills"), goal: 100, coins: 4000, xp: 2000},
-        {id: "dfm25", group: "Dogfights", icon: "🎇", name: "Fox Two", desc: "25 missile kills in Dogfights", value: () => st("dfMissileKills"), goal: 25, coins: 2000, xp: 1000},
-        {id: "dfg50", group: "Dogfights", icon: "🔩", name: "Guns Guns Guns", desc: "50 gun kills in Dogfights", value: () => st("dfGunKills"), goal: 50, coins: 2500, xp: 1200},
-        {id: "dff10", group: "Dogfights", icon: "✨", name: "Chaff and Flares", desc: "Dodge 10 missiles with flares", value: () => st("dfFlareSaves"), goal: 10, coins: 1500, xp: 750},
-        {id: "dfw1", group: "Dogfights", icon: "🏁", name: "Team Player", desc: "Win a Dogfights team match", value: () => st("dfWins"), goal: 1, coins: 800, xp: 400},
-        {id: "dfw10", group: "Dogfights", icon: "🥇", name: "Squadron Leader", desc: "Win 10 Dogfights matches", value: () => st("dfWins"), goal: 10, coins: 4000, xp: 2000},
-        {id: "dfmaps", group: "Dogfights", icon: "🗺", name: "World Tour", desc: "Fly every Dogfights map", value: () => Object.keys(st("dfMaps") || {}).length, goal: 6, coins: 2000, xp: 1000},
-        {id: "dfeject", group: "Dogfights", icon: "🪂", name: "Punch Out", desc: "Eject from a burning plane", value: () => st("dfEjects"), goal: 1, coins: 300, xp: 150},
+        {id: "df1", group: "Flight Sessions", icon: "🗻", name: "Into the Third Dimension", desc: "Shoot down a plane in Flight Sessions", value: () => st("dfKills"), goal: 1, coins: 300, xp: 150},
+        {id: "df100", group: "Flight Sessions", icon: "🦅", name: "Top Gun", desc: "Shoot down 100 planes in Flight Sessions", value: () => st("dfKills"), goal: 100, coins: 4000, xp: 2000},
+        {id: "dfm25", group: "Flight Sessions", icon: "🎇", name: "Fox Two", desc: "25 guided missile points in Flight Sessions", value: () => st("dfMissileKills"), goal: 25, coins: 2000, xp: 1000},
+        {id: "dfg50", group: "Flight Sessions", icon: "🔩", name: "Guns Guns Guns", desc: "50 gun points in Flight Sessions", value: () => st("dfGunKills"), goal: 50, coins: 2500, xp: 1200},
+        {id: "dff10", group: "Flight Sessions", icon: "✨", name: "Chaff Out", desc: "Dodge 10 guided missiles with countermeasures", value: () => st("dfFlareSaves"), goal: 10, coins: 1500, xp: 750},
+        {id: "dfw1", group: "Flight Sessions", icon: "🏁", name: "Team Player", desc: "Win a Team Flight session", value: () => st("dfWins"), goal: 1, coins: 800, xp: 400},
+        {id: "dfw10", group: "Flight Sessions", icon: "🥇", name: "Squadron Leader", desc: "Win 10 Flight Sessions", value: () => st("dfWins"), goal: 10, coins: 4000, xp: 2000},
+        {id: "dfmaps", group: "Flight Sessions", icon: "🗺", name: "World Tour", desc: "Fly every Flight Sessions environment", value: () => Object.keys(st("dfMaps") || {}).length, goal: 6, coins: 2000, xp: 1000},
+        {id: "dfeject", group: "Flight Sessions", icon: "🪂", name: "Punch Out", desc: "Eject from a burning plane", value: () => st("dfEjects"), goal: 1, coins: 300, xp: 150},
 
         {id: "lv10", group: "Career", icon: "⭐", name: "Rising Star", desc: "Reach level 10", value: () => levelInfo().level, goal: 10, coins: 1000, xp: 0},
         {id: "lv25", group: "Career", icon: "🌟", name: "Seasoned Pilot", desc: "Reach level 25", value: () => levelInfo().level, goal: 25, coins: 3000, xp: 0},
@@ -184,7 +184,7 @@ window.BitProgress = (function () {
                 window.BitShop && window.BitShop.addCoins(a.coins);
                 window.BitStats && window.BitStats.addEarned(a.coins);
             }
-            toast(`<span class="toast-icon">${a.icon}</span><span><small>Achievement unlocked</small><b>${a.name}</b>${a.desc} · +${a.coins.toLocaleString()} <i class="coin"></i>${a.xp ? ` +${a.xp} XP` : ""}</span>`, "ach", 4500);
+            toast(`<span class="toast-icon">${a.icon}</span><span><small>Milestone unlocked</small><b>${a.name}</b>${a.desc} · +${a.coins.toLocaleString()} <i class="coin"></i>${a.xp ? ` +${a.xp} XP` : ""}</span>`, "ach", 4500);
             if (a.xp) addXp(a.xp);
             renderPanel();
         }
@@ -247,8 +247,8 @@ window.BitProgress = (function () {
         panel = document.createElement("div");
         panel.className = "achievements panel-backdrop";
         panel.hidden = true;
-        panel.innerHTML = `<div class="panel" role="dialog" aria-label="Achievements">
-            <div class="shop-header"><h2>Achievements</h2><span class="ach-count"></span><button type="button" class="close-shop ach-close" aria-label="Close">×</button></div>
+        panel.innerHTML = `<div class="panel" role="dialog" aria-label="Milestones">
+            <div class="shop-header"><h2>Milestones</h2><span class="ach-count"></span><button type="button" class="close-shop ach-close" aria-label="Close">×</button></div>
             <div class="ach-body"></div>
         </div>`;
         document.body.appendChild(panel);

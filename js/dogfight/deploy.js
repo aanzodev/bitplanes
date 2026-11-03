@@ -48,28 +48,28 @@
             const sizes = setup.mode === "team" ? [[4, "4 v 4"], [6, "6 v 6"], [8, "8 v 8"]] : [[6, "6 pilots"], [10, "10 pilots"], [14, "14 pilots"]];
             if (!sizes.some(([v]) => v === setup.size)) setup.size = sizes[1][0];
             el.innerHTML = `<div class="df-deploy-box">
-                <div class="df-deploy-head"><h2>Dogfights <span class="beta-tag">Beta</span></h2>
+                <div class="df-deploy-head"><h2>Flight Sessions <span class="beta-tag">Beta</span></h2>
                     <button type="button" class="df-x" aria-label="Back to the lobby">×</button></div>
-                <h3>Map</h3>
+                <h3>Environment</h3>
                 <div class="df-maps">
                     ${D.MAPS.map(m => `<button type="button" class="df-map${setup.map === m.id ? " on" : ""}" data-map="${m.id}" style="background: ${GRADIENTS[m.id]}">
                         <span class="df-map-icon">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small>
                         <em>${D.SKIES[m.sky].name}</em></button>`).join("")}
-                    <button type="button" class="df-map random${setup.map === "random" ? " on" : ""}" data-map="random"><span class="df-map-icon">🎲</span><b>Random</b><small>Any map, any time of day.</small></button>
+                    <button type="button" class="df-map random${setup.map === "random" ? " on" : ""}" data-map="random"><span class="df-map-icon">🎲</span><b>Random Environment</b><small>Any environment, any lighting.</small></button>
                 </div>
                 <div class="df-opts">
-                    <div><h3>Match</h3>${chips("mode", [["team", "Team dogfight"], ["ffa", "Free for all"]], setup.mode)}</div>
-                    <div><h3>Size</h3>${chips("size", sizes, setup.size)}</div>
-                    <div><h3>Time of day</h3>${chips("sky", [["", "Map's own"], ["day", "Day"], ["dawn", "Dawn"], ["sunset", "Sunset"], ["overcast", "Overcast"], ["dusk", "Dusk"], ["night", "Night"]], setup.sky)}</div>
-                    <div><h3>Enemy pilots</h3>${chips("difficulty", [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"], ["ace", "Ace"]], setup.difficulty)}</div>
+                    <div><h3>Session</h3>${chips("mode", [["team", "Team Flight"], ["ffa", "Open Flight"]], setup.mode)}</div>
+                    <div><h3>Participants</h3>${chips("size", sizes, setup.size)}</div>
+                    <div><h3>Lighting</h3>${chips("sky", [["", "Environment's own"], ["day", "Day"], ["dawn", "Dawn"], ["sunset", "Sunset"], ["overcast", "Overcast"], ["dusk", "Dusk"], ["night", "Night"]], setup.sky)}</div>
+                    <div><h3>AI Pilots</h3>${chips("difficulty", [["easy", "Beginner"], ["normal", "Standard"], ["hard", "Advanced"], ["ace", "Expert"]], setup.difficulty)}</div>
                 </div>
                 <div class="df-deploy-foot">
                     <div class="df-your-plane">${plane ? `<img src="${window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(plane), true, plane.skin, shop.patternOf(plane)) : ""}" alt="">
-                        <div><small>Your plane</small><b>${plane.name}</b></div>` : ""}
-                        <button type="button" class="pill df-hangar">Hangar</button>
+                        <div><small>Selected Aircraft</small><b>${plane.name}</b></div>` : ""}
+                        <button type="button" class="pill df-hangar">Aircraft Selection</button>
                         <button type="button" class="pill df-set">⚙ Settings</button></div>
-                    <p class="df-tip">${setup.mode === "team" ? "Blue team vs red team. First team to the kill goal wins, or the most kills in 10 minutes." : "Everyone against everyone. First to 15 kills wins."}</p>
-                    <button type="button" class="btn df-go">Deploy</button>
+                    <p class="df-tip">${setup.mode === "team" ? "Blue team vs red team. First team to the score goal wins, or the most points in 10 minutes." : "Everyone against everyone. First to 15 points wins."}</p>
+                    <button type="button" class="btn df-go">Enter Session</button>
                 </div>
             </div>`;
         }
