@@ -319,7 +319,7 @@ BitModules[14] = function (M, j, t) {
                         M.effects.add(t),
                         X(M, t);
                 },
-                55 * Math.floor(k / 2),
+                95 * Math.floor(k / 2),
             );
         0 !== j.flares ||
             j.flareReloading ||

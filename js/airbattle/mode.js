@@ -126,7 +126,7 @@
         status("Loading 3D Flight Sessions…");
         let THREE;
         try {
-            [THREE] = await Promise.all([loadThree(), D.loadErosion ? D.loadErosion() : null]);
+            [THREE] = await Promise.all([loadThree(), D.loadErosion ? D.loadErosion() : null, D.loadFlight ? D.loadFlight() : null]);
         } catch (e) {
             return status(e.message);
         }

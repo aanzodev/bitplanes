@@ -228,7 +228,7 @@
             for (let k = 0; k < 24; k++) {
                 const out = plane.forward.clone().multiplyScalar(-55).addScaledVector(plane.up, -30).addScaledVector(plane.right, (k % 2 ? 1 : -1) * (25 + Math.random() * 35))
                     .add(V().set(rnd(20), rnd(12), rnd(20)));
-                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.07 + (k % 2) * 0.02});
+                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.11 + (k % 2) * 0.03});
             }
             let fooled = 0;
             for (const m of missiles) {

@@ -162,7 +162,7 @@ when they pass close by. Countermeasures still fool them, like any other guided 
 ◆ Exclusive planes have a gold border in Aircraft Selection.
 
 ★ Special jets have a black border in Aircraft Selection and carry countermeasures: press
-<kbd>Q</kbd> and guided missiles chasing you turn toward the countermeasures and explode on them. Each press fires 24 countermeasures in quick pairs, all out in under a second, and
+<kbd>Q</kbd> and guided missiles chasing you turn toward the countermeasures and explode on them. Each press fires 24 countermeasures in pairs over about a second, and
 they burn for 4 to 5 seconds (about 6 in Flight Sessions), so guided missiles stay fooled
 longer.
 
@@ -378,6 +378,19 @@ use keys. **V** switches between the chase camera and the **cockpit**, with a
 live instrument panel (airspeed, altitude, artificial horizon, heading, G,
 throttle, health).
 
+**Flight model (C++):** speed comes from real physics, written in C++ and
+compiled to WebAssembly (`native/flight.cpp`, with a matching JavaScript
+fallback in `flight.js`). Every plane uses its real weight, wing area,
+wingspan and engine (jet thrust, or propeller horsepower whose thrust falls
+off with speed). Each frame it works out thrust against drag: drag from the
+airframe, plus drag from lift, which grows with the square of the G you pull,
+so hard turns bleed speed. Gravity slows climbs and speeds up dives. Air
+thins with altitude, so engines lose power, drag drops and the stall speed
+rises. Pulling G raises the stall speed too (softened so dogfights stay
+playable). Each plane is calibrated so its top speed and 1 G stall speed
+match its stats, which keeps the balance between planes. Energy changes run
+2.2 times faster than real life, like most flight action titles.
+
 | Key | Action |
 |---|---|
 | <kbd>↑</kbd> <kbd>↓</kbd> / mouse | Pitch: nose up / down |
@@ -554,9 +567,11 @@ js/
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
     erosion.js          Loads erosion.wasm (rain wearing the terrain), JavaScript fallback
     erosion.wasm        Built from native/erosion.c
+    flight.js           Physics flight model: loads flight.wasm, JavaScript fallback, real plane specs
+    flight.wasm         Built from native/flight.cpp
     post.js             Bloom, filmic tone mapping and color grading (High/Ultra)
     models.js           Realistic plane models (each real plane its own shape, moving controls)
-    aircraft.js         Cockpits with instruments, flight model
+    aircraft.js         Cockpits with instruments, controls
     combat.js           Guns, guided missiles, countermeasures, GLSL particle effects, debris
     ai.js               Computer pilots
     audio.js            3D synthesized sound
@@ -568,7 +583,7 @@ assets/
   sprites/              Activity sprites (units, effects, scenery, ui)
   icons/                HUD and logo icons
 docs/screenshots/       Images for this README
-native/                 C code compiled to WebAssembly (build.sh rebuilds it; needs clang)
+native/                 C and C++ code compiled to WebAssembly (build.sh rebuilds it; needs clang)
 tests/run.mjs           Automated tests (npm test), run on every pull request
 server/                 Relay server for online play, friends and the rankings (Node.js)
 render.yaml             One-click deploy of the relay server on Render
