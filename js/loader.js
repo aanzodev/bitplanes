@@ -14,20 +14,9 @@
         [...document.querySelectorAll("script[src]")].find(s => /js\/loader\.js(\?.*)?$/.test(s.src));
     let base = ((me && me.src) || DEFAULT).replace(/js\/loader\.js(\?.*)?$/, "");
 
-    // jsDelivr keeps copies of branch files (like @main) for hours. Ask GitHub
-    // for the newest commit and load that exact version instead: commit links
-    // are always up to date, so every push shows up on the next page load.
-    async function newestBase() {
-        const m = base.match(/^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@/]+)@([^/]+)\/$/);
-        if (!m || /^[0-9a-f]{40}$/.test(m[3])) return base;
-        try {
-            const res = await fetchWithin(`https://api.github.com/repos/${m[1]}/${m[2]}/commits/${m[3]}`, 6000,
-                {headers: {Accept: "application/vnd.github.sha"}});
-            const sha = res.ok ? (await res.text()).trim() : "";
-            if (/^[0-9a-f]{40}$/.test(sha)) return `https://cdn.jsdelivr.net/gh/${m[1]}/${m[2]}@${sha}/`;
-        } catch (e) {}
-        return base; // GitHub unreachable or rate limited: use the branch copy
-    }
+    // Everything loads from the same place as this script (jsDelivr's copy of
+    // the repo), with no GitHub lookups. jsDelivr refreshes its copy of a
+    // branch like @main within about 12 hours of a push.
 
     function loadOnce(src) {
         return new Promise((resolve, reject) => {
@@ -181,9 +170,6 @@
     async function start() {
         await bodyReady();
         const done = showLoading();
-        step("Finding the newest version…");
-        progress(2);
-        base = await newestBase();
         window.BitBase = base; // asset paths (sprites, maps) are resolved against this
         step("Downloading the page…", "index.html");
         progress(5);

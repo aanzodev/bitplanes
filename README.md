@@ -41,16 +41,15 @@ Multiplayer, your time in the air otherwise.
 Night Owl, Arctic Fox, Desert Hawk, Moo Pilot, Top Gun, Neon Rider, Stealth
 and Golden Ace (25,000 credits).
 
-### One-line version (loads from GitHub)
+### One-line version (loads from jsDelivr)
 
-`play.html` is a single line that runs the newest activity from this GitHub repo
-through the [jsDelivr](https://www.jsdelivr.com) CDN. It asks GitHub for the
-newest commit on `main` and loads exactly that version, so every push shows up
-the next time the page is opened (no waiting for jsDelivr's cache). If GitHub
-can't be asked (offline or rate limited), it loads the copy on GitHub Pages
-instead (`aanzodev.github.io/bitplanes`, so Pages needs to be turned on in the
-repo's settings). Save it anywhere, or paste it into an online editor like
-OneCompiler.
+`play.html` is a single line that runs the activity from this GitHub repo
+through the [jsDelivr](https://www.jsdelivr.com) CDN, without asking GitHub
+anything. jsDelivr picks up a push to `main` within about 12 hours. To see a
+push right away, open
+`https://purge.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js` (and the
+same link ending in `index.html` or any file you changed) to clear jsDelivr's
+copy. Save it anywhere, or paste it into an online editor like OneCompiler.
 
 The short form also works:
 
@@ -58,9 +57,8 @@ The short form also works:
 <script src="https://cdn.jsdelivr.net/gh/aanzodev/bitplanes@main/js/loader.js"></script>
 ```
 
-`js/loader.js` does the same newest-commit lookup, then reads `index.html` and
-loads its page, styles, scripts and images. If GitHub can't be reached it falls
-back to jsDelivr's copy of `main`.
+`js/loader.js` reads `index.html` from the same place and loads its page,
+styles, scripts and images, with a loading screen that shows its progress.
 
 ## Levels, milestones and quests
 
