@@ -1,15 +1,3 @@
-// Automated tests for Bit Planes: opens the real page in a headless browser
-// (Playwright + Chromium) and plays it. Runs on every pull request (see
-// .github/workflows/test.yml), or locally:
-//
-//   npm install && npx playwright install chromium   (once)
-//   cd server && npm install && cd ..                (once, for the online tests)
-//   npm test                                         (all tests)
-//   npm test -- airbattle sound                       (only some groups)
-//
-// Each test is a few lines that use the page's own objects (BitShop,
-// BitAirBattle, BitSound, ...). A test passes if its checks hold and the page
-// threw no errors.
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -25,13 +13,11 @@ function loadPlaywright() {
     try {
         return require("playwright");
     } catch (e) {
-        // Fall back to a globally installed copy.
         return require(path.join(execSync("npm root -g").toString().trim(), "playwright"));
     }
 }
 const {chromium} = loadPlaywright();
 
-// ------------------------------------------------------------- servers
 
 const TYPES = {".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
     ".png": "image/png", ".wasm": "application/wasm", ".json": "application/json", ".mp3": "audio/mpeg", ".ico": "image/x-icon"};
@@ -66,7 +52,6 @@ async function relayServer() {
     return null;
 }
 
-// ------------------------------------------------------------- harness
 
 const GL = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--autoplay-policy=no-user-gesture-required"];
 let browser, base, relay;
@@ -75,7 +60,6 @@ const results = [];
 async function page(opts = {}) {
     const ctx = await browser.newContext({viewport: opts.viewport || {width: 1100, height: 700}});
     await ctx.addInitScript(init => {
-        // Skip the daily reward pop-up; set up saved data for the test.
         localStorage.setItem("daily", JSON.stringify({last: new Date().toLocaleDateString("en-CA"), streak: 1}));
         for (const [k, v] of Object.entries(init)) localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v));
     }, opts.storage || {});
@@ -117,18 +101,14 @@ async function test(group, name, fn) {
 
 const only = process.argv.slice(2);
 
-// ------------------------------------------------------------- tests
 
 async function run() {
-    // ---- source
-    // The project avoids one word (the owner's rule); spelled in two parts here.
     const word = "ga" + "me";
     await test("source", `the word "${word}" appears nowhere`, async () => {
         const out = execSync(`grep -rIli "${word}" --exclude-dir=.git --exclude-dir=node_modules --exclude=three.min.js . || true`, {cwd: ROOT}).toString().trim();
         check(!out, "found in: " + out);
     });
 
-    // ---- lobby
     await test("lobby", "every panel opens and closes", async open => {
         const p = await open();
         for (const sel of [".nav-tab.open-stats", ".nav-tab.open-shop", ".nav-tab.open-skins", ".open-quests", ".nav-tab.open-achievements",
@@ -153,11 +133,9 @@ async function run() {
         check(seen.size === 3, "modes seen: " + [...seen]);
     });
 
-    // ---- the one-line version (js/loader.js, what play.html and other sites use)
     async function oneLine(blockAirBattle) {
         const ctx = await browser.newContext({viewport: {width: 1100, height: 700}});
         await ctx.addInitScript(() => localStorage.setItem("daily", JSON.stringify({last: new Date().toLocaleDateString("en-CA"), streak: 1})));
-        // A page with nothing but the loader's script tag.
         await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
             body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
         if (blockAirBattle) await ctx.route(/js\/airbattle\/deploy\.js/, r => r.abort());
@@ -187,7 +165,6 @@ async function run() {
         try {
             await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
                 body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
-            // Slow every script down a little so the screen can be watched.
             await ctx.route(/\/js\/(?!loader).*\.js/, async r => { await new Promise(t => setTimeout(t, 40)); await r.continue(); });
             const p = await ctx.newPage();
             await p.goto(base + "one-line-test.html?server=off");
@@ -224,14 +201,12 @@ async function run() {
         }
     });
 
-    // ---- every script index.html lists exists
     await test("source", "every file index.html loads exists", async () => {
         const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
         const missing = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)].map(m => m[1]).filter(f => !/^https?:/.test(f) && !fs.existsSync(path.join(ROOT, f)));
         check(!missing.length, "missing: " + missing.join(", "));
     });
 
-    // ---- Bit Planes (2D)
     await test("2d", "take off, shoot, eject in your pilot skin", async open => {
         const p = await open({storage: {skins: {owned: ["rookie", "neon"], selected: "neon"}}});
         await p.click(".play-btn");
@@ -287,7 +262,6 @@ async function run() {
         check((await count()) >= 14, "flares still burning at 3.6 s: " + (await count()));
     });
 
-    // ---- progression
     await test("career", "XP levels you up, pays coins, unlocks achievements", async open => {
         const p = await open();
         const r = await p.evaluate(() => {
@@ -305,7 +279,6 @@ async function run() {
         check(await b.evaluate(() => BitAirBattle.access().ok), "MiG-21 owner is locked out");
     });
 
-    // ---- sound
     await test("sound", "every plane's guns sound different", async open => {
         const p = await open();
         const prints = await p.evaluate(async () => {
@@ -329,7 +302,7 @@ async function run() {
             }
             return out;
         });
-        p.errors = p.errors.filter(e => !/resume|suspend/i.test(e)); // offline contexts can't resume
+        p.errors = p.errors.filter(e => !/resume|suspend/i.test(e));
         check(new Set(prints).size === prints.length, "duplicates: " + prints.join(" "));
     });
 
@@ -351,7 +324,6 @@ async function run() {
         check(!bad.length, "silent or broken: " + bad);
     });
 
-    // ---- Air Battle
     await test("airbattle", "erosion (WebAssembly and the JavaScript fallback)", async open => {
         const p = await open();
         const r = await p.evaluate(async () => {
@@ -384,14 +356,12 @@ async function run() {
                 };
                 e.input = {pitch: 0, roll: 0, yaw: 0, throttle: 0.7};
             };
-            // Parked high above the Alpine peaks, so none of them crash meanwhile.
             const park = (o, i) => o.pos.set(9000, 7000, -9000 + i * 400);
             g.others.forEach((o, i) => (still(o), park(o, i)));
             pl.quat.identity();
             pl.pos.set(0, 2500, 3000);
             pl.speed = pl.cornerSpeed;
             const foes = g.others.filter(x => x.team !== pl.team), out = {};
-            // Guns
             const e = foes[0];
             g.held.add("fire");
             let t = 0;
@@ -403,9 +373,7 @@ async function run() {
             }
             g.held.delete("fire");
             out.gunKill = !e.alive;
-            // Keep that one down, so it can't respawn in front of us and take the lock.
             g.respawnAt.delete(e);
-            // Missile lock and hit
             const e2 = foes.find(f => f !== e && f.alive);
             e2.flares = 0;
             for (let i = 0; i < 40 && g.lock.progress < 1; i++) {
@@ -419,11 +387,7 @@ async function run() {
             g.combat.launch(pl, e2);
             for (let i = 0; i < 60 && e2.alive && e2.health === h; i++) D.advance(0.1);
             out.missileHit = e2.health < h || !e2.alive;
-            // Flares
             const shooter = foes.find(f => f !== e && f !== e2 && f.alive) || e2;
-            // Far enough back that the countermeasures are well clear of the
-            // plane when the missile reaches them (its proximity fuse would
-            // otherwise still catch the plane now and then).
             shooter.pos.copy(pl.pos).addScaledVector(pl.forward, -1500);
             shooter.quat.copy(pl.quat);
             pl.health = pl.maxHealth;
@@ -433,16 +397,14 @@ async function run() {
             g.combat.dropFlares(pl, 1);
             D.advance(4);
             out.flareSaved = pl.alive && pl.health === pl.maxHealth;
-            // Eject and respawn
             const deaths = pl.deaths;
-            g.paused = false; // keys only work while flying
+            g.paused = false;
             g.onKey({type: "keydown", code: g.binds.eject[0], repeat: false, target: document.body, preventDefault() {}, stopImmediatePropagation() {}});
             g.paused = true;
             D.advance(0.3);
             out.ejected = pl.deaths === deaths + 1 && g.chutes.length > 0;
             D.advance(6);
             out.respawned = pl.alive;
-            // End of match
             g.match.blue = g.match.goal;
             D.advance(0.1);
             out.results = !document.querySelector(".df-results").hidden;
@@ -469,7 +431,6 @@ async function run() {
         check(r.kills >= 3 && r.crashes <= 3, JSON.stringify(r));
     });
 
-    // ---- online (needs the relay server's packages: cd server && npm install)
     if (!relay) {
         console.log("  - online tests skipped (run npm install in server/)");
         return;
@@ -519,7 +480,6 @@ async function run() {
     });
 }
 
-// ------------------------------------------------------------- main
 
 const files = await staticServer();
 base = `http://127.0.0.1:${files.address().port}/`;

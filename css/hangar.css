@@ -1,4 +1,3 @@
-/* Hangar shop. */
 
 .coin {
     display: inline-block;
@@ -105,7 +104,6 @@
     border-color: #0a0;
 }
 
-/* Special planes (F-16, A-10, F-22) get a black border. */
 .shop-plane.special {
     border: 3px solid #000;
     background: linear-gradient(180deg, #f4f6f8 0%, #fff 45%);
@@ -115,7 +113,6 @@
     box-shadow: 0 0 0 3px #0a0;
 }
 
-/* Exclusive planes (B-2) get a gold border. */
 .shop-plane.exclusive {
     border: 3px solid #d4a017;
     background: linear-gradient(180deg, #fff6d6 0%, #fff 45%);
@@ -304,7 +301,6 @@
     }
 }
 
-/* Paint */
 
 .shop-paint {
     display: flex;
@@ -354,7 +350,6 @@
     box-shadow: 0 0 0 2px #fff inset;
 }
 
-/* Paint patterns (Hangar and in-activity menu). */
 .pattern-list {
     display: flex;
     flex-wrap: wrap;

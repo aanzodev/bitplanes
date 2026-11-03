@@ -1,13 +1,3 @@
-// Everything the Hangar sells.
-//
-// Plane stats are multipliers or bonuses on top of the base plane:
-//   thrust, turn, reload, bulletSpeed  multipliers (1 = normal)
-//   life, ammo, missiles, flares       extra hit points / rounds / missiles / flares
-// skin: "" (biplane), "prop" (WWII fighter), "jet" or "bomber" (flying wing).
-// special: shown with a black border in the Hangar.
-// exclusive: shown with a gold border in the Hangar.
-// smartMissiles: missiles lock on fast and turn hard (flares still fool them).
-// Computer pilots fly the regular planes plus special ones marked bots: true.
 window.BitCatalog = {
     planes: [
         {id: "classic", name: "Classic", price: 0, color: "#ff0015",
@@ -77,7 +67,6 @@ window.BitCatalog = {
             desc: "Fast twin-engine fighter, guns in the nose.",
             thrust: 1.35, turn: 1.1, life: 2, ammo: 10, missiles: 1, reload: 0.8, bulletSpeed: 1.15},
 
-        // Special jets: black border in the Hangar, flares (Q). None beats the F-22.
         {id: "mig21", name: "MiG-21 Fishbed", price: 7000, color: "#9aa39a", skin: "jet", special: true, bots: true,
             desc: "Cheap, fast jet with 2 countermeasures.",
             thrust: 1.3, turn: 1.15, life: 0, ammo: 3, missiles: 1, reload: 0.9, bulletSpeed: 1.25, flares: 2},
@@ -104,13 +93,11 @@ window.BitCatalog = {
             thrust: 1.4, turn: 1.35, life: 2, ammo: 5, missiles: 1, reload: 0.8, bulletSpeed: 1.6, flares: 3,
             smartMissiles: true},
 
-        // Exclusive: gold border in the Hangar.
         {id: "b2", name: "B-2 Spirit", price: 100000, color: "#3b4148", skin: "bomber", exclusive: true,
             desc: "Stealth bomber: massive armor, 6 guided missiles and 4 countermeasures.",
             thrust: 1.25, turn: 1.05, life: 6, ammo: 15, missiles: 4, reload: 0.8, bulletSpeed: 1.5, flares: 4},
     ],
 
-    // Paint colors for any plane (free). The first entry means "factory colors".
     paints: [
         {name: "Factory", color: null},
         {name: "Red", color: "#e8202e"}, {name: "Orange", color: "#ff7a00"}, {name: "Yellow", color: "#f5c400"},
@@ -125,7 +112,6 @@ window.BitCatalog = {
         {name: "Indigo", color: "#3b2a8f"}, {name: "Lavender", color: "#b39ddb"}, {name: "Magenta", color: "#d61fbf"},
     ],
 
-    // Paint patterns (free), drawn over the paint color.
     patterns: [
         {id: "", name: "None"},
         {id: "camo", name: "Camo"},
@@ -146,7 +132,6 @@ window.BitCatalog = {
         {id: "loader", name: "Guided missile loader", desc: "-12% guided missile reload time", max: 4, base: 60},
         {id: "flares", name: "Countermeasure pod", desc: "+1 countermeasure (Q), any plane", max: 3, base: 120},
         {id: "repair", name: "Repair kit", desc: "Fixes 1 hit point every 25s / 20s / 15s", max: 3, base: 150},
-        // Air Battle (3D) only. These don't get extra levels from your player level.
         {id: "boost", name: "Afterburner", desc: "Flight Sessions: +25% boost time", max: 3, base: 150, df: true},
         {id: "seeker", name: "Guided missile seeker", desc: "Flight Sessions: guided missiles lock on 15% faster", max: 3, base: 150, df: true},
         {id: "radar", name: "Radar", desc: "Flight Sessions: +20% radar and lock range", max: 3, base: 120, df: true},

@@ -1,10 +1,4 @@
-// Maps: each activity picks one at random (never the same one twice in a row).
-// Online, the host picks and everyone who joins gets the host's map.
-//
-// A map sets the sky colors, the ground tile, two background layers and the
-// small objects standing on the ground. Art lives in assets/sprites/maps/<id>/.
 window.BitMaps = (function () {
-    // BitBase is set by js/loader.js when the activity is loaded from a CDN.
     const BASE = (window.BitBase || "") + "assets/sprites/maps/";
     const LIST = [
         {id: "countryside", name: "Countryside"},
@@ -19,7 +13,6 @@ window.BitMaps = (function () {
     ];
     const cache = {};
 
-    // The theme object the engine reads (world.map).
     function get(id) {
         const def = LIST.find(m => m.id === id) || LIST[0];
         if (cache[def.id]) return cache[def.id];
@@ -39,7 +32,6 @@ window.BitMaps = (function () {
         return (cache[def.id] = theme);
     }
 
-    // A random map, different from the last one you played.
     function pick() {
         let last = null;
         try {
@@ -53,7 +45,6 @@ window.BitMaps = (function () {
         return get(map.id);
     }
 
-    // "Map: Desert" in the kill log when a match starts.
     function announce(map) {
         const log = document.querySelector(".log");
         if (!log || !map) return;

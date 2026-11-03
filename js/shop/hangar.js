@@ -1,4 +1,3 @@
-// The Hangar screen: shows planes and upgrades and handles the buy buttons.
 (function () {
     const shop = window.BitShop;
 
@@ -6,7 +5,6 @@
         return window.bitPlaneImage ? window.bitPlaneImage(color, true, p.skin, pattern) : "";
     }
 
-    // Pattern buttons, each showing the plane with that pattern.
     function patternButtons(p) {
         const current = shop.patternOf(p);
         return `<div class="pattern-list">${shop.patterns.map(({id, name}) => `
@@ -15,7 +13,6 @@
     }
     window.BitPatternButtons = patternButtons;
 
-    // Paint shop for the plane you fly: a big preview and color swatches.
     function paintSection(state) {
         const p = shop.selected();
         const current = (state.paint && state.paint[p.id]) || null;
@@ -88,7 +85,6 @@
 
     function render() {
         const state = shop.state();
-        // Full number in the Hangar; short (2.5M) in the in-flight display.
         document.querySelectorAll(".coin-count").forEach(el => el.textContent =
             el.closest(".ui") && window.BitMenu ? window.BitMenu.short(state.coins) : state.coins.toLocaleString());
         const planes = document.querySelector(".shop-planes");
@@ -101,7 +97,6 @@
 
     function init() {
         const panel = document.querySelector(".shop");
-        // Several buttons open the Hangar (lobby tab, your plane, your profile).
         const opens = document.querySelectorAll(".open-shop");
         const close = panel && panel.querySelector(".close-shop");
         if (panel) opens.forEach(open => open.addEventListener("click", () => {

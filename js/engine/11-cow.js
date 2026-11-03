@@ -1,4 +1,3 @@
-// Cows wandering on the ground.
 BitModules[11] = function (M, j, t) {
     "use strict";
     (t.d(j, "b", function () {

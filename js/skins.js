@@ -1,6 +1,3 @@
-// Pilot skins: the character who stands in the lobby (and in your profile
-// circle). Buy them with coins in the Skins tab; one is equipped at a time.
-// Each skin is drawn from a few colors and options (no image files).
 window.BitSkins = (function () {
     const KEY = "skins";
     const RARITY = {
@@ -9,7 +6,6 @@ window.BitSkins = (function () {
         epic: {name: "Epic", color: "#8e44ad"},
         legendary: {name: "Legendary", color: "#e5a50a"},
     };
-    // cap: "leather" (flying cap + goggles) or "jet" (helmet + visor)
     const SKINS = [
         {id: "rookie", name: "Rookie", rarity: "common", price: 0, desc: "Fresh out of flight school.",
             cap: "leather", capColor: "#7b4a2a", jacket: "#6b7a4b", pants: "#4a4f3a", scarf: "#f2f2f2", collar: "#d9cbb0", lens: "#9fdcff", skin: "#f1c27d", gloves: "#5a3b22"},
@@ -52,9 +48,7 @@ window.BitSkins = (function () {
         return SKINS.find(s => s.id === state.selected) || SKINS[0];
     }
 
-    // ------------------------------------------------------------- drawing
 
-    // The character, standing with hands on hips. bust: just head and shoulders.
     function image(skin, bust) {
         const s = skin, o = 'stroke="#1b1b1b" stroke-width="2.2" stroke-linejoin="round"';
         const torso = "M36 70 Q60 62 84 70 L82 130 L38 130 Z";
@@ -108,8 +102,6 @@ window.BitSkins = (function () {
         return "data:image/svg+xml;base64," + btoa(svg);
     }
 
-    // The tiny pilot you see after ejecting in Bit Planes (about 9 x 13 pixels
-    // on screen, drawn bigger so it stays sharp).
     function pilotImage(skin) {
         const s = skin || selected(), o = 'stroke="#111" stroke-width="0.8"';
         const head = s.cap === "jet"
@@ -125,8 +117,6 @@ window.BitSkins = (function () {
         return "data:image/svg+xml;base64," + btoa(svg);
     }
 
-    // The ejected pilot's sprite in Bit Planes. who: a player (you, or an
-    // online player who sent their skin) or a skin id. Bots keep the old pilot.
     const pilotSprites = {};
     window.bitPilotSprite = function (who) {
         let id = typeof who === "string" ? who : null;
@@ -144,7 +134,6 @@ window.BitSkins = (function () {
         return pilotSprites[id];
     };
 
-    // --------------------------------------------------------------- shop
 
     function buy(id) {
         const s = SKINS.find(x => x.id === id);

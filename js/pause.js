@@ -1,6 +1,3 @@
-// In-activity menu (Esc or the ⏸ button): resume, change your plane or paint,
-// or leave to the start screen. Single player freezes while the menu is
-// open; online activities keep running for everyone else.
 (function () {
     const shop = window.BitShop;
     let open = false;
@@ -18,7 +15,6 @@
         return online() === "guest";
     }
 
-    // The plane you are flying right now, if any.
     function currentPlane() {
         if (isGuest()) return window.BitOnline.prediction && window.BitOnline.prediction.plane();
         const player = window.BitEngine && window.BitEngine.player;
@@ -29,7 +25,6 @@
         return window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(p), true, p.skin, shop.patternOf(p)) : "";
     }
 
-    // ------------------------------------------------------------ open/close
 
     function show() {
         if (open || !inActivity()) return;
@@ -59,7 +54,6 @@
         location.href = location.pathname + location.search;
     }
 
-    // ------------------------------------------------------------- content
 
     function render() {
         const state = shop.state();
@@ -92,7 +86,6 @@
         render();
     }
 
-    // Paint and patterns show on your current plane right away (if it's the selected type).
     function paint(color, pattern) {
         if (color !== undefined) shop.setPaint(color);
         if (pattern !== undefined) shop.setPattern(pattern);
@@ -107,12 +100,10 @@
         render();
     }
 
-    // Online guests tell the host so their next plane uses the new choice.
     function sendLoadout() {
         if (isGuest()) window.BitOnline.sendToHost({t: "loadout", l: shop.loadout()});
     }
 
-    // --------------------------------------------------------------- input
 
     function init() {
         const menu = document.querySelector(".pause-menu");
@@ -130,7 +121,6 @@
             if (btn.dataset.paint !== undefined) paint(btn.dataset.paint || null);
             if (btn.dataset.pattern !== undefined) paint(undefined, btn.dataset.pattern);
         });
-        // Runs before the activity's own key handlers (window capture comes first).
         window.addEventListener("keydown", ev => {
             if (ev.code === "Escape" && inActivity()) {
                 ev.preventDefault();
@@ -138,7 +128,6 @@
                 open ? hide() : show();
                 return;
             }
-            // While the menu is open, keys don't fly the plane (M still mutes).
             if (open && ev.code !== "KeyM") ev.stopPropagation();
         }, true);
     }

@@ -1,6 +1,3 @@
-// Daily reward: free coins the first time you open the activity each day.
-// Coming back on the next day grows a 7-day streak (day 7 pays the most);
-// missing a day starts over at day 1.
 window.BitDaily = (function () {
     const KEY = "daily";
     const REWARDS = [100, 150, 200, 300, 400, 500, 1000];
@@ -20,14 +17,12 @@ window.BitDaily = (function () {
         } catch (e) {}
     }
 
-    // Local calendar dates, e.g. "2026-10-03".
     function dateKey(offsetDays = 0) {
         const d = new Date();
         d.setDate(d.getDate() + offsetDays);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     }
 
-    // What claiming today would give (null if already claimed today).
     function today() {
         const d = load();
         if (d.last === dateKey()) return null;
@@ -55,7 +50,6 @@ window.BitDaily = (function () {
         el.querySelector(".daily-claim").innerHTML = `Claim ${t.coins.toLocaleString()} <i class="coin"></i>`;
     }
 
-    // Show the reward window on the start screen if today's reward is waiting.
     function offer() {
         const t = today();
         const ui = document.querySelector(".ui");
@@ -94,7 +88,6 @@ window.BitDaily = (function () {
     return {
         today, claim, offer, rewards: REWARDS,
         status: () => Object.assign(load(), {next: today()}),
-        // Console: make today's reward claimable again (for testing).
         reset: () => {
             const d = load();
             save(Object.assign(d, {last: d.last === dateKey() ? dateKey(-1) : d.last}));

@@ -1,4 +1,3 @@
-// Missile body.
 BitModules[5] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

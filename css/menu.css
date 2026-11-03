@@ -1,8 +1,6 @@
-/* Lobby (start screen): the bots fly behind, your plane on its pad in the
-   middle, tabs on top, mode + PLAY bottom left, Controls / Servers bottom right. */
 
 main .lobby {
-    box-sizing: border-box; /* children inherit: widths include padding */
+    box-sizing: border-box;
     position: fixed;
     inset: 0;
     overflow: hidden;
@@ -27,7 +25,6 @@ main .demo {
         linear-gradient(180deg, rgba(5, 15, 35, 0.55) 0%, rgba(5, 15, 35, 0) 22%, rgba(5, 15, 35, 0) 70%, rgba(5, 15, 35, 0.6) 100%);
 }
 
-/* Top bar */
 .lobby-nav {
     position: absolute;
     top: 14px;
@@ -93,7 +90,6 @@ main .demo {
     display: none;
 }
 
-/* Top right: coins and your plane in a circle */
 .lobby-profile {
     position: absolute;
     top: 16px;
@@ -136,7 +132,6 @@ main .demo {
     border: 2px solid #fff;
 }
 
-/* Middle: name, your plane, its pad */
 .lobby-center {
     position: absolute;
     left: 50%;
@@ -236,7 +231,6 @@ main .lobby-name input::placeholder {
     color: #000;
 }
 
-/* Bottom left: mode card and PLAY */
 .lobby-mode {
     position: absolute;
     left: 18px;
@@ -322,7 +316,6 @@ main .lobby-name input::placeholder {
     display: none;
 }
 
-/* Bottom right: Controls and Servers */
 .lobby-corner {
     position: absolute;
     right: 18px;
@@ -347,7 +340,6 @@ main .lobby-name input::placeholder {
     background: #fff;
 }
 
-/* Pop-ups opened from the lobby are normal light panels */
 main .panel-backdrop {
     color: #111;
     font-weight: 700;
@@ -403,7 +395,6 @@ main .panel-backdrop {
     }
 }
 
-/* Your pilot on the pad (replaces the plane) */
 .lobby-hero {
     margin-top: 1vh;
     border: none;

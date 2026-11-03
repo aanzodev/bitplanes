@@ -1,4 +1,3 @@
-// Canvas setup and the follow camera.
 BitModules[16] = function (M, j, t) {
     "use strict";
 

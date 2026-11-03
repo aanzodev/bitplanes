@@ -1,12 +1,3 @@
-// Air Battle (3D): the on-screen display, Battlefield style.
-//   Middle: gunsight, the lead indicator (where to aim to hit the target),
-//   the missile lock diamond, hit and kill markers, damage direction.
-//   Planes: red diamonds for enemies, blue for your team, arrows off screen.
-//   Top: team score bar and match clock; kill feed on the right.
-//   Bottom: radar (left), your plane's panel (right): health, speed, altitude,
-//   throttle, boost, ammo, missiles, flares, repair.
-//   Score ribbons ("+100 ENEMY DOWN"), warnings, killcam card, scoreboard
-//   (Tab), pause menu, and the end of match results.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
 
@@ -59,7 +50,7 @@
                 <div class="df-weapons">
                     <div><small>GUNS</small><b class="df-ammo">0</b></div>
                     <div><small>GUIDED MISSILES</small><b class="df-missiles">0</b></div>
-                    <div><small>COUNTERMEASURES</small><b class="df-flares">0</b></div>
+                    <div><small>COUNTER&shy;MEASURES</small><b class="df-flares">0</b></div>
                 </div>
                 <div class="df-repair"></div>
             </div>
@@ -126,7 +117,6 @@
                 while ($(".df-feed").children.length > 6) $(".df-feed").lastChild.remove();
             },
 
-            // Score ribbon: "+100 ENEMY DOWN".
             ribbon(points, text, big) {
                 const div = document.createElement("div");
                 div.className = "df-ribbon" + (big ? " big" : "");
@@ -145,7 +135,6 @@
                 killT = 0.6;
             },
 
-            // Hurt from a direction (radians, 0 = ahead, positive = right).
             hurt(angle) {
                 const v = $(".df-vignette");
                 v.classList.remove("on");
@@ -183,11 +172,9 @@
                 r.querySelector(".df-out").addEventListener("click", onLeave);
             },
 
-            // s: everything the HUD shows this frame.
             update(dt, s) {
                 const {player: p, planes, camera, width: W, height: H, lock, time} = s;
                 if (performance.now() > msgUntil) $(".df-msg").innerHTML = "";
-                // Top: team scores and the clock.
                 const m = s.match;
                 const clock = Math.max(0, Math.ceil(m.timeLeft));
                 $(".df-clock").textContent = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, "0")}`;
@@ -206,7 +193,6 @@
                 }
                 $(".df-score").innerHTML = `Score <b>${p.score}</b> · P <b>${p.kills}</b> · D <b>${p.deaths}</b> · <i class="coin"></i> +${s.coins}`;
 
-                // Panel.
                 const hp = Math.max(0, p.health) / p.maxHealth;
                 $(".df-plane").textContent = p.label;
                 $(".df-hp").textContent = Math.ceil(hp * 100) + "%";
@@ -231,11 +217,9 @@
                 hm.hidden = hitT <= 0 && killT <= 0;
                 hm.className = "df-hitmark" + (killT > 0 ? " kill" : "");
 
-                // Blackout in long hard turns; red edges when badly hurt.
                 $(".df-blackout").style.opacity = Math.min(0.85, s.blackout || 0);
                 hud.classList.toggle("low-hp", p.alive && hp < 0.3);
 
-                // Gunsight: where the guns point, 600 m ahead.
                 const cross = $(".df-cross");
                 if (p.alive && !s.deadView) {
                     const c = project(p.pos.clone().addScaledVector(p.forward, 600), camera, W, H);
@@ -243,7 +227,6 @@
                     cross.style.visibility = c.on ? "visible" : "hidden";
                 } else cross.style.visibility = "hidden";
 
-                // Lead indicator for the enemy nearest the gunsight.
                 const lead = $(".df-lead");
                 if (s.lead && p.alive && !s.deadView) {
                     const c = project(s.lead, camera, W, H);
@@ -251,7 +234,6 @@
                     lead.style.transform = `translate(${c.x}px, ${c.y}px)`;
                 } else lead.hidden = true;
 
-                // Lock diamond: shrinks onto the target while locking.
                 const lb = $(".df-lockbox");
                 if (lock && lock.target && p.alive && !s.deadView) {
                     const c = project(lock.target.pos, camera, W, H);
@@ -263,7 +245,6 @@
                     lb.querySelector("span").textContent = lock.progress >= 1 ? "LOCKED" : "LOCKING";
                 } else lb.hidden = true;
 
-                // Markers on every other plane.
                 for (const e of planes) {
                     if (e === p) continue;
                     const mk = mark(e);
@@ -286,7 +267,6 @@
                         mk.className = "df-box" + (friend ? " friend" : " foe") + (lock && lock.target === e ? " target" : "") + (dist > 3000 && !(lock && lock.target === e) ? " far" : "");
                         mk.style.transform = `translate(${c.x}px, ${c.y}px)`;
                     } else if (!friend) {
-                        // Off screen: an arrow at the edge pointing the way to turn.
                         let x = c.px, y = c.py;
                         if (c.z > 1) [x, y] = [-x, -y];
                         const ang = Math.atan2(-y, x), r = Math.min(W, H) * 0.42;
@@ -295,7 +275,6 @@
                     } else mk.style.display = "none";
                 }
 
-                // Radar: you in the middle, nose up.
                 const R = 100, range = s.radarRange || 4000, scale = (R - 8) / range;
                 radar.clearRect(0, 0, 200, 200);
                 radar.fillStyle = "rgba(8, 24, 18, 0.62)";
@@ -323,7 +302,6 @@
                     if (d > R - 8) [x, y] = [x / d * (R - 8), y / d * (R - 8)];
                     return [R + x, R + y, d > R - 8];
                 };
-                // The battle area's edge.
                 radar.strokeStyle = "rgba(255, 200, 60, 0.6)";
                 radar.beginPath();
                 for (let a = 0; a <= Math.PI * 2 + 0.01; a += Math.PI / 32) {

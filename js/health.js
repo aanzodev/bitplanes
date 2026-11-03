@@ -1,6 +1,3 @@
-// Health bar for the plane you're flying, bottom right of the screen.
-// Green, then yellow, then red as armor runs out. Online guests get their
-// plane's health from the host.
 (function () {
     let el, fill, text, name;
 

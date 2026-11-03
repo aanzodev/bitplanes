@@ -1,12 +1,6 @@
-// Career progress: XP and levels, achievements, and the pop-up notices
-// ("LEVEL UP!", "Milestone unlocked"). XP comes from your stats as they
-// grow (kills, hits, matches, time flying) in Bit Planes and in Air Battle,
-// plus bonuses (quests, achievements, Air Battle medals). Every level pays
-// coins, and levels 10, 25 and 50 raise every Hangar upgrade's top level by one.
 window.BitProgress = (function () {
     const KEY = "progress";
     const MAX_LEVEL = 100;
-    // XP for stats: per kill, per hit, per match, per 6 seconds in the air.
     const XP_FOR = {killed: 100, hits: 2, matches: 50, flySeconds: 1 / 6};
     const UPGRADE_TIERS = [10, 25, 50];
 
@@ -27,9 +21,7 @@ window.BitProgress = (function () {
         });
     }
 
-    // ------------------------------------------------------------- levels
 
-    // XP from level n to n + 1.
     function needFor(n) {
         return 400 + 150 * (n - 1);
     }
@@ -48,7 +40,6 @@ window.BitProgress = (function () {
         return 100 * n + (n % 5 === 0 ? 500 : 0);
     }
 
-    // How many extra upgrade levels your player level has unlocked.
     function upgradeBonus() {
         const l = levelInfo().level;
         return UPGRADE_TIERS.filter(t => l >= t).length;
@@ -81,20 +72,17 @@ window.BitProgress = (function () {
         save();
     }
 
-    // Watch the stats and turn their growth into XP.
     function tick() {
         const s = window.BitStats && window.BitStats.get();
         if (!s) return;
         const now = {};
         for (const k of Object.keys(XP_FOR)) now[k] = s[k] || 0;
         if (!state.seen) {
-            // First time: your past also counts, once.
             state.seen = Object.fromEntries(Object.keys(XP_FOR).map(k => [k, 0]));
         }
         let xp = 0;
         for (const k of Object.keys(XP_FOR)) {
             const d = now[k] - (state.seen[k] || 0);
-            // Stats can be reset; only growth counts.
             if (d > 0) xp += d * XP_FOR[k];
             if (d !== 0) state.seen[k] = now[k];
         }
@@ -107,7 +95,6 @@ window.BitProgress = (function () {
         checkAchievements();
     }
 
-    // -------------------------------------------------------- achievements
 
     function st(k) {
         const s = window.BitStats && window.BitStats.get();
@@ -122,7 +109,6 @@ window.BitProgress = (function () {
         return 0;
     }
 
-    // value(): how far you are; goal: what it takes.
     const ACHIEVEMENTS = [
         {id: "first", group: "Combat", icon: "🎯", name: "First Blood", desc: "Shoot down your first plane", value: () => st("killed"), goal: 1, coins: 200, xp: 100},
         {id: "k50", group: "Combat", icon: "✈", name: "Ace", desc: "Shoot down 50 planes", value: () => st("killed"), goal: 50, coins: 1000, xp: 500},
@@ -190,7 +176,6 @@ window.BitProgress = (function () {
         }
     }
 
-    // --------------------------------------------------------------- toasts
 
     let toasts;
 
@@ -209,7 +194,6 @@ window.BitProgress = (function () {
         setTimeout(() => t.remove(), ms + 600);
     }
 
-    // ------------------------------------------------------------ the panel
 
     let panel;
 
@@ -233,7 +217,6 @@ window.BitProgress = (function () {
             </div>`).join("")}</div>`).join("");
     }
 
-    // Level badge in the lobby (top right) and the level bar in Stats.
     function renderBadge() {
         const info = levelInfo();
         document.querySelectorAll(".lobby-level").forEach(el => {

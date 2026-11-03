@@ -1,4 +1,3 @@
-// Plane colors for computer pilots.
 BitModules[23] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

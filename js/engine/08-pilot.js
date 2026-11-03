@@ -1,4 +1,3 @@
-// Pilot and parachute bodies.
 BitModules[8] = function (M, j, t) {
     "use strict";
     (t.d(j, "b", function () {

@@ -1,4 +1,3 @@
-// The plane body and its generated sprites (biplane, jet, prop).
 BitModules[4] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {
@@ -23,7 +22,6 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
-    // WWII style propeller fighter (skin "prop").
     function K(M, j) {
         return (
             "data:image/svg+xml;base64," +
@@ -44,8 +42,6 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
-    // B-2 style flying wing (skin "bomber"), seen from the side: a thin wedge
-    // with a cockpit hump and no tail.
     function B(M, j) {
         return (
             "data:image/svg+xml;base64," +
@@ -60,8 +56,6 @@ BitModules[4] = function (M, j, t) {
         );
     }
 
-    // Paint patterns: drawn over the plane's body, clipped to its outline.
-    // Body outline and nose (for decals) of each plane shape.
     const BODY = {
         jet: {d: "M1 12.5 L7.5 9.5 L30 9 L35 10.5 L35 13.5 L30 14.5 L7.5 14.5 Z", nose: [8, 13.2]},
         prop: {d: "M4 10.2 Q6 8 11 8 L30 9.5 L34.5 11 L34.2 12.6 L28 14 L11 15.2 Q6 15.2 4 13.2 Z", nose: [6.5, 13]},
@@ -97,14 +91,13 @@ BitModules[4] = function (M, j, t) {
         const art = PATTERNS[pat]
             ? `<path d="${body.d}" fill="url(#pt)" clip-path="url(#bd)"/>`
             : `<g clip-path="url(#bd)"><g transform="translate(${body.nose[0]} ${body.nose[1]})">${DECALS[pat]}</g></g>`;
-        // Defs go first; the pattern goes right after the body so wings and cockpit stay on top.
         svg = svg.replace(/(<svg[^>]*>)/, `$1<defs>${clip}${PATTERNS[pat] || ""}</defs>`);
         let at = -1;
         if (skin) {
             const k = svg.indexOf(`d="${body.d}"`, svg.indexOf("</defs>"));
             if (k >= 0) at = svg.indexOf("/>", k) + 2;
         } else {
-            const k = svg.indexOf('id="Path-2"'); // the biplane's fuselage
+            const k = svg.indexOf('id="Path-2"');
             if (k >= 0) at = svg.indexOf("</path>", k) + 7;
         }
         svg = at > 0 ? svg.slice(0, at) + art + svg.slice(at) : svg.replace("</svg>", art + "</svg>");

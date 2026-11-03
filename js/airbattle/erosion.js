@@ -1,9 +1,3 @@
-// Air Battle (3D): wears the terrain down like rain does over thousands of
-// years (hydraulic erosion), so mountains get real gullies, ridges and
-// valley floors. The work is done by native/erosion.c compiled to
-// WebAssembly (erosion.wasm, about 2.5 KB). If WebAssembly can't load (an old
-// browser, or opening index.html straight from disk), the same steps run in
-// plain JavaScript with fewer raindrops.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
     let wasm = null, loading = null;
@@ -25,8 +19,6 @@
         return loading;
     };
 
-    // grid: Float32Array of w * w heights in meters, spacing 'step' meters.
-    // Changes the grid in place. Returns "wasm" or "js".
     D.erode = function (grid, w, step, opts = {}) {
         const drops = Math.round((opts.drops || 0.9) * w * w);
         const sea = opts.sea === undefined ? -1e9 : opts.sea / step;
@@ -51,7 +43,6 @@
         return "js";
     };
 
-    // The same raindrops as erosion.c (see the comments there).
     function erodeJs(h, w, drops, seed, strength, sea) {
         let rng = seed >>> 0 || 1;
         const rnd = () => {

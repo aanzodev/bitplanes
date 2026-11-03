@@ -1,7 +1,3 @@
-// Activity sounds: your engine, guns, missiles, flares and explosions.
-// Everything is synthesized with the Web Audio API (no audio files).
-// Sounds from other planes get quieter and pan left/right with distance.
-// Press M or the speaker button to mute.
 (function () {
     const PROFILES = window.BitSoundProfiles;
     const HEAR_DISTANCE = 2200;
@@ -10,7 +6,6 @@
         s.muted = localStorage.getItem("muted") === "1";
     } catch (e) {}
 
-    // ----------------------------------------------------------------- setup
 
     function ctx() {
         if (!s.ctx) {
@@ -28,18 +23,15 @@
         return s.ctx;
     }
 
-    // Engine and gun levels from Settings (0..1, 1 = the loudest).
     function mix(k) {
         const v = window.BitSettings && window.BitSettings.get(k);
         return typeof v === "number" ? v : 0.6;
     }
 
-    // Master level: off when muted, otherwise the Settings volume.
     function level() {
         return s.muted ? 0 : 0.875 * s.volume;
     }
 
-    // Browsers only allow sound after the player clicks or presses a key.
     ["pointerdown", "keydown"].forEach(type => window.addEventListener(type, () => ctx(), {capture: true}));
 
     function noiseBuffer() {
@@ -83,7 +75,6 @@
         return nodes[nodes.length - 1];
     }
 
-    // --------------------------------------------------------------- position
 
     function listenerObject() {
         try {
@@ -93,10 +84,6 @@
         }
     }
 
-    // Output for a one-shot sound at a world position (or right here if pos is null).
-    // Returns null when the sound is too far away or we are not in an activity.
-    // dest: {node, dist} plays into that node instead (the 3D Air Battle mode
-    // places sounds itself); dist 0..1 makes it duller with distance.
     function output(pos, volume, muffle, dest) {
         if (dest) {
             if (!ctx() || s.muted || volume < 0.01) return null;
@@ -120,7 +107,6 @@
         if (v < 0.01) return null;
         const g = gain(v);
         let last = g;
-        // muffle: far sounds lose their high end, like real distant gunfire.
         if (muffle && dist > 0) last = chain(g, filter("lowpass", 600 + 9000 * (1 - dist) ** 2, 0.7));
         if (s.ctx.createStereoPanner) {
             const p = s.ctx.createStereoPanner();
@@ -145,7 +131,6 @@
         return PROFILES[plane && plane.planeId] || PROFILES.classic;
     }
 
-    // Plays nodes from now for `dur` seconds with a quick attack and decay.
     function envelope(g, peak, attack, dur) {
         const t = s.ctx.currentTime;
         g.gain.setValueAtTime(0.0001, t);
@@ -161,22 +146,11 @@
         });
     }
 
-    // ------------------------------------------------------------------ guns
 
-    // Real aircraft guns, each built from a few parts:
-    //   crack  [Hz, Q]   the sharp supersonic snap of the muzzle blast
-    //   body   Hz        how bright the blast's roar is (low-pass cutoff)
-    //   thump  [Hz, Hz]  the low punch of the shot (falls from the first to the second)
-    //   buzz   Hz        rotary cannons: barrels spinning (= rounds per second)
-    //   click            light machine guns: the bolt cycling
-    //   dur, vol         length of one shot and loudness
     const GUNS = {
-        // WWI rifle-caliber machine guns: light, fast and rattly.
-        // rof: real rounds per second for one gun.
         vickers: {name: "Vickers .303", crack: [2600, 1.6], body: 3200, thump: [200, 90], dur: 0.07, vol: 0.5, click: true, rof: 8},
         lewis: {name: "Lewis gun", crack: [2900, 1.8], body: 3600, thump: [230, 110], dur: 0.06, vol: 0.42, click: true, rof: 9.5},
         spandau: {name: "LMG 08/15 Spandau", crack: [2300, 1.5], body: 2800, thump: [180, 85], dur: 0.075, vol: 0.52, click: true, rof: 7.5},
-        // WWII
         shkas: {name: "ShKAS 7.62 mm", crack: [3200, 1.4], body: 3800, thump: [240, 120], dur: 0.045, vol: 0.4, click: true, rof: 30},
         browning303: {name: "Browning .303", crack: [2400, 1.3], body: 3000, thump: [190, 85], dur: 0.06, vol: 0.48, click: true, rof: 19},
         m2: {name: "Browning M2 .50 cal", crack: [1500, 1.4], body: 2000, thump: [130, 55], dur: 0.12, vol: 0.7, rof: 13},
@@ -184,33 +158,22 @@
         type99: {name: "Type 99 20 mm", crack: [1050, 1.2], body: 1600, thump: [100, 45], dur: 0.16, vol: 0.78, rof: 8},
         shvak: {name: "ShVAK 20 mm", crack: [1000, 1.2], body: 1550, thump: [98, 44], dur: 0.15, vol: 0.76, rof: 13},
         hispano: {name: "Hispano 20 mm", crack: [900, 1.1], body: 1450, thump: [90, 40], dur: 0.18, vol: 0.82, rof: 11},
-        // Jets
         gsh23: {name: "GSh-23 23 mm", crack: [850, 1.1], body: 1400, thump: [85, 40], dur: 0.12, vol: 0.75, buzz: 57, rof: 57},
         gsh301: {name: "GSh-30-1 30 mm", crack: [700, 1.0], body: 1200, thump: [70, 32], dur: 0.2, vol: 0.9, rof: 27},
         m61: {name: "M61 Vulcan 20 mm", crack: [1300, 0.9], body: 2200, thump: [110, 60], dur: 0.09, vol: 0.55, buzz: 100, rof: 100},
         gau22: {name: "GAU-22/A 25 mm", crack: [1100, 0.9], body: 1800, thump: [95, 50], dur: 0.1, vol: 0.6, buzz: 55, rof: 55},
         gau8: {name: "GAU-8 Avenger 30 mm", crack: [600, 0.8], body: 900, thump: [65, 35], dur: 0.13, vol: 0.62, buzz: 65, rof: 65},
     };
-    // More WWII guns for mixed loadouts.
     GUNS.mg131 = {name: "MG 131 13 mm", crack: [1700, 1.3], body: 2300, thump: [140, 62], dur: 0.1, vol: 0.62, rof: 15};
     GUNS.type97 = {name: "Type 97 7.7 mm", crack: [2700, 1.5], body: 3300, thump: [210, 95], dur: 0.06, vol: 0.45, click: true, rof: 15};
     GUNS.ubs = {name: "Berezin UBS 12.7 mm", crack: [1600, 1.3], body: 2200, thump: [135, 58], dur: 0.1, vol: 0.64, rof: 17};
-    // Older names still used by some code paths.
     GUNS.mg = GUNS.vickers;
     GUNS.cannon = GUNS.m61;
     GUNS.brrt = GUNS.gau8;
-    // The gun a plane shape usually carries (for planes we only know the shape of).
     const SHAPE_GUN = {"": "vickers", prop: "m2", jet: "m61", bomber: "m61"};
 
-    // One round, scheduled at time t0, into node out. Real aircraft guns are
-    // built from a few parts:
-    //   crack  [Hz, Q]   the sharp supersonic snap of the muzzle blast
-    //   body   Hz        how bright the blast's roar is (low-pass cutoff)
-    //   thump  [Hz, Hz]  the low punch of the shot (falls from the first to the second)
-    //   buzz   Hz        rotary cannons: the barrels' tearing buzz (len: how long it runs)
-    //   click            light machine guns: the bolt clacking back
     function shotAt(g, out, t0, volume = 1, len = 0) {
-        const vary = 0.9 + Math.random() * 0.2; // no two shots sound exactly alike
+        const vary = 0.9 + Math.random() * 0.2;
         const dur = g.dur * vary, v = g.vol * vary * volume;
         const env = (gn, peak, attack, d, at = t0) => {
             gn.gain.setValueAtTime(0.0001, at);
@@ -261,36 +224,25 @@
         run(nodes, dur * 1.4);
     }
 
-    // A single round of a gun type (used where only the type is known).
     function playGun(type, pos, volume, dest) {
         const g = GUNS[type] || GUNS.vickers;
-        // Far-away guns are quieter and duller (the air soaks up the crack).
         const out = output(pos, volume, true, dest);
         if (!out) return;
         shotAt(g, out, s.ctx.currentTime);
     }
 
-    // Every plane sounds different: its own airframe resonance (where its
-    // guns sit rings the structure around them), from its name.
     function voiceOf(id) {
         let h = 2166136261;
         for (const c of String(id || "x")) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
         return {freq: 280 + (h % 1000), q: 1.2 + ((h >>> 10) % 20) / 10, db: 4 + ((h >>> 16) % 6)};
     }
 
-    // A volley: every gun the plane carries, for one firing interval (in
-    // seconds). profile: from profiles.js (guns: [[type, count], ...], mount:
-    // "nose" | "wing" | "sync" | "side" | "internal"). Mixed loadouts like the
-    // Spitfire's two 20 mm cannons and four .303s play together, at their real
-    // rates of fire: eight .50 cals chatter densely, a synchronized WWI gun
-    // fires slower through the propeller, rotary cannons tear continuously.
     function volley(profile, pos, volume, dest, interval = 0.08) {
         const out = output(pos, volume, true, dest);
         if (!out) return;
         const t0 = s.ctx.currentTime;
         const id = profile.id || profile.gun;
         const vc = voiceOf(id), mount = profile.mount || "nose";
-        // The plane's own sound: resonance, then how the mounting colors it.
         const head = gain(1), res = filter("peaking", vc.freq, vc.q);
         res.gain.value = vc.db;
         let last = chain(head, res);
@@ -303,7 +255,6 @@
         }
         last.connect(out);
         const groups = profile.guns || [[profile.gun || "vickers", 1]];
-        // How many rounds land in this interval, at most 6 sounds in all.
         const want = groups.map(([type, count]) => {
             const g = GUNS[type] || GUNS.vickers;
             return g.buzz ? 1 : Math.max(1, count * (g.rof || 10) * interval * (mount === "sync" ? 0.85 : 1));
@@ -312,8 +263,6 @@
         groups.forEach(([type, count], gi) => {
             const g = GUNS[type] || GUNS.vickers;
             const n = g.buzz ? 1 : Math.max(1, Math.round(want[gi] * scale));
-            // Several guns at once are louder, but not simply added up.
-            // Rifle-caliber guns are lighter, but not that much quieter in the cockpit.
             const kind = g.click ? 1.8 : g.buzz ? 0.85 : 1;
             const vol = kind * Math.min(1.6, Math.sqrt(count)) / Math.sqrt(Math.max(1, n * 0.7));
             let dst = head;
@@ -337,7 +286,6 @@
         volley(Object.assign({id: plane.planeId}, prof), mine ? null : plane.position, (mine ? 0.75 : 0.45) * mix("gunVolume"), undefined, 0.08);
     }
 
-    // --------------------------------------------------- missiles and flares
 
     function missile(plane) {
         const mine = isMine(plane);
@@ -360,7 +308,6 @@
         if (!mine && !throttle("flares", 400)) return;
         const out = output(mine ? null : plane.position, mine ? 0.8 : 0.5);
         if (!out) return;
-        // Twelve quick pairs of pops (one per flare), then a long burning fizz.
         for (let k = 0; k < 24; k++) {
             const t = s.ctx.currentTime + Math.floor(k / 2) * 0.055 + (k % 2) * 0.02, pop = osc("sine", 950), g = gain(0);
             chain(pop, g, out);
@@ -378,12 +325,10 @@
         startStop([n], 2.2);
     }
 
-    // Guests only see other players' flares as particles.
     function flaresAt(pos) {
         flares({position: pos});
     }
 
-    // ------------------------------------------------------------ explosions
 
     function explosion(pos) {
         if (!throttle("boom", 60)) return;
@@ -401,7 +346,6 @@
         startStop([n, sub], dur);
     }
 
-    // A far-off rumble of thunder (storms).
     function thunder() {
         const out = output(null, 0.55);
         if (!out) return;
@@ -417,9 +361,7 @@
         startStop([n], dur);
     }
 
-    // ---------------------------------------------------------- your engine
 
-    // Your plane's engine, modelled on its real engine (audio/engines.js).
     function buildEngine(profile) {
         const out = gain(0);
         out.connect(s.master);
@@ -450,13 +392,11 @@
         const e = s.engine;
         const t = Math.max(0, Math.min(1, plane.thrust / (plane.maxThrust || 17)));
         e.out.gain.setTargetAtTime((profile.kind === "jet" ? 0.2 : 0.24) * mix("engineVolume"), s.ctx.currentTime, 0.1);
-        // Jets light the afterburner at full throttle.
         e.eng.set(t, {boost: profile.kind === "jet" && t > 0.85, speed: t, level: profile.idleSilent && t === 0 ? 0 : 1});
     }
 
     setInterval(updateEngine, 60);
 
-    // ---------------------------------------------------------------- mute
 
     function setMuted(muted) {
         s.muted = muted;
@@ -485,22 +425,16 @@
     else init();
 
     window.BitSound = {
-        // fn returns the object you are flying (plane or pilot); sounds are heard from there.
         setListener: fn => (s.listener = fn),
         gun, missile, flares, flaresAt, explosion, thunder,
         gunAt: (pos, type) => throttle("gun", 35) && playGun(type || "mg", pos, 0.6),
-        // Online guests only know the shooter's plane shape.
         gunForShape: shape => SHAPE_GUN[shape || ""] || "vickers",
-        // A gun sound right here (no position), e.g. for the 3D Air Battle beta.
         playGun: (type, volume = 1) => playGun(type, null, volume),
-        // A gun sound into a node of your own (3D Air Battle), dist 0..1 for distance.
         playGunInto: (type, node, volume = 1, dist = 0) => playGun(type, null, volume * mix("gunVolume"), {node, dist}),
-        // A plane's whole gun loadout for one firing interval, into a node of your own (3D Air Battle).
         volleyInto: (planeId, node, volume = 1, dist = 0, interval = 0.08) =>
             volley(Object.assign({id: planeId}, PROFILES[planeId] || PROFILES.classic), null, volume * mix("gunVolume"), {node, dist}, interval),
         mix,
         profileGuns: planeId => (PROFILES[planeId] || {}).guns || null,
-        // The shared audio context and master output (null until sound is allowed).
         context: () => ctx(),
         master: () => (ctx(), s.master),
         noiseBuffer: () => (ctx(), s.noise),

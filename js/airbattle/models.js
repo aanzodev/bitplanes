@@ -1,17 +1,7 @@
-// Air Battle (3D): realistic plane models, built in code (no model files).
-// Each real plane gets its own shape: lofted fuselages (smooth, with flat
-// stealth chines where the real one has them), wings with rounded edges that
-// thin toward the tips, canted or upright twin tails, intakes, engine nozzles
-// that glow inside, canopies with the pilot, missiles on pylons, propellers
-// with spinners, radial or inline engines, biplane struts and wires, wheels.
-// Ailerons, tailplanes and rudders move with the controls.
-// On High/Ultra the paint gets panel lines, a little grime and the Hangar
-// paint pattern (camo, tiger stripes, checkers), drawn by a GLSL shader.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
     let T;
 
-    // ------------------------------------------------------------ materials
 
     const PAINT_GLSL = `
         varying vec3 vObj;
@@ -24,7 +14,6 @@
             return mix(mix(mix(pHash(i), pHash(i + vec3(1, 0, 0)), u.x), mix(pHash(i + vec3(0, 1, 0)), pHash(i + vec3(1, 1, 0)), u.x), u.y),
                        mix(mix(pHash(i + vec3(0, 0, 1)), pHash(i + vec3(1, 0, 1)), u.x), mix(pHash(i + vec3(0, 1, 1)), pHash(i + vec3(1, 1, 1)), u.x), u.y), u.z);
         }
-        // A thin line every 'period' meters along v, fading out when too small to see.
         float pLine(float v, float period) {
             float d = abs(fract(v / period + 0.5) - 0.5) * period;
             float w = max(0.018, fwidth(v) * 1.2);
@@ -33,7 +22,6 @@
 
     const matCache = new Map();
 
-    // Paint for the body. pattern: "" | "camo" | "tiger" | "checkers"
     function paint(color, opts = {}) {
         const key = [color, opts.pattern || "", opts.rough || 0, opts.metal || 0, D.pbr ? 1 : 0].join("|");
         if (matCache.has(key)) return matCache.get(key);
@@ -65,7 +53,6 @@
                         } else if (pattern > 2.5) {
                             if (mod(floor(vObj.x * 0.8) + floor(vObj.z * 0.8) + floor(vObj.y * 0.8), 2.0) > 0.5) diffuseColor.rgb = color2;
                         }
-                        // Panel lines and rivet rows, and a little grime.
                         float pl = max(pLine(vObj.z, 1.45), pLine(vObj.x + vObj.y * 0.4, 1.9) * 0.8);
                         diffuseColor.rgb *= 1.0 - pl * 0.32;
                         diffuseColor.rgb *= 0.93 + 0.12 * pNoise(vObj * 2.3);`)
@@ -96,10 +83,7 @@
         return new T.MeshBasicMaterial({color: new T.Color(hex).multiplyScalar(1 + ((D.glow || 1) - 1) * k), transparent: true, depthWrite: false});
     }
 
-    // ------------------------------------------------------------- shapes
 
-    // A smooth body through cross sections along z (forward is -z).
-    // stations: [{z, w, h, y = 0, n = 2 (2 = ellipse, higher = boxier), top = 1, bot = 1}]
     function loft(stations, radial = 24, capEnd = true) {
         const pos = [], idx = [];
         for (const s of stations) {
@@ -133,8 +117,6 @@
         return g;
     }
 
-    // A wing (or tailplane) from its outline in the x/z plane, with rounded
-    // edges, thinner toward the tips, with dihedral. pts: the whole outline.
     function wing(pts, thick, opts = {}) {
         const s = new T.Shape();
         pts.forEach(([x, z], i) => (i ? s.lineTo(x, z) : s.moveTo(x, z)));
@@ -152,12 +134,10 @@
         return g;
     }
 
-    // Mirror an outline given for the right side into a whole one (left side drawn first).
     function both(right) {
         return right.map(([x, z]) => [-x, z]).reverse().concat(right);
     }
 
-    // A vertical tail from its side outline [[z, y]], thickness along x.
     function fin(pts, thick) {
         const s = new T.Shape();
         pts.forEach(([z, y], i) => (i ? s.lineTo(z, y) : s.moveTo(z, y)));
@@ -180,8 +160,6 @@
         return new T.Mesh(g, mat);
     }
 
-    // A pivot so a control surface turns about its hinge.
-    // (px, py, pz): the hinge; (ox, oy, oz): where the part's own origin sits.
     function hinge(part, px, py, pz, ox = 0, oy = 0, oz = 0) {
         const p = new T.Group();
         p.position.set(px, py, pz);
@@ -190,9 +168,7 @@
         return p;
     }
 
-    // ------------------------------------------------------------- details
 
-    // The 2-digit side number, drawn on a canvas.
     function numberDecal(text, w, h) {
         const c = document.createElement("canvas");
         c.width = 128;
@@ -208,7 +184,6 @@
         return new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({map: t, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, side: T.DoubleSide}));
     }
 
-    // A national marking: team colors around a white center.
     function roundel(r, team, color) {
         const g = new T.Group();
         const ring = team === "red" ? 0xc8102e : team === "blue" ? 0x1f4fd1 : color;
@@ -239,7 +214,6 @@
         return g;
     }
 
-    // A round jet exhaust: dark petals outside, hot glow deep inside.
     function nozzle(r, len, out) {
         const g = new T.Group();
         const metal = plain(0x3a3632, 0.35, 0.85), inner = plain(0x141414, 0.8, 0.2);
@@ -259,10 +233,9 @@
         hot.rotation.y = Math.PI;
         g.add(hot);
         out.glows.push(hot);
-        // The afterburner flame.
         const f = new T.Mesh(new T.ConeGeometry(r * 0.75, 3, 12, 1, true), glowMat(0xffa040));
         f.material.opacity = 0.8;
-        f.rotation.x = Math.PI / 2; // wide at the nozzle, pointing back
+        f.rotation.x = Math.PI / 2;
         f.position.z = len + 1.5;
         f.userData.z = len;
         g.add(f);
@@ -299,10 +272,8 @@
         return mesh(g, plain(0x1a1a1a, 0.9, 0), x, y, z);
     }
 
-    // ------------------------------------------------------------- jets
 
     const JETS = {
-        // length, wing outline (right side), tails, engines, intakes, nozzle style
         f22: {nose: -10, tail: 8.6, w: 1.5, chine: 3.2, wingR: [[1.2, -3.2], [6.8, 2.6], [6.8, 3.7], [3.6, 3.4], [1.2, 5.2]], tails: 2, cant: 0.45, engines: 2, spread: 0.85, flat: true, intake: "caret", stab: [[1.0, 5.4], [3.6, 7.6], [3.6, 8.4], [1.0, 8.6]], finSide: [[3.6, 0.5], [7.9, 0.5], [8.3, 3.7], [6.4, 3.7]]},
         f35: {nose: -9.2, tail: 7.4, w: 1.65, chine: 3.0, wingR: [[1.3, -2.4], [5.4, 2.2], [5.4, 3.3], [1.3, 4.2]], tails: 2, cant: 0.4, engines: 1, flat: false, intake: "caret", stab: [[1.0, 4.6], [3.4, 6.6], [3.4, 7.4], [1.0, 7.4]], finSide: [[3.2, 0.6], [6.9, 0.6], [7.4, 3.2], [5.7, 3.2]]},
         f15: {nose: -10.4, tail: 8.8, w: 1.45, chine: 2.4, wingR: [[1.6, -2.4], [6.6, 3.0], [6.6, 4.4], [1.6, 4.6]], tails: 2, cant: 0.04, engines: 2, spread: 0.9, intake: "box", stab: [[1.4, 5.6], [4.4, 7.8], [4.4, 8.8], [1.4, 8.8]], finSide: [[4.4, 0.8], [8.3, 0.8], [8.8, 4.3], [7.0, 4.3]]},
@@ -316,7 +287,6 @@
         const g = out.group, body = paint(color, {pattern: opts.pattern, rough: 0.45, metal: 0.35});
         const dark = plain(new T.Color(color).multiplyScalar(0.55).getHex(), 0.5, 0.4), black = plain(0x1b1b1b, 0.6, 0.3);
         const L0 = def.nose, L1 = def.tail, w = def.w, n = def.chine;
-        // Fuselage: pointed nose, the cockpit, the widest middle, the tail.
         const st = [
             {z: L0, w: 0.02, h: 0.02, y: -0.1, n: 2},
             {z: L0 + 0.6, w: 0.22, h: 0.2, y: -0.08, n: 2.2},
@@ -328,7 +298,6 @@
             {z: L1 - 0.5, w: w * (def.engines === 2 && !def.pods ? 1.05 : 0.66), h: 0.55, y: 0, n: n},
         ];
         g.add(mesh(loft(st, 28), body));
-        // Engine pods slung apart (Flanker, Fulcrum).
         if (def.pods) [-1, 1].forEach(s => {
             g.add(mesh(loft([
                 {z: -2.6, w: 0.62, h: 0.62, y: -0.55, n: 3}, {z: -1.5, w: 0.66, h: 0.66, y: -0.6, n: 2.6},
@@ -337,7 +306,6 @@
             const intake = mesh(new T.BoxGeometry(1.05, 0.95, 0.2), black, s * def.spread, -0.6, -2.7);
             g.add(intake);
         });
-        // Intakes.
         if (def.intake === "caret" || def.intake === "box") [-1, 1].forEach(s => {
             const caret = mesh(loft([
                 {z: -4.6, w: 0.42, h: 0.5, n: 4}, {z: -3.4, w: 0.55, h: 0.6, n: 4}, {z: 0.5, w: 0.5, h: 0.55, n: 3},
@@ -361,9 +329,7 @@
             g.children[0].geometry = loft([{z: L0, w: 0.55, h: 0.55, n: 2}].concat(st.slice(3)), 28);
         }
         if (def.intake === "under") {
-            // Splitter plates under the leading edge extensions are part of the pods.
         }
-        // Wings, with ailerons on the outer trailing edges.
         const wingGeo = wing(both(def.wingR), 0.32, {tip: 0.35, dihedral: -0.03});
         g.add(mesh(wingGeo, body, 0, -0.05, 0));
         const wr = def.wingR, tip = wr[wr.length - 3] || wr[1], tipBack = wr[wr.length - 2];
@@ -376,7 +342,6 @@
             out.ailerons.push({pivot: h, side: s});
             void tip;
         });
-        // All-moving tailplanes.
         [-1, 1].forEach(s => {
             const pts = def.stab.map(([x, z]) => [x * s, z]);
             const geo = wing(s > 0 ? pts : pts.slice().reverse(), 0.18, {tip: 0.4, root: def.stab[0][0] * s, span: Math.abs(def.stab[1][0] - def.stab[0][0])});
@@ -386,7 +351,6 @@
             g.add(h);
             out.elevators.push(h);
         });
-        // Fins (canted twin tails, or one), with rudders and side numbers.
         const fins = def.tails === 2 ? [-1, 1] : [0];
         fins.forEach(s => {
             const f = new T.Group();
@@ -406,7 +370,6 @@
             f.rotation.z = -s * def.cant;
             g.add(f);
         });
-        // Canopy, the seat and the pilot.
         const cz = L0 + 4.3;
         const canopy = mesh(loft([
             {z: cz - 1.6, w: 0.05, h: 0.05, y: 0.75, n: 2}, {z: cz - 0.9, w: 0.45, h: 0.42, y: 0.75, n: 2, bot: 0.1},
@@ -418,7 +381,6 @@
         out.helmetPos = [0, 0.98, cz + 0.4];
         out.eye = [0, 1.3, cz + 0.3];
         g.add(mesh(new T.BoxGeometry(0.5, 0.7, 0.2), black, 0, 1.0, cz + 0.85));
-        // Nozzles.
         const nz = L1 - 0.4;
         if (def.flat) [-1, 1].forEach(s => {
             const nb = mesh(new T.BoxGeometry(0.95, 0.55, 1.2), plain(0x3a3632, 0.35, 0.85), s * def.spread, 0, nz + 0.6);
@@ -438,7 +400,6 @@
         });
         else if (def.engines === 2) [-1, 1].forEach(s => g.add(Object.assign(nozzle(0.52, 1.2, out), {}).translateX(s * (def.pods ? def.spread : def.spread * 0.75)).translateZ(nz).translateY(def.pods ? -0.4 : 0)));
         else g.add(nozzle(0.62, 1.3, out).translateZ(nz));
-        // Missiles on the wings and a roundel on each wing.
         const span = Math.max(...def.wingR.map(p => p[0]));
         [-1, 1].forEach(s => {
             const m = missile();
@@ -530,7 +491,6 @@
         out.tail = [0, 0.9, 4];
     }
 
-    // ------------------------------------------------------------- props
 
     const PROPS = {
         spitfire: {len: 9.1, eng: "inline", wing: "ellipse", span: 5.6, blades: 4, chord: 2.4},
@@ -579,7 +539,6 @@
                 {z: tail, w: 0.06, h: 0.12, y: 0.45, n: 2},
             ], 26), body));
             if (radial) {
-                // The radial engine behind the cowling ring.
                 const ring = new T.Mesh(new T.TorusGeometry(0.88 * f, 0.13, 8, 24), dark);
                 ring.position.z = nose;
                 g.add(ring);
@@ -590,7 +549,6 @@
                     g.add(c);
                 }
             } else {
-                // Exhaust stacks along the nose.
                 [-1, 1].forEach(s => {
                     for (let i = 0; i < 6; i++) g.add(mesh(new T.BoxGeometry(0.16, 0.1, 0.16), metal, s * 0.66, 0.25, nose + 0.5 + i * 0.3));
                 });
@@ -601,7 +559,6 @@
             out.spinners.push(spin);
             g.add(propeller(def.blades, def.small ? 1.0 : 1.6, out, nose - 0.45));
         } else {
-            // P-38: a central pod and two booms with engines.
             g.add(mesh(loft([{z: -4.8, w: 0.1, h: 0.1, n: 2}, {z: -3.6, w: 0.6, h: 0.6, n: 2}, {z: 0, w: 0.75, h: 0.8, n: 2.2}, {z: 1.8, w: 0.4, h: 0.4, n: 2}], 22), body));
             [-1, 1].forEach(s => {
                 g.add(mesh(loft([{z: -3.8, w: 0.55, h: 0.6, n: 2}, {z: -2, w: 0.62, h: 0.7, n: 2}, {z: 2, w: 0.42, h: 0.5, y: 0.1, n: 2}, {z: 5.6, w: 0.22, h: 0.3, y: 0.25, n: 2}], 20), body, s * 2.1, 0, 0));
@@ -613,7 +570,6 @@
             });
             g.add(mesh(wing([[-2.1, 4.9], [2.1, 4.9], [2.1, 5.8], [-2.1, 5.8]], 0.16, {tip: 1}), body, 0, 0.35, 0));
         }
-        // Wings with ailerons.
         const outline = propWing(def.wing === "gull" || def.wing === "high" ? "tapered" : def.wing, def.span, def.chord);
         const gw = wing(both(outline), 0.36, {tip: 0.4, dihedral: def.wing === "high" ? 0.0 : 0.09, gull: def.wing === "gull" ? 0.6 : 0, span: def.span});
         const wy = def.wing === "high" ? 0.95 : def.eng === "twin" ? -0.1 : -0.55;
@@ -636,7 +592,6 @@
             r.position.set(s * sp * 0.7, wy + sp * 0.7 * 0.09 + 0.2, wz - 0.1);
             g.add(r);
         });
-        // Tailplane with elevators, the fin with the rudder.
         if (def.eng !== "twin") {
             const tz = tail - 1.0, ty = 0.3;
             g.add(mesh(wing(both([[0.2, -0.5], [1.8, -0.2], [2.1, 0.2], [1.8, 0.5], [0.2, 0.6]]), 0.16, {tip: 0.6}), body, 0, ty, tz));
@@ -655,7 +610,6 @@
             });
             out.tail = [0, 1.9, tz];
         } else out.tail = [2.1, 1.5, 5.8];
-        // Canopy and pilot.
         const cz = def.eng === "twin" ? -2.2 : nose + L * 0.47;
         const canopy = mesh(loft([
             {z: cz - 0.9, w: 0.08, h: 0.06, y: 0.72, n: 2, bot: 0.1}, {z: cz - 0.4, w: 0.42, h: 0.42, y: 0.76, n: 2, bot: 0.1},
@@ -666,19 +620,10 @@
         out.helmetPos = [0, 0.95, cz + 0.3];
         out.eye = [0, 1.32, cz + 0.2];
         out.tips = [[-def.span - 0.8, wy, wz + 0.2], [def.span + 0.8, wy, wz + 0.2]];
-        // Wheels tucked up show as bulges; the tail wheel stays down.
         g.add(wheel(0.18, 0, -0.1, tail - 0.6));
     }
 
-    // ------------------------------------------------------------- biplane
 
-    // Every biplane is its own aircraft:
-    //   len/fw: fuselage length and half width; span/chord/gap/stagger/sweep: wings;
-    //   eng: "rotary" (spinning cylinders behind a ring), "radial" (cylinders
-    //   showing), "inline" (slim nose, exhaust pipe), "radiator" (flat front
-    //   radiator, SPAD), "twin" (two engines on the lower wing); bays: struts
-    //   each side; tips: "round" | "square"; extras: hump, spats, canopy,
-    //   gunner, spray bar, two seats, three wings.
     const BIPLANES = {
         classic: {len: 6.2, fw: 0.8, span: 4.0, chord: 1.5, gap: 2.5, stagger: 0.3, eng: "rotary", bays: 1, tips: "round"},
         tigermoth: {len: 7.0, fw: 0.62, span: 4.4, chord: 1.4, gap: 2.4, stagger: 0.7, sweep: 0.18, eng: "inline", bays: 1, tips: "square", seats: 2},
@@ -707,7 +652,6 @@
         const wood = plain(0x6b4a2e, 0.7, 0), black = plain(0x1b1b1b, 0.7, 0.3);
         const L = def.len, nose = -L * 0.48, tail = L * 0.52, fw = def.fw, twin = def.eng === "twin";
         const boxy = def.smooth ? 2.4 : 3.6;
-        // Fuselage (with the camel's hump over the guns).
         g.add(mesh(loft([
             {z: nose, w: fw * (def.eng === "radiator" ? 0.95 : 0.98), h: fw * 1.02, n: def.eng === "radiator" ? 4 : 2.2},
             {z: nose + 0.9, w: fw * 1.05, h: fw * 1.1, n: boxy * 0.8},
@@ -716,7 +660,6 @@
             {z: tail - 0.6, w: 0.14, h: 0.24, y: 0.35, n: 2.5},
             {z: tail, w: 0.05, h: 0.1, y: 0.4, n: 2},
         ], 22), fabric));
-        // The engine.
         if (def.eng === "rotary" || def.eng === "radial") {
             const ring = new T.Mesh(new T.TorusGeometry(fw * 0.98, 0.12, 8, 24), def.eng === "rotary" ? metal : dark);
             ring.position.z = nose;
@@ -736,7 +679,6 @@
         } else if (def.eng === "inline") {
             g.add(mesh(cyl(0.07, 0.07, L * 0.4, metal, 8).geometry, metal, fw * 0.95, -0.25, nose + L * 0.2));
         }
-        // Propeller(s).
         if (twin) {
             [-1, 1].forEach(s => {
                 const nx = s * def.span * 0.38;
@@ -749,7 +691,6 @@
                 g.add(sp);
                 out.spinners.push(sp);
             });
-            // A glazed nose for the bomb aimer and gunner.
             g.add(mesh(loft([{z: nose - 0.6, w: 0.05, h: 0.05, n: 2}, {z: nose - 0.3, w: 0.55, h: 0.55, n: 2}, {z: nose + 0.1, w: fw * 0.95, h: fw, n: 2.4}], 16), glassMat()));
         } else {
             const big = def.spinner;
@@ -759,7 +700,6 @@
             out.spinners.push(sp);
             g.add(propeller(2, def.span * 0.33 + 0.2, out, nose - 0.42));
         }
-        // Wings: two or three, staggered, with ailerons on the top one.
         const nw = def.wings || 2, top = def.gap * (nw === 3 ? 1.35 : 0.72), z0 = nose + L * 0.28;
         const levels = [];
         for (let i = 0; i < nw; i++) {
@@ -781,13 +721,11 @@
             r.position.set(s * sp * 0.68, T0.y + 0.1, T0.z + sp * 0.68 * sw);
             g.add(r);
         });
-        // Cabane struts from the fuselage to the top wing.
         [-1, 1].forEach(s => [-0.35, 0.35].forEach(dz => {
             const st = mesh(new T.BoxGeometry(0.06, T0.y - fw * 0.6, 0.06), metal, s * fw * 0.6, (T0.y + fw * 0.6) / 2, T0.z + dz);
             st.rotation.z = s * -0.15;
             g.add(st);
         }));
-        // Interplane struts (bays), or a single streamlined I-strut on racers.
         const bays = Math.max(1, def.bays);
         [-1, 1].forEach(s => {
             for (let b = 1; b <= bays; b++) {
@@ -802,7 +740,6 @@
                     st.rotation.x = Math.atan2(zt - zb, T0.y - B.y);
                     g.add(st);
                 });
-                // Crossed bracing wires in each bay.
                 if (def.bays > 0) {
                     const inner = b === 1 ? s * fw : s * T0.sp * (0.3 + 0.62 * (b - 2) / (bays - 1));
                     const dx = x - inner, dy = T0.y - B.y, len = Math.hypot(dx, dy);
@@ -814,7 +751,6 @@
                 }
             }
         });
-        // Landing gear (spats on the racers), tail skid.
         const wr = def.bigWheels ? 0.55 : 0.45, gy = B.y - 1.1;
         [-1, 1].forEach(s => {
             g.add(wheel(wr, s * (fw + 0.25), gy, nose + L * 0.22));
@@ -825,13 +761,11 @@
         });
         if (!def.spats) g.add(mesh(new T.CylinderGeometry(0.03, 0.03, 2 * (fw + 0.25), 4).rotateZ(Math.PI / 2), metal, 0, gy, nose + L * 0.22));
         g.add(mesh(new T.BoxGeometry(0.05, 0.5, 0.05), metal, 0, 0.0, tail - 0.4));
-        // Crop duster's spray bar.
         if (def.spray) {
             g.add(mesh(new T.CylinderGeometry(0.04, 0.04, B.sp * 1.7, 6).rotateZ(Math.PI / 2), metal, 0, B.y - 0.25, B.z + def.chord * 0.55));
             for (let i = -6; i <= 6; i++) g.add(mesh(new T.BoxGeometry(0.04, 0.12, 0.04), metal, i * B.sp * 0.13, B.y - 0.33, B.z + def.chord * 0.55));
             g.add(mesh(loft([{z: -0.6, w: 0.3, h: 0.3, n: 2}, {z: 0, w: 0.45, h: 0.45, n: 2}, {z: 0.6, w: 0.3, h: 0.3, n: 2}], 12), dark, 0, -fw - 0.2, nose + L * 0.3));
         }
-        // Tail.
         const tz = tail - 0.9;
         g.add(mesh(wing(both([[0.1, -0.4], [1.6 + def.span * 0.06, -0.2], [1.9 + def.span * 0.06, 0.2], [1.6 + def.span * 0.06, 0.5], [0.1, 0.5]]), 0.1, {tip: 0.8}), fabric, 0, 0.35, tz));
         const el = hinge(mesh(wing(both([[0.1, 0.5], [1.6 + def.span * 0.06, 0.5], [1.7 + def.span * 0.06, 0.9], [0.1, 0.95]]), 0.06, {tip: 1}), dark), 0, 0.35, tz + 0.5, 0, 0.35, tz);
@@ -847,7 +781,6 @@
             d.rotation.y = side * Math.PI / 2;
             g.add(d);
         });
-        // Guns on the cowling, cockpits, the rear gunner.
         const guns = def.guns || 2;
         for (let i = 0; i < guns; i++) {
             const x = (i - (guns - 1) / 2) * 0.45;
@@ -885,9 +818,7 @@
         out.tail = [0, 1.6, tz + 1.1];
     }
 
-    // ------------------------------------------------------------- entry
 
-    // Builds the model for a Hangar plane. opts: {pattern, team, number}
     D.buildPlaneModel = function (shape, color, planeId, opts = {}) {
         T = D.THREE;
         const out = {group: new T.Group(), props: [], spinners: [], burners: [], glows: [], ailerons: [], elevators: [], rudders: [], canopy: null, tips: null, tail: null, eye: null, helmetPos: null};
@@ -903,7 +834,6 @@
         return out;
     };
 
-    // Clear cached materials between matches (quality may change).
     D.resetModelCache = () => {
         for (const m of matCache.values()) m.dispose();
         matCache.clear();

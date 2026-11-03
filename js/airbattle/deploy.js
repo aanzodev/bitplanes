@@ -1,6 +1,3 @@
-// Air Battle (3D): the deploy screen you see after pressing PLAY (choose the
-// map, time of day, match type, team size and enemy skill), and the pilot who
-// bails out under a parachute, dressed in their pilot skin.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
     const KEY = "dfSetup";
@@ -29,7 +26,6 @@
         } catch (e) {}
     }
 
-    // Shows the screen; calls go(setup) on DEPLOY.
     D.showDeploy = function (go) {
         const setup = load();
         const S = window.BitSettings;
@@ -124,9 +120,7 @@
         return close;
     };
 
-    // ------------------------------------------------------------ parachute
 
-    // A pilot hanging under a parachute, in the colors of their pilot skin.
     D.makeChute = function (THREE, skin) {
         const s = skin || {jacket: "#6b7a4b", pants: "#4a4f3a", capColor: "#7b4a2a", skin: "#f1c27d", scarf: "#f2f2f2", gloves: "#5a3b22"};
         const mat = c => new THREE.MeshLambertMaterial({color: c, flatShading: true});
@@ -161,7 +155,6 @@
             pilot.add(visor);
         }
         g.add(pilot);
-        // The canopy: striped panels, and the lines down to the harness.
         const canopy = new THREE.Group();
         const colors = [0xffffff, 0xe8202e];
         for (let i = 0; i < 8; i++) {

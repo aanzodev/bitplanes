@@ -1,12 +1,3 @@
-// Friends and the global leaderboard. Every browser connects once with a
-// secret random id (uid) and gets a short public friend code made from it, so
-// the same player always has the same code. The server keeps everyone's name,
-// level and a few stats for the leaderboard, friend requests waiting for
-// someone who is offline, and who is online in which room.
-//
-// Data is saved to data.json (or $DATA_FILE) every half minute. On free hosting
-// that file can be wiped when the server restarts; browsers send their stats
-// again every time they connect, so the leaderboard fills back up by itself.
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -17,11 +8,11 @@ const MAX_PROFILES = 200000;
 const MAX_FRIENDS = 100;
 const BOARDS = ["xp", "kills", "dfKills", "streak"];
 
-const profiles = new Map(); // code -> profile
-const online = new Map();   // code -> socket
-let pending = new Map();    // code -> [{type, from, name, at}] notices for someone offline
+const profiles = new Map();
+const online = new Map();
+let pending = new Map();
 let dirty = false;
-const boardCache = new Map(); // by -> {at, rows}
+const boardCache = new Map();
 
 function codeOf(uid) {
     const h = crypto.createHash("sha256").update("bitplanes:" + uid).digest();
@@ -63,7 +54,6 @@ function saveNow() {
 load();
 setInterval(saveNow, 30000).unref();
 
-// Forget players who haven't been seen in 180 days, if the list gets huge.
 function trim() {
     if (profiles.size <= MAX_PROFILES) return;
     const old = [...profiles.values()].sort((a, b) => a.seen - b.seen);
@@ -82,7 +72,6 @@ function notify(code, notice, send) {
     const ws = online.get(code);
     if (ws) return send(ws, Object.assign({op: "notice"}, notice));
     const list = pending.get(code) || [];
-    // One notice of each kind per sender is enough.
     const i = list.findIndex(n => n.type === notice.type && n.from === notice.from);
     if (i >= 0) list.splice(i, 1);
     list.push(notice);
@@ -99,7 +88,6 @@ function board(by) {
     return rows;
 }
 
-// Returns true if the message was one of ours.
 function handle(ws, msg, send) {
     const op = msg.op;
     if (op === "hi") {
@@ -118,8 +106,6 @@ function handle(ws, msg, send) {
             skin: /^[a-z0-9]{1,20}$/.test(msg.skin || "") ? msg.skin : "", plane: /^[a-z0-9]{1,20}$/.test(msg.plane || "") ? msg.plane : "",
             seen: Date.now(),
         });
-        // Friends this browser remembers. When both sides remember each other,
-        // the friendship comes back (after the saved data was lost).
         if (Array.isArray(msg.friends)) {
             p.claims = msg.friends.map(String).filter(c => /^[A-Z0-9]{6}$/.test(c)).slice(0, MAX_FRIENDS);
             for (const c of p.claims) {
@@ -134,7 +120,7 @@ function handle(ws, msg, send) {
         if (ws.code && ws.code !== code && online.get(ws.code) === ws) online.delete(ws.code);
         ws.code = code;
         const prev = online.get(code);
-        if (prev && prev !== ws) prev.code = null; // the same player in a newer tab
+        if (prev && prev !== ws) prev.code = null;
         online.set(code, ws);
         const notices = pending.get(code) || [];
         pending.delete(code);
@@ -154,9 +140,7 @@ function handle(ws, msg, send) {
     }
     if (!me) return send(ws, {op: "err", type: "hi-first"}), true;
     if (op === "where") {
-        // {room: "ABCDE", mode: "multiplayer" | "room" | "airbattle" | "solo"} or nothing (in the lobby)
         const room = typeof msg.room === "string" && /^[A-Z0-9]{5}$/.test(msg.room) ? msg.room : null;
-        // (Pages from before the rename still send its old name.)
         const sent = msg.mode === "dog" + "fights" ? "airbattle" : msg.mode;
         const mode = ["multiplayer", "room", "airbattle", "solo"].includes(sent) ? sent : null;
         ws.where = mode ? {room, mode} : null;
@@ -174,7 +158,6 @@ function handle(ws, msg, send) {
         if (code === me.code) return send(ws, {op: "ferr", code, text: "That's your own code."}), true;
         if (!other) return send(ws, {op: "ferr", code, text: "No pilot has that code. Check it and try again."}), true;
         if ((me.friends || []).includes(code)) return send(ws, {op: "ferr", code, text: `${other.name} is already your friend.`}), true;
-        // They already asked us: that's a yes from both sides.
         const theirs = pending.get(me.code) || [];
         me.outgoing = (me.outgoing || []).filter(c => c !== code).concat(code).slice(-MAX_FRIENDS);
         if ((other.outgoing || []).includes(me.code) || theirs.some(n => n.type === "request" && n.from === code)) return accept(ws, me, other, send), true;

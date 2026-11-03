@@ -1,14 +1,7 @@
-// Air Battle (3D): computer pilots. Each one picks an enemy to hunt (the one
-// that shot at it, the closest, or you), flies a lead pursuit, fires short
-// bursts when lined up, locks on and launches missiles, drops flares and
-// breaks hard when a missile comes, uses the afterburner to catch up or
-// escape, and never flies into hills, buildings or other planes. skill (0..1)
-// sets how well it aims, how fast it reacts and how often it gets it right.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
 
     D.makePilot = function (THREE, plane, skill = 0.7) {
-        // Good pilots get a little more out of the same plane.
         plane.pilotBonus = 1 + 0.12 * skill;
         const tmp = new THREE.Vector3(), inv = new THREE.Quaternion(), goal = new THREE.Vector3(), look = new THREE.Vector3();
         const aimQ = new THREE.Quaternion(), idQ = new THREE.Quaternion();
@@ -23,10 +16,8 @@
             const {planes, player} = ctx;
             const foes = planes.filter(enemyOf);
             if (!foes.length) return null;
-            // Whoever shot us recently.
             if (plane.lastHitBy && plane.lastHitBy.alive && enemyOf(plane.lastHitBy) && ctx.time - (plane.lastHitAt || 0) < 6 && Math.random() < 0.7) return plane.lastHitBy;
             if (enemyOf(player) && Math.random() < ctx.focusPlayer) return player;
-            // Otherwise the easiest one: close, and already in front of us.
             const f = plane.forward;
             const cost = p => {
                 tmp.copy(p.pos).sub(plane.pos);
@@ -37,13 +28,10 @@
             return foes[Math.random() < 0.8 ? 0 : Math.min(foes.length - 1, 1)];
         }
 
-        // Steer so that `goalPos` ends up straight ahead. Returns how lined up we are (1 = dead ahead).
         function steerTo(goalPos, out) {
             inv.copy(plane.quat).invert();
             tmp.copy(goalPos).sub(plane.pos).normalize().applyQuaternion(inv);
-            // tmp is now in the plane's own frame: x right, y up, -z ahead.
             const ahead = -tmp.z;
-            // Roll so the goal is "above" us, then pull toward it.
             let roll = Math.atan2(tmp.x, Math.max(0.05, tmp.y));
             if (ahead > 0.97) roll *= 0.3;
             out.roll = Math.max(-1, Math.min(1, roll * 1.8));
@@ -62,7 +50,6 @@
             ai.flareCd -= dt;
             ai.missileCd -= dt;
 
-            // 1. Don't hit the ground: look 1 to 4 seconds ahead, then pull up and level the wings.
             const gNow = world.ground(plane.pos.x, plane.pos.z);
             let danger = plane.pos.y - gNow < 180;
             for (let s = 1; s <= 4 && !danger; s++) {
@@ -77,7 +64,6 @@
                 i.boost = plane.speed < plane.cornerSpeed;
                 return;
             }
-            // 2. Missile coming: flares when it gets close, and break hard.
             const incoming = combat.missilesAt(plane);
             if (incoming.length) {
                 const m = incoming[0], d = m.mesh.position.distanceTo(plane.pos);
@@ -90,12 +76,10 @@
                     ai.breakDir = m.vel.dot(plane.right) > 0 ? 1 : -1;
                 }
             }
-            // 3. Too far out: head back to the middle.
             if (Math.hypot(plane.pos.x, plane.pos.z) > world.size * 0.4) {
                 steerTo(goal.set(0, Math.max(1200, gNow + 900), 0), i);
                 return;
             }
-            // 4. About to fly into another plane: swerve.
             for (const p of planes) {
                 if (p === plane || !p.alive) continue;
                 tmp.copy(p.pos).sub(plane.pos);
@@ -106,7 +90,6 @@
                     return;
                 }
             }
-            // 5. Breaking: a hard turn away (someone on our tail, or a missile).
             if (ai.breakT > 0) {
                 ai.breakT -= dt;
                 i.roll = ai.breakDir * (plane.right.y * ai.breakDir > 0.8 ? 0 : 1);
@@ -126,8 +109,6 @@
                 steerTo(goal.set(Math.sin(time * 0.1) * 3000, Math.max(1400, gNow + 900), Math.cos(time * 0.1) * 3000), i);
                 return;
             }
-            // Someone right behind us: now and then, break (better pilots
-            // notice sooner), then fight again for a while.
             ai.breakCd = (ai.breakCd || 0) - dt;
             if (ai.breakCd <= 0) for (const p of planes) {
                 if (!enemyOf(p)) continue;
@@ -140,23 +121,17 @@
                     break;
                 }
             }
-            // 6. Lead the target: aim where it will be when the bullets arrive.
             const dist = t.pos.distanceTo(plane.pos);
             goal.copy(t.pos).addScaledVector(t.velocity, dist / 1000);
             ai.wobble += dt;
-            // Aim error is an angle: worse pilots miss by more, further away.
             const wob = (0.6 + (1 - skill) * 2.4) * Math.min(dist, 1500) / 100;
             goal.x += Math.sin(ai.wobble * 1.7) * wob;
             goal.y += Math.cos(ai.wobble * 1.3) * wob;
             goal.z += Math.sin(ai.wobble * 0.9 + 2) * wob;
-            // Stay above the ground while chasing.
             goal.y = Math.max(goal.y, world.ground(goal.x, goal.z) + 150);
             const ahead = steerTo(goal, i);
-            if (dist < 300 && ahead > 0.9) i.throttle = 0.45; // don't overshoot
+            if (dist < 300 && ahead > 0.9) i.throttle = 0.45;
             if (dist > 1800 && ahead > 0.8 && plane.boost > plane.maxBoost * 0.5) i.boost = true;
-            // 7. Guns: short bursts when the aim point is on the target (bigger
-            //    and closer targets are easier). A practiced pilot finishes the
-            //    last few degrees of tracking smoothly (the nose eases onto the aim point).
             let err = Math.acos(Math.min(1, ahead));
             if (err < 0.35 && dist < 1100) {
                 const rate = (0.2 + 0.45 * skill) * dt;
@@ -177,7 +152,6 @@
                 ai.pauseT = 0.3 + Math.random() * 0.6;
                 ai.wantFire = true;
             }
-            // 8. Missiles: hold the target in front to lock, then fire.
             const inCone = ahead > 0.9 && dist > 350 && dist < 2600;
             if (inCone && plane.missiles > 0 && ai.missileCd <= 0) {
                 ai.lockT += dt;

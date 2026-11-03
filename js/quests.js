@@ -1,10 +1,5 @@
-// Quests: three daily goals (new every day) and three bigger weekly goals
-// (new every Monday), the same for everyone on a given date, tracked from
-// your stats in Bit Planes and Air Battle. Finish one and claim its coins and
-// XP in the Quests tab of the lobby.
 window.BitQuests = (function () {
     const KEY = "quests";
-    // stat: a counter in BitStats; "max": reach the value once (e.g. a streak).
     const DAILY = [
         {id: "kills5", text: "Shoot down 5 planes", stat: "killed", goal: 5, coins: 250},
         {id: "kills15", text: "Shoot down 15 planes", stat: "killed", goal: 15, coins: 600},
@@ -46,14 +41,12 @@ window.BitQuests = (function () {
         return dateKey(new Date());
     }
 
-    // The Monday this week started on.
     function week() {
         const d = new Date();
         d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
         return dateKey(d);
     }
 
-    // Pick quests from the date, so they're the same all day (or week).
     function pick(pool, key, n) {
         let seed = [...key].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
         const rest = pool.slice(), out = [];
@@ -83,7 +76,6 @@ window.BitQuests = (function () {
         state = state || {};
         let changed = false;
         if (state.date !== today() || !Array.isArray(state.list)) {
-            // New day: new quests, counting from your stats right now.
             Object.assign(state, {date: today(), list: fresh(DAILY, today(), s)});
             changed = true;
         }
@@ -111,7 +103,6 @@ window.BitQuests = (function () {
         }).filter(Boolean);
     }
 
-    // Each quest with its progress. which: "daily" | "weekly" | "all"
     function list(which = "daily") {
         const s = stats();
         if (!load() || !s) return [];
@@ -139,7 +130,6 @@ window.BitQuests = (function () {
 
     function render() {
         const all = list("all");
-        // Yellow dot on the Quests tab when a reward is waiting.
         const dot = document.querySelector(".open-quests .nav-dot");
         if (dot) dot.hidden = !all.some(q => q.done && !q.claimed);
         if (!el || el.hidden) return;

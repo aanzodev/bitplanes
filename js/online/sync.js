@@ -1,5 +1,3 @@
-// Online play: turning activity objects, sprites and particles into small
-// messages and back again.
 (function () {
     const O = window.BitOnline;
     const {engine, round} = O;
@@ -11,7 +9,6 @@
         const r = engine().require;
         const p = r(10);
         classes = {
-            // plane, missile, bullet, pilot, parachute, barn, cow
             bodies: [r(4).a, r(5).a, r(15).a, r(8).b, r(8).a, r(17).a, r(11).a],
             particles: [p.f, p.a, p.c, p.b, p.d, p.e],
         };
@@ -21,7 +18,6 @@
         return classes;
     }
 
-    // Sprites are sent by name ("explosion.3") or, for planes, by their look.
     let spriteKeys, spritesByKey;
 
     function indexSprites() {

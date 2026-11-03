@@ -1,4 +1,3 @@
-// Activity constants (gravity, thrust, ammo, timings).
 BitModules[1] = function (M, j, t) {
     "use strict";
     (t.d(j, "m", function () {

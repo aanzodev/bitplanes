@@ -1,4 +1,3 @@
-/* Online play. */
 
 main .online {
     margin-top: 28px;
@@ -56,7 +55,6 @@ main input.room-code {
     white-space: nowrap;
 }
 
-/* Ping meter (online activities only) */
 
 .ping-meter {
     position: absolute;
@@ -117,7 +115,6 @@ main input.room-code {
 
 .ping.waiting { color: #5b6b7a; }
 
-/* Multiplayer: match timer, lobby and top 5 */
 .match-timer {
     position: absolute;
     left: 12px;

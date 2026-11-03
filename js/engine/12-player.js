@@ -1,4 +1,3 @@
-// Players and teams.
 BitModules[12] = function (M, j, t) {
     "use strict";
     (t.d(j, "b", function () {

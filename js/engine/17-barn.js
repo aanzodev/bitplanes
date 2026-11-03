@@ -1,4 +1,3 @@
-// Barn: land here to get a new plane.
 BitModules[17] = function (M, j, t) {
     "use strict";
     t.d(j, "a", function () {

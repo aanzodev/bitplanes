@@ -1,15 +1,6 @@
-// Air Battle (3D): plane models, cockpits and flight. Every plane is built
-// from simple shapes in its Hangar colors: biplane, propeller fighter, jet
-// (twin tails for the big ones, the A-10's own shape) or the B-2 flying wing,
-// with navigation lights. The cockpit view has a working instrument panel.
-//
-// Flight is arcade with real energy: planes turn best near their corner speed,
-// hard turns bleed speed, climbing costs speed and diving gains it, too slow
-// stalls, and the afterburner (or a prop's emergency power) gives a burst.
 (function () {
     const D = window.BitAirBattle = window.BitAirBattle || {};
 
-    // Speeds by shape in m/s (before the plane's own engine), and how big it is.
     const SHAPES = {
         "": {top: 80, min: 32, radius: 9, roll: 2.2, pitch: 1.0, eye: [0, 1.95, 1.6], boost: 1.18},
         prop: {top: 125, min: 45, radius: 9, roll: 2.3, pitch: 0.8, eye: [0, 1.45, -0.9], boost: 1.2},
@@ -22,19 +13,15 @@
         return new D.THREE.Color(hex).multiplyScalar(f);
     }
 
-    // Paint: physically based with sky reflections on High/Ultra (D.pbr),
-    // simple flat shading otherwise.
     function lambert(color) {
         if (D.pbr) return new D.THREE.MeshStandardMaterial({color, roughness: 0.5, metalness: 0.28});
         return new D.THREE.MeshLambertMaterial({color, flatShading: true});
     }
 
-    // Unlit glowing things (flames, lights) are extra bright on High/Ultra so they bloom.
     function glowColor(hex, k = 1) {
         return new D.THREE.Color(hex).multiplyScalar(1 + ((D.glow || 1) - 1) * k);
     }
 
-    // A smooth body of revolution along the plane's length: [[z, radius], ...].
     function lathe(profile, mat, segments = 18) {
         const T = D.THREE;
         const g = new T.LatheGeometry(profile.map(([z, r]) => new T.Vector2(r, -z)), segments);
@@ -42,7 +29,6 @@
         return new T.Mesh(g, mat);
     }
 
-    // A flat shape in the x/z plane (points as [x, z]), given some thickness.
     function slab(points, thick) {
         const T = D.THREE, s = new T.Shape();
         points.forEach(([x, z], i) => (i ? s.lineTo(x, z) : s.moveTo(x, z)));
@@ -64,8 +50,6 @@
         return m;
     }
 
-    // Forward is -Z, up is +Y, right is +X. The detailed models are in
-    // models.js; this adds the navigation lights and the pilot's helmet.
     function buildModel(opts) {
         const T = D.THREE;
         const m = D.buildPlaneModel(opts.shape, opts.color, opts.planeId, {pattern: opts.pattern, team: opts.team, number: opts.number});
@@ -82,10 +66,7 @@
         return Object.assign(m, {navs, helmet});
     }
 
-    // ------------------------------------------------------------- cockpit
 
-    // The view from the pilot's seat: instrument panel (drawn live onto a
-    // canvas), canopy frame, and the nose ahead.
     function buildCockpit(shape, color, eye) {
         const T = D.THREE, g = new T.Group();
         const [ex, ey, ez] = eye;
@@ -100,11 +81,9 @@
         panel.position.set(ex, ey - (shape === "jet" || shape === "bomber" ? 0.5 : 0.62), ez - 1.0);
         panel.rotation.x = -0.25;
         g.add(panel);
-        // The panel's housing (glare shield on top).
         g.add(box(panelW + 0.2, 0.08, 0.45, frame, ex, ey - 0.16, ez - 1.22));
         g.add(box(panelW + 0.3, 0.5, 0.1, metal, ex, ey - 0.88, ez - 0.98));
         if (shape === "jet" || shape === "bomber") {
-            // HUD glass and the canopy frame arching over your head.
             const hud = new T.Mesh(new T.PlaneGeometry(0.62, 0.5), new T.MeshBasicMaterial({color: 0x7dffa0, transparent: true, opacity: 0.08, depthWrite: false}));
             hud.position.set(ex, ey - 0.02, ez - 1.25);
             g.add(hud);
@@ -121,7 +100,6 @@
             bow2.position.z = ez + 0.9;
             g.add(bow2);
         } else if (shape === "prop") {
-            // Framed canopy and a reflector gunsight.
             [-1, 1].forEach(s => g.add(box(0.06, 0.06, 2.2, frame, ex + s * 0.7, ey - 0.3, ez + 0.2)));
             const bow = new T.Mesh(new T.TorusGeometry(0.75, 0.05, 4, 14, Math.PI), frame);
             bow.position.set(ex, ey - 0.35, ez - 0.9);
@@ -136,13 +114,11 @@
             const glass = new T.Mesh(new T.PlaneGeometry(0.12, 0.1), new T.MeshBasicMaterial({color: 0xffc040, transparent: true, opacity: 0.2, depthWrite: false}));
             glass.position.set(ex, ey - 0.22, ez - 1.05);
             g.add(glass);
-            // Engine cowling stretching ahead.
             const cowl = new T.Mesh(new T.CylinderGeometry(1.2, 1.4, 4.6, 12, 1, true, -Math.PI / 2, Math.PI), new T.MeshLambertMaterial({color, side: T.DoubleSide}));
             cowl.rotation.x = Math.PI / 2;
             cowl.position.set(ex, ey - 1.85, ez - 3.6);
             g.add(cowl);
         } else {
-            // Open cockpit: a small windscreen and the guns on the cowling.
             const ws = new T.Mesh(new T.PlaneGeometry(0.9, 0.35), new T.MeshBasicMaterial({color: 0xbfe8ff, transparent: true, opacity: 0.25, depthWrite: false, side: T.DoubleSide}));
             ws.position.set(ex, ey - 0.32, ez - 1.0);
             ws.rotation.x = -0.35;
@@ -152,7 +128,6 @@
         return {group: g, canvas, tex, ctx: canvas.getContext("2d")};
     }
 
-    // Draws the instruments: airspeed, altitude, artificial horizon, compass, throttle, G.
     function drawInstruments(cp, plane) {
         const c = cp.ctx, W = 512, H = 200;
         c.fillStyle = "#1b1e21";
@@ -191,7 +166,6 @@
         };
         dial(70, 100, 62, "KM/H", plane.speed, plane.topSpeed * 1.4, String(Math.round(plane.speed * 3.6)));
         dial(442, 100, 62, "ALT M", plane.pos.y, 5000, String(Math.round(plane.pos.y)));
-        // Artificial horizon.
         const f = plane.forward, r = plane.right;
         const pitch = Math.asin(Math.max(-1, Math.min(1, f.y))), roll = Math.atan2(r.y, plane.up.y);
         c.save();
@@ -233,7 +207,6 @@
         c.beginPath();
         c.arc(256, 92, 70, 0, Math.PI * 2);
         c.stroke();
-        // Heading, throttle and G.
         const heading = (Math.atan2(f.x, -f.z) * 180 / Math.PI + 360) % 360;
         c.fillStyle = "#cfd5da";
         c.font = "bold 16px monospace";
@@ -250,16 +223,13 @@
         cp.tex.needsUpdate = true;
     }
 
-    // ------------------------------------------------------------- plane
 
     class Aircraft {
-        // opts: {name, label, color, shape, planeId, isPlayer, team, stats: {...}, gun}
         constructor(scene, opts) {
             const T = D.THREE;
             Object.assign(this, opts);
             const kind = SHAPES[opts.shape] || SHAPES[""];
             this.kind = kind;
-            // Engine and handling upgrades count half as much here as in 2D.
             this.topSpeed = kind.top * (1 + ((opts.stats.thrust || 1) - 1) * 0.5);
             this.minSpeed = kind.min;
             this.cornerSpeed = this.minSpeed + (this.topSpeed - this.minSpeed) * 0.5;
@@ -268,7 +238,6 @@
             this.maxHealth = Math.round((100 + 18 * (opts.stats.life || 0)) * (1 + 0.1 * (opts.stats.airframe || 0)));
             this.maxAmmo = Math.max(150, 260 + (opts.stats.ammo || 0) * 10);
             this.maxMissiles = 2 + (opts.stats.missiles || 0);
-            // Everyone has some countermeasures in 3D; planes that carry flares have more.
             this.maxFlares = 3 + (opts.stats.flares || 0);
             this.maxBoost = 4 * (1 + 0.25 * (opts.stats.boost || 0));
             const model = buildModel(opts);
@@ -305,7 +274,6 @@
             this.navT = Math.random();
         }
 
-        // The cockpit (made the first time you look from inside).
         cockpit() {
             if (!this._cockpit) {
                 this._cockpit = buildCockpit(this.shape, this.color, this.eyeLocal);
@@ -314,7 +282,6 @@
             return this._cockpit;
         }
 
-        // The helmet in the canopy takes the pilot skin's color.
         setPilot(skin) {
             this.skin = skin;
             if (this.helmet && skin && skin.capColor) this.helmet.material.color.set(skin.capColor);
@@ -337,7 +304,6 @@
             this.mesh.position.copy(pos);
             this.mesh.quaternion.identity();
             this.mesh.lookAt(lookAt);
-            // lookAt points +Z at the target; our nose is -Z, so turn around.
             this.mesh.rotateY(Math.PI);
             this.quat.copy(this.mesh.quaternion);
             this.speed = this.cornerSpeed * 1.15;
@@ -375,25 +341,21 @@
             return this.forward.clone().multiplyScalar(this.speed);
         }
 
-        // Wingtip positions in the world (for vapor trails).
         tipWorld(i, out) {
             return out.copy(this.tips[i]).multiplyScalar(this.scale).applyQuaternion(this.quat).add(this.pos);
         }
 
-        // How well the plane turns at this speed: best at corner speed.
         turnFactor() {
             const s = this.speed, lo = this.minSpeed * 0.6;
             if (s < this.cornerSpeed) return Math.max(0.3, (s - lo) / (this.cornerSpeed - lo));
             return Math.max(0.62, 1 - 0.38 * (s - this.cornerSpeed) / (this.topSpeed - this.cornerSpeed));
         }
 
-        // Returns "crash" if the plane hit the ground, water or a building.
         update(dt, world) {
             if (!this.alive) return null;
             const T = D.THREE, i = this.input, k = this.kind;
             this.throttle = Math.max(0, Math.min(1, this.throttle + (i.throttleDelta || 0) * dt));
             if (i.throttle !== undefined && i.throttleDelta === undefined) this.throttle = i.throttle;
-            // Afterburner / emergency power while there is some left.
             this.boosting = !!i.boost && this.boost > 0 && this.throttle > 0.3;
             if (this.boosting) this.boost = Math.max(0, this.boost - dt);
             else this.boost = Math.min(this.maxBoost, this.boost + dt * 0.35);
@@ -402,11 +364,9 @@
             const pitchRate = k.pitch * a * i.pitch;
             this._e.set(pitchRate * dt, -0.42 * a * i.yaw * dt, -k.roll * Math.min(1.2, this.agility) * Math.max(0.45, this.turnFactor()) * i.roll * dt, "XYZ");
             this.quat.multiply(this._q.setFromEuler(this._e));
-            // Banking turns the plane a little by itself (the lift tilts sideways).
             const bank = this.right.y;
             this._q.setFromAxisAngle(this._axis.set(0, 1, 0), bank * 0.32 * this.agility * dt);
             this.quat.premultiply(this._q);
-            // Stall: the nose drops.
             const f = this.forward;
             if (this.speed < this.minSpeed) {
                 const drop = (this.minSpeed - this.speed) / this.minSpeed;
@@ -414,17 +374,13 @@
                 this.quat.premultiply(this._q);
                 this.stalling = true;
             } else this.stalling = false;
-            // Too high: the thin air pushes the nose down.
             if (this.pos.y > 7000) {
                 this._q.setFromAxisAngle(this.right, -0.6 * dt);
                 this.quat.premultiply(this._q);
             }
             this.quat.normalize();
-            // G load, for the vapor trails, the blackout and the G meter.
             const gNow = 1 + Math.abs(pitchRate) * this.speed / 33;
             this.g += (gNow - this.g) * Math.min(1, dt * 6);
-            // Speed: the engine pulls toward the throttle's speed; pulling hard
-            // bleeds speed; climbing costs speed, diving gains it.
             const top = this.topSpeed * (this.burning ? 0.8 : 1) * (this.boosting ? k.boost : 1);
             const target = this.minSpeed * 0.75 + (top - this.minSpeed * 0.75) * (this.boosting ? 1 : this.throttle);
             this.speed += (target - this.speed) * (this.boosting ? 0.9 : 0.42) * dt;
@@ -437,7 +393,6 @@
             const spin = dt * (25 + 45 * this.throttle);
             for (const p of this.props) p.rotation.z += spin;
             for (const p of this.spinners) p.rotation.z += spin;
-            // Control surfaces follow the stick (a little slowly, like real ones).
             const d = this.defl, k2 = Math.min(1, dt * 10);
             d.p += (i.pitch - d.p) * k2;
             d.r += (i.roll - d.r) * k2;
@@ -445,20 +400,17 @@
             for (const e of this.surfaces.elevators) e.rotation.x = -0.32 * d.p;
             for (const a of this.surfaces.ailerons) a.pivot.rotation.x = -0.32 * a.side * d.r + (this.shape === "bomber" ? -0.25 * d.p : 0);
             for (const r of this.surfaces.rudders) r.rotation.y = 0.35 * d.y;
-            // Engines glow hotter with the throttle, white-blue on afterburner.
             for (const gl of this.glows) {
                 gl.material.color.set(glowColor(this.boosting ? 0xffc890 : 0xff6a20, this.boosting ? 1.4 : 0.3 + this.throttle * 0.5));
                 gl.material.opacity = 0.55 + 0.45 * this.throttle;
             }
             for (const b of this.burners) {
-                // A short pale flame normally; a long hot one on afterburner.
                 const s = (this.boosting ? 1.3 : 0.25 + this.throttle * 0.3) + Math.random() * 0.12;
                 b.scale.y = s;
                 b.position.z = b.userData.z + 1.5 * s;
                 b.material.opacity = this.boosting ? 0.85 : 0.35;
                 b.material.color.set(glowColor(this.boosting ? 0xffb070 : 0xff8a40, this.boosting ? 1.2 : 0.25));
             }
-            // The white tail light blinks.
             this.navT += dt;
             if (this.navs[2]) this.navs[2].visible = this.navT % 1.2 < 0.12;
             return this.pos.y < world.ground(this.pos.x, this.pos.z) + 2.5 ? "crash" : null;

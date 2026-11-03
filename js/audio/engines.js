@@ -1,22 +1,3 @@
-// Engine sounds modelled on each plane's real engine (see the "engine"
-// entries in profiles.js). Used by Bit Planes (sound.js) and Air Battle
-// (airbattle/audio.js) alike.
-//
-// Piston engines are built from how they really work:
-//   - each cylinder fires once every two turns, so the firing note is
-//     rpm / 60 * cylinders / 2 (a Merlin V12 at 3,000 rpm: 300 Hz, a 9 cylinder
-//     rotary at 1,200 rpm: 90 Hz), shaped by the exhaust's resonances;
-//   - exhaust pops ride on every firing; a lope once per turn of the crank
-//     (radials are lumpy, V12s smooth) and small timing wobbles (rough);
-//   - the propeller adds a "whop" at its blade-pass rate and a wash of air;
-//   - superchargers and turbochargers whine; the P-51's scoop whistles;
-//   - rotary engines (WWI) stutter on the blip switch;
-//   - twin-engine planes have two engines a little out of step, which beat.
-// Jet engines:
-//   - roar (broadband exhaust noise), turbine whine (and its harmonic),
-//   - turbofans buzz (the fan's "buzzsaw" tone at high thrust),
-//   - turbojets rasp and howl, the A-10's TF34s whine loudly,
-//   - the afterburner adds thunder and crackle.
 window.BitEngines = (function () {
     function makeCurve(amount) {
         const n = 1024, c = new Float32Array(n);
@@ -27,8 +8,6 @@ window.BitEngines = (function () {
         return c;
     }
 
-    // ctx: AudioContext, dest: node to play into, p: the plane's sound profile
-    // (with p.engine), noiseBuf: a looping noise buffer.
     function create(ctx, dest, p, noiseBuf) {
         const E = p.engine || {type: p.kind === "jet" ? "turbofan" : "inline", cyl: 6, rpm: [700, 2600]};
         const nodes = [];
@@ -75,7 +54,6 @@ window.BitEngines = (function () {
         const jet = E.type === "turbojet" || E.type === "turbofan" || E.type === "tf34" || E.type === "stealth";
 
         if (!jet) {
-            // ---- one piston engine (a second, slightly out of step, for twins)
             const engines = E.engines || 1;
             v.fire = [];
             v.cranks = [];
@@ -93,24 +71,20 @@ window.BitEngines = (function () {
                 chain(body, bodyG, crank);
                 chain(exh, exhG, crank);
                 crank.connect(out);
-                // The lope: once per turn of the crank.
                 const lope = osc("sine", 10), lopeG = gain(0);
                 chain(lope, lopeG, crank.gain);
                 v.fire.push({f, wobG, body, exh, lope, lopeG, detune: 1 + k * 0.013});
                 v.cranks.push(crank);
             }
-            // Exhaust pops on each firing.
             const pops = noise(), popsF = filt("bandpass", E.exhaust || 1100, 1.4), popsAM = gain(0), popsG = gain(0.35 * (E.bright || 0.8));
             const popLfo = osc("square", 80), popDepth = gain(0.5);
             chain(popLfo, popDepth, popsAM.gain);
             chain(pops, popsF, popsAM, popsG, out);
             v.popLfo = popLfo;
             v.popsF = popsF;
-            // Low rumble (half the firing note).
             const sub = osc("sine", 40), subG = gain(0.35);
             chain(sub, subG, out);
             v.sub = sub;
-            // Propeller: blade-pass whop on a wash of air.
             const wash = noise(), washF = filt("bandpass", 500, 0.8), washAM = gain(0.5), washG = gain(0.18);
             const whop = osc("sine", 20), whopD = gain(0.45);
             chain(whop, whopD, washAM.gain);
@@ -118,7 +92,6 @@ window.BitEngines = (function () {
             v.whop = whop;
             v.washF = washF;
             v.washG = washG;
-            // Supercharger / turbo whine.
             if (E.blower) {
                 const b = osc("sine", 1500), bG = gain(0);
                 chain(b, bG, out);
@@ -130,7 +103,6 @@ window.BitEngines = (function () {
                 v.whistle = wG;
             }
         } else {
-            // ---- jets
             const roar = noise(), roarF = filt("lowpass", 800, 0.6), roarG = gain(0.5);
             chain(roar, roarF, roarG, out);
             const core = noise(), coreF = filt("bandpass", 600, 1.2), coreG = gain(0.2);
@@ -170,13 +142,10 @@ window.BitEngines = (function () {
         nodes.forEach(n => n.start());
 
         let sputter = 0;
-        // t: throttle 0..1, opts: {boost, speed (0..1.5 of top speed), pitch (Doppler), level}
         v.set = function (t, opts = {}) {
             const now = ctx.currentTime, k = 0.08, pitch = opts.pitch || 1, boost = opts.boost ? 1 : 0;
             const level = opts.level === undefined ? 1 : opts.level;
             if (!jet) {
-                // Engine speed: up with the throttle, a bit more on emergency
-                // power, and the propeller windmills faster in a dive.
                 const [idle, max] = E.rpm;
                 const rpm = (idle + (max - idle) * Math.pow(t, 0.85)) * (1 + 0.06 * boost + 0.05 * Math.max(0, (opts.speed || 0) - 0.9));
                 const crankF = rpm / 60, fireF = crankF * E.cyl / 2 * pitch;
@@ -199,7 +168,6 @@ window.BitEngines = (function () {
                     v.blower.g.gain.setTargetAtTime(0.012 * Math.min(2, E.blower) * t * t, now, k);
                 }
                 if (v.whistle) v.whistle.gain.setTargetAtTime(0.03 * t * Math.min(1, opts.speed || t), now, k);
-                // WWI rotaries: the pilot blips the ignition now and then.
                 let vol = (0.32 + 0.4 * t) * level;
                 if (E.sputter) {
                     sputter -= 1;
@@ -221,7 +189,6 @@ window.BitEngines = (function () {
                 v.roarG.gain.setTargetAtTime(0.5 + 0.4 * t, now, k);
                 v.coreF.frequency.setTargetAtTime((300 + 600 * t) * pitch, now, k);
                 if (v.fan) {
-                    // The fan's buzzsaw comes in at high thrust.
                     const [fLo, fHi] = E.fan || [110, 240];
                     v.fan.o.frequency.setTargetAtTime((fLo + (fHi - fLo) * spool) * pitch, now, 0.2);
                     v.fan.f.frequency.setTargetAtTime((900 + 1400 * t) * pitch, now, k);
@@ -238,7 +205,6 @@ window.BitEngines = (function () {
                 v.ab.rumble.gain.setTargetAtTime(burner * 0.5, now, 0.12);
                 v.ab.crackle.gain.setTargetAtTime(burner * 0.45 * (0.5 + Math.random() * 0.5), now, 0.04);
                 const quiet = E.idleSilent && t < 0.02 ? 0 : 1;
-                // Jets are kept well below the guns and the propeller planes.
                 out.gain.setTargetAtTime((0.5 + 0.3 * t + 0.25 * burner) * 0.5 * (E.volume || 1) * level * quiet, now, k);
             }
         };

@@ -1,4 +1,3 @@
-/* Air Battle (3D beta) */
 .df-root {
     position: fixed;
     inset: 0;
@@ -41,7 +40,6 @@
     color: #ff6b5c;
 }
 
-/* ---- loading */
 .df-loading {
     position: absolute;
     inset: 0;
@@ -73,7 +71,6 @@
     }
 }
 
-/* ---- top: team scores and clock */
 .df-top {
     position: absolute;
     top: 10px;
@@ -153,7 +150,6 @@
     font-size: 15px;
 }
 
-/* ---- kill feed */
 .df-feed {
     position: absolute;
     top: 14px;
@@ -176,7 +172,6 @@
     color: #ffd23f;
 }
 
-/* ---- gunsight, lead indicator, lock, hit markers */
 .df-cross {
     position: absolute;
     top: 0;
@@ -344,7 +339,6 @@
     }
 }
 
-/* ---- markers on planes */
 .df-box {
     position: absolute;
     top: 0;
@@ -406,7 +400,6 @@
     display: none;
 }
 
-/* ---- messages, ribbons, warnings */
 .df-msg {
     position: absolute;
     top: 22%;
@@ -528,7 +521,6 @@
     font-style: normal;
 }
 
-/* ---- radar and your plane's panel */
 .df-radar {
     position: absolute;
     left: 16px;
@@ -636,7 +628,22 @@
     flex: 1;
 }
 
+.df-weapons > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.df-weapons small {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+    min-height: 2.4em;
+    hyphens: manual;
+}
+
 .df-weapons {
+    gap: 6px;
     margin-top: 6px;
     padding-top: 6px;
     border-top: 1px solid rgba(255, 255, 255, 0.15);
@@ -658,7 +665,6 @@
     color: #ff8a80;
 }
 
-/* ---- screen effects */
 .df-vignette {
     position: absolute;
     inset: 0;
@@ -691,7 +697,6 @@
     background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 20%, #000 75%);
 }
 
-/* ---- scoreboard */
 .df-board {
     position: absolute;
     top: 50%;
@@ -742,7 +747,6 @@
     background: rgba(255, 210, 63, 0.18);
 }
 
-/* ---- pause and results */
 .df-pause,
 .df-results {
     position: absolute;
@@ -862,7 +866,6 @@
     color: #ff6b5c;
 }
 
-/* ---- deploy screen */
 .df-deploy {
     position: fixed;
     inset: 0;
@@ -1070,7 +1073,6 @@
     }
 }
 
-/* ---- Air Battle locked */
 .df-lock-box {
     max-width: 760px;
     margin-top: 8vh;

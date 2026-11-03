@@ -1,4 +1,3 @@
-// Keyboard controls, guns, missiles, flares, catapult.
 BitModules[14] = function (M, j, t) {
     "use strict";
     (t.d(j, "a", function () {
@@ -128,7 +127,7 @@ BitModules[14] = function (M, j, t) {
     }
 
     function c(M, j) {
-        if (M.frozen) return; // no shooting in Multiplayer's lobby
+        if (M.frozen) return;
         if (M.has(j)) {
             if (j.ammo > 0) {
                 (j.ammo--, window.BitSound && window.BitSound.gun(j));
@@ -173,27 +172,22 @@ BitModules[14] = function (M, j, t) {
                         j
                     );
                 })(j);
-                // F-22: smart missiles lock on fast and turn hard (flares still fool them).
                 t.smart = !!j.smartMissiles;
                 (j.timeout(L.n, () => (t.justDeployed = !1)),
                     (function (M, j) {
                         function t() {
                             var t, L;
-                            // Decoyed by flares: chase the nearest flare instead.
                             if (M.has(j) && j.flared) return void K(M, j);
                             if (M.has(j))
                                 if (void 0 !== j.target)
                                     if (M.has(j.target)) {
                                         let t = Object(i.c)(j.position, j.target.position, M);
-                                        // Proximity fuse: close enough counts as a hit.
                                         if (j.smart && Object(N.q)(j.position, t) < 50) return void (j.position = Object(N.c)(j.target.position));
-                                        // Smart missiles aim where the target is going, not where it is.
                                         if (j.smart && j.target.velocity) {
                                             const k = Math.min(1, Object(N.q)(j.position, t) / Math.max(1, Object(N.h)(j.velocity)));
                                             t = Object(N.a)(t, Object(N.e)(j.target.velocity, k));
                                         }
                                         const L = Object(N.b)(Object(N.r)(t, j.position), j.forward);
-                                        // Smart missiles steer smoothly instead of zig-zagging.
                                         ((j.elevator = j.smart ? Math.max(-1, Math.min(1, 4 * L)) : Math.sign(L) > 0 ? 1 : -1),
                                             Object(N.a)(j.position, Object(N.e)(j.velocity, 4)).y >
                                                 M.ground &&
@@ -205,7 +199,6 @@ BitModules[14] = function (M, j, t) {
                                     for (let I of M)
                                         if (I instanceof u.a) {
                                             if (I === j.source) continue;
-                                            // Burning flares hide the plane and lure the missile to them.
                                             if (I.flareUntil > performance.now()) {
                                                 Object(N.q)(j.position, I.position) < 700 && (j.flared = !0);
                                                 continue;
@@ -269,7 +262,6 @@ BitModules[14] = function (M, j, t) {
         }
     }
 
-    // A missile lured by flares steers to the nearest one and explodes on it.
     function K(M, j) {
         let t,
             L = 900;
@@ -286,7 +278,6 @@ BitModules[14] = function (M, j, t) {
                 (j.elevator = Math.sign(j.forward.x) > 0 ? -1 : 1));
     }
 
-    // White smoke trail behind a burning flare.
     function X(M, t) {
         const k = setInterval(() => {
             if (!M.effects.has(t)) return clearInterval(k);
@@ -302,7 +293,6 @@ BitModules[14] = function (M, j, t) {
         }, 30);
     }
 
-    // Flares: drop decoys that break the lock of missiles chasing this plane.
     function F(M, j) {
         if (!M.has(j) || !(j.maxFlares > 0) || !(j.flares > 0)) return;
         (j.flares--, window.BitSound && window.BitSound.flares(j));
@@ -312,9 +302,6 @@ BitModules[14] = function (M, j, t) {
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
-        // Release 24 flares in quick pairs, all out in about two thirds of a
-        // second. Like a real jet they are shot out below and behind the plane
-        // in a fan, then arc down trailing smoke, burning for 4 to 5 seconds.
         for (let k = 0; k < 24; k++)
             setTimeout(
                 () => {
