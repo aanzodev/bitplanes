@@ -46,8 +46,11 @@ and Golden Ace (25,000 credits).
 `play.html` is a single line that runs the newest activity from this GitHub repo
 through the [jsDelivr](https://www.jsdelivr.com) CDN. It asks GitHub for the
 newest commit on `main` and loads exactly that version, so every push shows up
-the next time the page is opened (no waiting for jsDelivr's cache). Save it
-anywhere, or paste it into an online editor like OneCompiler.
+the next time the page is opened (no waiting for jsDelivr's cache). If GitHub
+can't be asked (offline or rate limited), it loads the copy on GitHub Pages
+instead (`aanzodev.github.io/bitplanes`, so Pages needs to be turned on in the
+repo's settings). Save it anywhere, or paste it into an online editor like
+OneCompiler.
 
 The short form also works:
 
