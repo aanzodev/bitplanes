@@ -12,7 +12,7 @@ window.BitStats = (function () {
         if (!s) return null;
         for (const [k, v] of Object.entries({hits: 0, streak: 0, bestStreak: 0, flySeconds: 0, matches: 0, onlineMatches: 0,
             coinsEarned: 0, planeSeconds: {}, planeKills: {},
-            // Dogfights (3D)
+            // Air Battle (3D)
             dfKills: 0, dfDeaths: 0, dfMissileKills: 0, dfGunKills: 0, dfFlareSaves: 0, dfWins: 0, dfMatches: 0, dfEjects: 0, dfMaps: {}})) if (s[k] === undefined) s[k] = v;
         return s;
     }

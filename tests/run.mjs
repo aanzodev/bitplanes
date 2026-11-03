@@ -5,10 +5,10 @@
 //   npm install && npx playwright install chromium   (once)
 //   cd server && npm install && cd ..                (once, for the online tests)
 //   npm test                                         (all tests)
-//   npm test -- dogfights sound                       (only some groups)
+//   npm test -- airbattle sound                       (only some groups)
 //
 // Each test is a few lines that use the page's own objects (BitShop,
-// BitDogfight, BitSound, ...). A test passes if its checks hold and the page
+// BitAirBattle, BitSound, ...). A test passes if its checks hold and the page
 // threw no errors.
 import http from "node:http";
 import fs from "node:fs";
@@ -154,13 +154,13 @@ async function run() {
     });
 
     // ---- the one-line version (js/loader.js, what play.html and other sites use)
-    async function oneLine(blockDogfight) {
+    async function oneLine(blockAirBattle) {
         const ctx = await browser.newContext({viewport: {width: 1100, height: 700}});
         await ctx.addInitScript(() => localStorage.setItem("daily", JSON.stringify({last: new Date().toLocaleDateString("en-CA"), streak: 1})));
         // A page with nothing but the loader's script tag.
         await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
             body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
-        if (blockDogfight) await ctx.route(/js\/dogfight\/deploy\.js/, r => r.abort());
+        if (blockAirBattle) await ctx.route(/js\/airbattle\/deploy\.js/, r => r.abort());
         const p = await ctx.newPage();
         p.errors = [];
         p.on("pageerror", e => p.errors.push(e.message));
@@ -175,8 +175,8 @@ async function run() {
         const p = await oneLine(false);
         try {
             const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
-                dogfight: !!(window.BitDogfight && window.BitDogfight.open), modes: document.querySelectorAll('input[name="mode"]').length}));
-            check(!r.failed && r.shop && r.dogfight && r.modes === 3 && !p.errors.length, JSON.stringify(r) + p.errors);
+                airBattle: !!(window.BitAirBattle && window.BitAirBattle.open), modes: document.querySelectorAll('input[name="mode"]').length}));
+            check(!r.failed && r.shop && r.airBattle && r.modes === 3 && !p.errors.length, JSON.stringify(r) + p.errors);
         } finally {
             await p.context().close();
         }
@@ -215,7 +215,7 @@ async function run() {
         try {
             const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
                 modes: [...document.querySelectorAll('input[name="mode"]')].map(x => x.value), note: document.querySelector(".online-status").textContent}));
-            check(!r.failed && r.shop && !r.modes.includes("dogfights") && /Flight Sessions/.test(r.note), JSON.stringify(r));
+            check(!r.failed && r.shop && !r.modes.includes("airbattle") && /Flight Sessions/.test(r.note), JSON.stringify(r));
             await p.click(".play-btn");
             await p.waitForTimeout(800);
             check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "Bit Planes didn't start");
@@ -298,11 +298,11 @@ async function run() {
         check(r.level >= 6 && r.coins > 0, JSON.stringify(r));
     });
 
-    await test("career", "Dogfights stays locked until level 10 or a special plane", async open => {
+    await test("career", "Air Battle stays locked until level 10 or a special plane", async open => {
         const a = await open();
-        check(!(await a.evaluate(() => BitDogfight.access().ok)), "new player can play Dogfights");
+        check(!(await a.evaluate(() => BitAirBattle.access().ok)), "new player can play Air Battle");
         const b = await open({storage: {shop: {coins: 0, owned: ["classic", "mig21"], selected: "classic", upgrades: {}, paint: {}, pattern: {}}}});
-        check(await b.evaluate(() => BitDogfight.access().ok), "MiG-21 owner is locked out");
+        check(await b.evaluate(() => BitAirBattle.access().ok), "MiG-21 owner is locked out");
     });
 
     // ---- sound
@@ -351,11 +351,11 @@ async function run() {
         check(!bad.length, "silent or broken: " + bad);
     });
 
-    // ---- Dogfights
-    await test("dogfights", "erosion (WebAssembly and the JavaScript fallback)", async open => {
+    // ---- Air Battle
+    await test("airbattle", "erosion (WebAssembly and the JavaScript fallback)", async open => {
         const p = await open();
         const r = await p.evaluate(async () => {
-            const D = BitDogfight, w = 129, step = 100, make = () => {
+            const D = BitAirBattle, w = 129, step = 100, make = () => {
                 const g = new Float32Array(w * w);
                 for (let y = 0; y < w; y++) for (let x = 0; x < w; x++) g[y * w + x] = 600 * Math.sin(x / 9) * Math.cos(y / 7) + 600;
                 return g;
@@ -370,13 +370,13 @@ async function run() {
         check(r.wasm === "wasm" && r.js === "js" && r.changedWasm && r.changedJs && !r.nan, JSON.stringify(r));
     });
 
-    await test("dogfights", "a match: guns, missile lock, flares, eject, results", async open => {
+    await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
-        await p.evaluate(() => BitDogfight.start({map: "alpine", mode: "team", size: 4, difficulty: "normal"}));
-        await p.waitForFunction(() => window.BitDogfight.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.evaluate(() => BitAirBattle.start({map: "alpine", mode: "team", size: 4, difficulty: "normal"}));
+        await p.waitForFunction(() => window.BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
-            const D = BitDogfight, g = D.state(), pl = g.player;
+            const D = BitAirBattle, g = D.state(), pl = g.player;
             g.paused = true;
             const still = e => {
                 e.pilot.think = function () {
@@ -451,12 +451,12 @@ async function run() {
         for (const [k, v] of Object.entries(r)) check(v, k + " failed: " + JSON.stringify(r));
     });
 
-    await test("dogfights", "computer pilots fight (kills in 60 s, few crashes)", async open => {
+    await test("airbattle", "computer pilots fight (kills in 60 s, few crashes)", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
-        await p.evaluate(() => BitDogfight.start({map: "canyon", mode: "team", size: 6, difficulty: "hard"}));
-        await p.waitForFunction(() => window.BitDogfight.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.evaluate(() => BitAirBattle.start({map: "canyon", mode: "team", size: 6, difficulty: "hard"}));
+        await p.waitForFunction(() => window.BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
-            const D = BitDogfight, g = D.state(), pl = g.player;
+            const D = BitAirBattle, g = D.state(), pl = g.player;
             g.paused = true;
             pl.pilot = D.makePilot(g.THREE, pl, 0.8);
             g.others.push(pl);

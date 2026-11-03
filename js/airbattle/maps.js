@@ -1,9 +1,9 @@
-// Dogfights maps. Each map is a height function (ground height in meters at
+// Air Battle maps. Each map is a height function (ground height in meters at
 // any x, z), a color function for the ground, what grows on it, and extras
 // (a city, a carrier, icebergs, barns). Maps are 24 km across; the battle
 // area is the circle in the middle.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
 
     // ------------------------------------------------------------- noise
 

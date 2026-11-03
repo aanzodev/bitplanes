@@ -46,8 +46,11 @@ and Golden Ace (25,000 credits).
 `play.html` is a single line that runs the newest activity from this GitHub repo
 through the [jsDelivr](https://www.jsdelivr.com) CDN. It asks GitHub for the
 newest commit on `main` and loads exactly that version, so every push shows up
-the next time the page is opened (no waiting for jsDelivr's cache). Save it
-anywhere, or paste it into an online editor like OneCompiler.
+the next time the page is opened (no waiting for jsDelivr's cache). If GitHub
+can't be asked (offline or rate limited), it loads the copy on GitHub Pages
+instead (`aanzodev.github.io/bitplanes`, so Pages needs to be turned on in the
+repo's settings). Save it anywhere, or paste it into an online editor like
+OneCompiler.
 
 The short form also works:
 
@@ -494,7 +497,7 @@ To run them yourself:
 ```sh
 npm install && npx playwright install chromium   # once
 cd server && npm install && cd ..                # once, for the online tests
-npm test                                         # or: npm test -- dogfights sound
+npm test                                         # or: npm test -- airbattle sound
 ```
 
 ## Project layout
@@ -505,7 +508,7 @@ css/
   base.css              Page, buttons, keys
   menu.css              Start screen
   career.css            Settings, levels, milestones, friends, rankings
-  dogfight.css          Flight Sessions
+  airbattle.css         Flight Sessions
   hangar.css            Aircraft Selection
   online.css            Online play
   activity.css              In-activity HUD
@@ -548,7 +551,7 @@ js/
     87-main.js          controls, physics, rendering, AI, activity modes…
     assets.js           Sprite file paths
     boot.js             …and boot.js starts the activity
-  dogfight/             Flight Sessions (3D beta):
+  airbattle/            Flight Sessions (3D beta):
     maps.js             The six environments and their lighting
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
     erosion.js          Loads erosion.wasm (rain wearing the terrain), JavaScript fallback

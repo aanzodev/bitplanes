@@ -1,11 +1,11 @@
-// Dogfights (3D): wears the terrain down like rain does over thousands of
+// Air Battle (3D): wears the terrain down like rain does over thousands of
 // years (hydraulic erosion), so mountains get real gullies, ridges and
 // valley floors. The work is done by native/erosion.c compiled to
 // WebAssembly (erosion.wasm, about 2.5 KB). If WebAssembly can't load (an old
 // browser, or opening index.html straight from disk), the same steps run in
 // plain JavaScript with fewer raindrops.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
     let wasm = null, loading = null;
 
     D.loadErosion = function () {
@@ -13,7 +13,7 @@
         loading = (async () => {
             try {
                 if (typeof WebAssembly === "undefined") return null;
-                const res = await fetch((window.BitBase || "") + "js/dogfight/erosion.wasm");
+                const res = await fetch((window.BitBase || "") + "js/airbattle/erosion.wasm");
                 if (!res.ok) return null;
                 const {instance} = await WebAssembly.instantiate(await res.arrayBuffer(), {});
                 wasm = instance.exports;

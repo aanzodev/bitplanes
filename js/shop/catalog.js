@@ -29,7 +29,7 @@ window.BitCatalog = {
             desc: "Big ammo belt and quick reload.",
             thrust: 1, turn: 0.95, life: 1, ammo: 10, missiles: 0, reload: 0.75},
         {id: "fokker", name: "Fokker Dr.I", price: 450, color: "#c8102e",
-            desc: "The Red Baron's tight-turning dogfighter.",
+            desc: "The Red Baron's tight-turning fighter.",
             thrust: 1.0, turn: 1.3, life: 0, ammo: 2, missiles: 0, reload: 0.95},
         {id: "spad", name: "SPAD XIII", price: 750, color: "#8a9a5b",
             desc: "Fast, strong WWI fighter.",
@@ -146,7 +146,7 @@ window.BitCatalog = {
         {id: "loader", name: "Guided missile loader", desc: "-12% guided missile reload time", max: 4, base: 60},
         {id: "flares", name: "Countermeasure pod", desc: "+1 countermeasure (Q), any plane", max: 3, base: 120},
         {id: "repair", name: "Repair kit", desc: "Fixes 1 hit point every 25s / 20s / 15s", max: 3, base: 150},
-        // Dogfights (3D) only. These don't get extra levels from your player level.
+        // Air Battle (3D) only. These don't get extra levels from your player level.
         {id: "boost", name: "Afterburner", desc: "Flight Sessions: +25% boost time", max: 3, base: 150, df: true},
         {id: "seeker", name: "Guided missile seeker", desc: "Flight Sessions: guided missiles lock on 15% faster", max: 3, base: 150, df: true},
         {id: "radar", name: "Radar", desc: "Flight Sessions: +20% radar and lock range", max: 3, base: 120, df: true},

@@ -1,6 +1,6 @@
 // Engine sounds modelled on each plane's real engine (see the "engine"
-// entries in profiles.js). Used by Bit Planes (sound.js) and Dogfights
-// (dogfight/audio.js) alike.
+// entries in profiles.js). Used by Bit Planes (sound.js) and Air Battle
+// (airbattle/audio.js) alike.
 //
 // Piston engines are built from how they really work:
 //   - each cylinder fires once every two turns, so the firing note is

@@ -1,4 +1,4 @@
-// Dogfights (3D): plane models, cockpits and flight. Every plane is built
+// Air Battle (3D): plane models, cockpits and flight. Every plane is built
 // from simple shapes in its Hangar colors: biplane, propeller fighter, jet
 // (twin tails for the big ones, the A-10's own shape) or the B-2 flying wing,
 // with navigation lights. The cockpit view has a working instrument panel.
@@ -7,7 +7,7 @@
 // hard turns bleed speed, climbing costs speed and diving gains it, too slow
 // stalls, and the afterburner (or a prop's emergency power) gives a burst.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
 
     // Speeds by shape in m/s (before the plane's own engine), and how big it is.
     const SHAPES = {

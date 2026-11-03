@@ -68,11 +68,11 @@
 
     // Files only the Flight Sessions (3D) mode needs. If one of them won't load,
     // the rest of Bit Planes still starts, with Flight Sessions switched off.
-    const OPTIONAL = /js\/dogfight\//;
+    const OPTIONAL = /js\/airbattle\//;
 
-    function dropDogfights(missing) {
+    function dropAirBattle(missing) {
         console.warn("Flight Sessions is off: these files didn't load:", missing);
-        const radio = document.querySelector('input[name="mode"][value="dogfights"]');
+        const radio = document.querySelector('input[name="mode"][value="airbattle"]');
         if (radio) {
             if (radio.checked) {
                 const first = document.querySelector('input[name="mode"]');
@@ -233,8 +233,8 @@
         step("Ready!");
         progress(100);
         if (missing.length) {
-            window.BitDogfight = null;
-            dropDogfights(missing);
+            window.BitAirBattle = null;
+            dropAirBattle(missing);
         }
         done();
     }

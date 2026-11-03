@@ -1,8 +1,8 @@
-// Dogfights (3D): the deploy screen you see after pressing PLAY (choose the
+// Air Battle (3D): the deploy screen you see after pressing PLAY (choose the
 // map, time of day, match type, team size and enemy skill), and the pilot who
 // bails out under a parachute, dressed in their pilot skin.
 (function () {
-    const D = window.BitDogfight = window.BitDogfight || {};
+    const D = window.BitAirBattle = window.BitAirBattle || {};
     const KEY = "dfSetup";
 
     const GRADIENTS = {

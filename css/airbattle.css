@@ -1,4 +1,4 @@
-/* Dogfights (3D beta) */
+/* Air Battle (3D beta) */
 .df-root {
     position: fixed;
     inset: 0;
@@ -1070,7 +1070,7 @@
     }
 }
 
-/* ---- Dogfights locked */
+/* ---- Air Battle locked */
 .df-lock-box {
     max-width: 760px;
     margin-top: 8vh;

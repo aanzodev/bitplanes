@@ -1,7 +1,7 @@
 // Friends and the global leaderboard, through the online server.
 //   Friends (👥 in the lobby): your friend code, add friends by code, accept
 //   requests, see who is online and where, join their room, invite them to yours.
-//   Leaderboard tab: the top 50 pilots worldwide by XP, kills, Dogfights kills
+//   Leaderboard tab: the top 50 pilots worldwide by XP, kills, Air Battle kills
 //   or best kill streak, and your own rank.
 // Your secret id (localStorage "uid") stays in this browser; others only see
 // your friend code, name, level and pilot skin.
@@ -197,10 +197,10 @@ window.BitSocial = (function () {
     let lastWhere = "";
 
     function whereNow(force) {
-        const df = window.BitDogfight && window.BitDogfight.state && window.BitDogfight.state();
+        const df = window.BitAirBattle && window.BitAirBattle.state && window.BitAirBattle.state();
         const ui = document.querySelector(".ui"), flying = ui && ui.style.display === "block";
         let w = {};
-        if (df) w = {mode: "dogfights"};
+        if (df) w = {mode: "airbattle"};
         else if (O.role === "host" && O.hostState && O.hostState.code) w = {mode: O.mode === "multiplayer" ? "multiplayer" : "room", room: O.hostState.code};
         else if (O.role === "guest" && O.guestState && O.guestState.code) w = {mode: O.mode === "multiplayer" ? "multiplayer" : "room", room: O.guestState.code};
         else if (flying) w = {mode: "solo"};
@@ -224,7 +224,7 @@ window.BitSocial = (function () {
 
     function inActivity() {
         const ui = document.querySelector(".ui");
-        return (ui && ui.style.display === "block") || !!(window.BitDogfight && window.BitDogfight.state && window.BitDogfight.state());
+        return (ui && ui.style.display === "block") || !!(window.BitAirBattle && window.BitAirBattle.state && window.BitAirBattle.state());
     }
 
     // Join a friend's room. From inside an activity the page reloads into it.
@@ -260,7 +260,7 @@ window.BitSocial = (function () {
         }
         const r = f.room;
         if (!r) return "Online · in the lobby";
-        return "Online · " + ({multiplayer: "in a Multiplayer session", room: "in a private room", dogfights: "in Flight Sessions", solo: "flying solo"}[r.mode] || "playing");
+        return "Online · " + ({multiplayer: "in a Multiplayer session", room: "in a private room", airbattle: "in Flight Sessions", solo: "flying solo"}[r.mode] || "playing");
     }
 
     function myRoom() {
