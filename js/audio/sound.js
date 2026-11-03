@@ -308,8 +308,8 @@
         if (!mine && !throttle("flares", 400)) return;
         const out = output(mine ? null : plane.position, mine ? 0.8 : 0.5);
         if (!out) return;
-        for (let k = 0; k < 24; k++) {
-            const t = s.ctx.currentTime + Math.floor(k / 2) * 0.095 + (k % 2) * 0.03, pop = osc("sine", 950), g = gain(0);
+        for (let k = 0; k < 20; k++) {
+            const t = s.ctx.currentTime + Math.floor(k / 2) * 0.125 + (k % 2) * 0.03, pop = osc("sine", 950), g = gain(0);
             chain(pop, g, out);
             g.gain.setValueAtTime(0.0001, t);
             g.gain.exponentialRampToValueAtTime(0.35, t + 0.004);
