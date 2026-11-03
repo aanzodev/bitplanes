@@ -9,50 +9,50 @@ BitModules[21] = function (M, j, t) {
         i = t(8);
     class u {
         constructor(M) {
-            ((this.players = []),
-                (this.bodies = new Set()),
-                (this.pilots = new Set()),
-                (this.bullets = new Set()),
-                (this.barns = new Set()),
-                (this.particles = new Set()),
-                (this.clouds = []),
-                (this.groundObjects = new Set()),
-                (this.onCrash = (M) => {}),
-                (this.onCowKill = (M) => {}),
+            ((this.participants = []),
+                (this.worldEntities = new Set()),
+                (this.aircraftOperators = new Set()),
+                (this.projectiles = new Set()),
+                (this.structures = new Set()),
+                (this.effects = new Set()),
+                (this.atmosphere = []),
+                (this.terrainEntities = new Set()),
+                (this.onImpact = (M) => {}),
+                (this.onTargetDestroyed = (M) => {}),
                 (this.width = M.width),
                 (this.height = M.height),
                 (this.ground = M.ground),
                 (this.stratosphere = M.stratosphere));
         }
         *[Symbol.iterator]() {
-            (yield* this.barns, yield* this.bodies, yield* this.bullets, yield* this.pilots);
+            (yield* this.structures, yield* this.worldEntities, yield* this.projectiles, yield* this.aircraftOperators);
         }
         add(M) {
             M instanceof L.a
-                ? this.bullets.add(M)
+                ? this.projectiles.add(M)
                 : M instanceof i.b
-                  ? this.pilots.add(M)
+                  ? this.aircraftOperators.add(M)
                   : M instanceof N.a
-                    ? this.barns.add(M)
-                    : this.bodies.add(M);
+                    ? this.structures.add(M)
+                    : this.worldEntities.add(M);
         }
         has(M) {
             return M instanceof L.a
-                ? this.bullets.has(M)
+                ? this.projectiles.has(M)
                 : M instanceof i.b
-                  ? this.pilots.has(M)
+                  ? this.aircraftOperators.has(M)
                   : M instanceof N.a
-                    ? this.barns.has(M)
-                    : this.bodies.has(M);
+                    ? this.structures.has(M)
+                    : this.worldEntities.has(M);
         }
         delete(M) {
             (M instanceof L.a
-                ? this.bullets.delete(M)
+                ? this.projectiles.delete(M)
                 : M instanceof i.b
-                  ? this.pilots.delete(M)
+                  ? this.aircraftOperators.delete(M)
                   : M instanceof N.a
-                    ? this.barns.delete(M)
-                    : this.bodies.delete(M),
+                    ? this.structures.delete(M)
+                    : this.worldEntities.delete(M),
                 M.destroy());
         }
     }

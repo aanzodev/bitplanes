@@ -247,7 +247,7 @@
     function onHostWorld(world) {
         if (O.mode !== "multiplayer") return;
         m.world = world;
-        world.players.forEach(tag);
+        world.participants.forEach(tag);
         fitBots();
         startLobby();
         setInterval(hostTick, 250);
@@ -260,8 +260,8 @@
     function fitBots() {
         const world = m.world;
         if (!world) return;
-        const humans = world.players.filter(p => !isBot(p)).length;
-        let bots = world.players.filter(isBot);
+        const humans = world.participants.filter(p => !isBot(p)).length;
+        let bots = world.participants.filter(isBot);
         while (bots.length > Math.max(0, ROOM_SIZE - humans)) removeBot(bots.pop());
         for (let n = bots.length; n < ROOM_SIZE - humans; n++) addBot();
         publishMeta();
@@ -276,17 +276,17 @@
             world.delete(obj);
         }
         p.detach();
-        world.players.splice(world.players.indexOf(p), 1);
+        world.participants.splice(world.participants.indexOf(p), 1);
         O.hostLog(`<span class="message">${p.html()} left to make room</span>`);
     }
 
     function addBot() {
         const world = m.world, e = O.engine(), {Plane, Player, vec, consts} = e;
-        const used = new Set(world.players.map(p => p.color));
+        const used = new Set(world.participants.map(p => p.color));
         const color = (e.require(23).a() || []).find(c => !used.has(c)) || "#555";
         const names = e.require(20).a;
-        const taken = new Set(world.players.map(p => p.name.replace(/^\[(PLAYER|BOTS)\] /, "")));
-        let name = names.find(n => !taken.has(n)) || "Bot " + (world.players.length + 1);
+        const taken = new Set(world.participants.map(p => p.name.replace(/^\[(PLAYER|BOTS)\] /, "")));
+        let name = names.find(n => !taken.has(n)) || "Bot " + (world.participants.length + 1);
         const plane = new Plane(color);
         const p = new Player(name, color, plane);
         plane.player = p;
@@ -294,7 +294,7 @@
         plane.life = consts.h;
         plane.landed = true;
         plane.move(vec(world.width * Math.random(), world.ground));
-        world.players.push(p);
+        world.participants.push(p);
         world.add(plane);
         p.disableAI = e.require(19).a(world, p);
         tag(p);
@@ -305,12 +305,12 @@
         const world = m.world, peer = O.hostState && O.hostState.peer;
         if (!world || !peer || !peer.setMeta) return;
         const strip = n => String(n).replace(/^\[(PLAYER|BOTS)\] /, "");
-        const humans = world.players.filter(p => !isBot(p));
+        const humans = world.participants.filter(p => !isBot(p));
         const nick = (document.getElementsByName("nickname")[0] || {}).value || "Player";
         peer.setMeta({
             name: strip(nick).slice(0, 16) + "'s server",
             players: humans.map(p => strip(p.name)).slice(0, ROOM_HUMANS),
-            bots: world.players.length - humans.length,
+            bots: world.participants.length - humans.length,
             map: world.map ? world.map.name : "",
             phase: m.phase,
             left: Math.max(0, Math.round(m.endsAt - performance.now())),
@@ -342,10 +342,10 @@
         const C = O.engineClasses();
         m.phase = "lobby";
         world.frozen = true;
-        world.bullets.clear();
-        world.particles.clear();
-        for (const b of [...world.bodies]) if (b instanceof C.bodies[1] || b instanceof C.Pilot || b instanceof C.bodies[4]) world.delete(b);
-        world.players.forEach((p, i) => {
+        world.projectiles.clear();
+        world.effects.clear();
+        for (const b of [...world.worldEntities]) if (b instanceof C.bodies[1] || b instanceof C.Pilot || b instanceof C.bodies[4]) world.delete(b);
+        world.participants.forEach((p, i) => {
             const old = p.object;
             if (old) {
                 old.player = undefined;
@@ -357,14 +357,14 @@
             plane.life = consts.h;
             plane.maxAmmo = plane.ammo = p.maxAmmo || consts.f;
             plane.landed = true;
-            plane.move(vec(world.width * (i + 0.5) / world.players.length, world.ground));
+            plane.move(vec(world.width * (i + 0.5) / world.participants.length, world.ground));
             p.control(plane);
             world.add(plane);
         });
         if (window.BitMaps) {
             world.map = window.BitMaps.pick();
-            world.groundObjects.clear();
-            world.clouds.length = 0;
+            world.terrainEntities.clear();
+            world.atmosphere.length = 0;
             e.decorate(world);
             window.BitMaps.announce(world.map); // also rolls the weather
         }
@@ -383,7 +383,7 @@
     }
 
     function topFive(world) {
-        return world.players.slice()
+        return world.participants.slice()
             .sort((a, b) => b.kills - a.kills || a.deaths - b.deaths)
             .slice(0, 5)
             .map(p => Object.assign({name: p.name, kills: p.kills, deaths: p.deaths}, planeOf(p)));
@@ -409,8 +409,8 @@
         const world = O.guestState && O.guestState.world, e = O.engine();
         if (!world || !window.BitMaps) return;
         world.map = window.BitMaps.get(typeof msg.map === "string" ? msg.map : "countryside");
-        world.groundObjects.clear();
-        world.clouds.length = 0;
+        world.terrainEntities.clear();
+        world.atmosphere.length = 0;
         e.decorate(world);
         window.BitWeather && window.BitWeather.force(msg.weather);
         window.BitMaps.announce(world.map);
@@ -438,7 +438,7 @@
 
     function players() {
         const w = m.world || (O.guestState && O.guestState.world);
-        return (w && w.players) || [];
+        return (w && w.participants) || [];
     }
 
     function render() {

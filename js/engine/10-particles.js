@@ -82,7 +82,7 @@ BitModules[10] = function (M, j, t) {
     }
 
     function y(M, j) {
-        for (let t of M.particles) {
+        for (let t of M.effects) {
             const u = Object(L.s)(0, t.size);
             ((t.velocity.x += i.m * u.x * j),
                 (t.velocity.y += i.m * u.y * j),
@@ -92,16 +92,16 @@ BitModules[10] = function (M, j, t) {
                     ((t.angle += j),
                     (t.scale += i.m * t.scaleRate * j),
                     (t.opacity -= i.m * t.opacityRate * j),
-                    t.opacity < 0 && M.particles.delete(t)),
+                    t.opacity < 0 && M.effects.delete(t)),
                 t instanceof g &&
                     Object(N.g)() - t.timeSinceFrameShown >= t.frameDuration &&
                     (t.frame++,
                     (t.timeSinceFrameShown = Object(N.g)()),
-                    t.frame >= t.sprites.length && M.particles.delete(t)),
-                t instanceof a && Object(N.g)() - t.createdAt >= t.duration && M.particles.delete(t),
+                    t.frame >= t.sprites.length && M.effects.delete(t)),
+                t instanceof a && Object(N.g)() - t.createdAt >= t.duration && M.effects.delete(t),
                 t.position.x < 0 && (t.position.x = M.width),
                 t.position.x > M.width && (t.position.x = 0),
-                t.position.y > M.ground && M.particles.delete(t));
+                t.position.y > M.ground && M.effects.delete(t));
         }
     }
 };

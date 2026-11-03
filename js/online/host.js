@@ -62,9 +62,9 @@
         world.onStep = placeGuestPlanes;
         O.match && O.match.onHostWorld(world);
 
-        const add = world.particles.add.bind(world.particles);
+        const add = world.effects.add.bind(world.effects);
         // Remember new particles; they are sent (in their current state) with the next snapshot.
-        world.particles.add = p => {
+        world.effects.add = p => {
             if (host.clients.size) host.fx.add(p);
             return add(p);
         };
@@ -214,7 +214,7 @@
         if (!host.clients.has(client.conn)) return;
         const {Plane, Player, vec, consts} = engine();
         const world = host.world;
-        const used = new Set(world.players.filter(p => p.isHuman || p.remote).map(p => p.color));
+        const used = new Set(world.participants.filter(p => p.isHuman || p.remote).map(p => p.color));
         let color = client.loadout.color;
         if (used.has(color)) color = GUEST_COLORS.find(c => !used.has(c)) || color;
 
@@ -229,7 +229,7 @@
         plane.landed = true;
         plane.move(vec(world.width / 2 + (1200 * Math.random() - 600), world.ground));
         player.control(plane);
-        world.players.push(player);
+        world.participants.push(player);
         world.add(plane);
         if (O.mode === "multiplayer" && O.match) O.match.tag(player);
         client.player = player;
@@ -366,8 +366,8 @@
             const obj = player.object;
             if (obj && world.has(obj)) world.delete(obj);
             player.detach();
-            const index = world.players.indexOf(player);
-            if (index >= 0) world.players.splice(index, 1);
+            const index = world.participants.indexOf(player);
+            if (index >= 0) world.participants.splice(index, 1);
             hostLog(`<span class="message">${player.html()} left</span>`);
             // Multiplayer: a bot takes the empty spot.
             if (O.mode === "multiplayer" && O.match) O.match.fitBots();
@@ -394,12 +394,12 @@
             all.push(o);
             entries.push([o.netId, round(o.position.x, 1), round(o.position.y, 1), round(o.angle, 3)]);
         }
-        const players = world.players.map(p => [
+        const players = world.participants.map(p => [
             p.name, p.color, p.kills, p.deaths, p.object && p.object.netId || 0,
         ]);
         const fx = [];
         for (const p of host.fx) {
-            if (!world.particles.has(p)) continue;
+            if (!world.effects.has(p)) continue;
             const s = serializeParticle(p);
             if (s) fx.push(s);
         }

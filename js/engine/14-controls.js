@@ -273,13 +273,13 @@ BitModules[14] = function (M, j, t) {
     function K(M, j) {
         let t,
             L = 900;
-        for (const i of M.particles)
+        for (const i of M.effects)
             if (i.sprite === Q.b.flare) {
                 const M = Object(N.q)(j.position, i.position);
                 M < L && ((t = i), (L = M));
             }
         if (!t) return void (j.elevator = 0);
-        if (L < 30) return void (Object(R.d)(M, j), M.delete(j), M.particles.delete(t));
+        if (L < 30) return void (Object(R.d)(M, j), M.delete(j), M.effects.delete(t));
         const i = Object(N.b)(Object(N.r)(t.position, j.position), j.forward);
         ((j.elevator = Math.sign(i) > 0 ? 1 : -1),
             Object(N.a)(j.position, Object(N.e)(j.velocity, 4)).y > M.ground &&
@@ -289,7 +289,7 @@ BitModules[14] = function (M, j, t) {
     // White smoke trail behind a burning flare.
     function X(M, t) {
         const k = setInterval(() => {
-            if (!M.particles.has(t)) return clearInterval(k);
+            if (!M.effects.has(t)) return clearInterval(k);
             const s = new P.f(Q.b.puff);
             (s.position = Object(N.c)(t.position)),
                 (s.velocity = Object(N.s)(0.1 * t.velocity.x, -1)),
@@ -298,7 +298,7 @@ BitModules[14] = function (M, j, t) {
                 (s.scaleRate = 0.7),
                 (s.opacity = 0.75),
                 (s.opacityRate = 0.3),
-                M.particles.add(s);
+                M.effects.add(s);
         }, 30);
     }
 
@@ -307,7 +307,7 @@ BitModules[14] = function (M, j, t) {
         if (!M.has(j) || !(j.maxFlares > 0) || !(j.flares > 0)) return;
         (j.flares--, window.BitSound && window.BitSound.flares(j));
         j.flareUntil = performance.now() + 3500;
-        for (let t of M.bodies)
+        for (let t of M.worldEntities)
             t instanceof I.a &&
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
@@ -329,7 +329,7 @@ BitModules[14] = function (M, j, t) {
                             Object(N.e)(j.normal, -8 - 36 * fan),
                         )),
                         (t.size = 4),
-                        M.particles.add(t),
+                        M.effects.add(t),
                         X(M, t);
                 },
                 140 * Math.floor(k / 2),

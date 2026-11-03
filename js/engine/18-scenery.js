@@ -50,14 +50,14 @@ BitModules[18] = function (M, j, t) {
             let u = M.height;
             for (; u > M.height - 500;) u = M.height * Math.random();
             let e = 1e3;
-            ((t.position = Object(i.s)((e + M.width) * Math.random() - e / 2, u)), M.clouds.push(t));
+            ((t.position = Object(i.s)((e + M.width) * Math.random() - e / 2, u)), M.atmosphere.push(t));
         }
         for (let j = 0, t = 10; t < M.width;) {
             const objs = (M.map && M.map.groundObjects) || N.b.groundObjects,
                 u = new L.d(objs[j++ % objs.length]);
             ((u.position = Object(i.s)(t, M.ground - u.sprite.height + 0.5)),
                 (t += u.sprite.width + 30 + 800 * Math.random()),
-                M.groundObjects.add(u));
+                M.terrainEntities.add(u));
         }
     }
 
@@ -67,15 +67,15 @@ BitModules[18] = function (M, j, t) {
             (j.move(Object(i.s)(Math.random() * M.width, M.ground - j.sprite.height / 2)), I(M, j), M.add(j));
         }
         for (let M = D.g; M >= 0; M--) j();
-        M.onCowKill = (t) => {
+        M.onTargetDestroyed = (t) => {
             if (t.dead) return;
             (t.destroy(), (t.dead = !0));
             let i = new L.d(N.b.cowDead);
             ((i.position = t.position),
                 (i.position.y = M.ground - i.sprite.height + 2),
-                M.groundObjects.add(i),
+                M.terrainEntities.add(i),
                 setTimeout(j, 10 * D.n),
-                setTimeout(() => M.groundObjects.delete(i), 30 * D.n),
+                setTimeout(() => M.terrainEntities.delete(i), 30 * D.n),
                 Object(g.a)(M, t));
         };
     }

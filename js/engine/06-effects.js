@@ -42,7 +42,7 @@ BitModules[6] = function (M, j, t) {
                 (s.angle = 2 * Math.PI * Math.random()),
                 (s.scale = 1 + 0.5 * Math.random() + 0.7 * dmg),
                 (s.opacity = 0.1 + 0.65 * dmg + 0.2 * Math.random()),
-                M.particles.add(s));
+                M.effects.add(s));
             // Half its armor gone: flames. Three quarters: big flames.
             for (let k = dmg >= 0.75 ? 2 : dmg >= 0.5 ? 1 : 0; k > 0; k--) {
                 const f = new N.f(i.b.flare);
@@ -53,7 +53,7 @@ BitModules[6] = function (M, j, t) {
                     (f.scaleRate = -0.4),
                     (f.opacity = 0.95),
                     (f.opacityRate = 1.6),
-                    M.particles.add(f));
+                    M.effects.add(f));
             }
         }
     }
@@ -70,7 +70,7 @@ BitModules[6] = function (M, j, t) {
                 (t.scaleRate = 0.3),
                 (t.opacity = 0.5 + 0.2 * Math.random()),
                 (t.opacityRate = 0.1),
-                M.particles.add(t),
+                M.effects.add(t),
                 (u -= 1));
     }
 
@@ -80,12 +80,12 @@ BitModules[6] = function (M, j, t) {
         ((L.frameDuration = 50),
             (L.position = Object(e.s)(j.position.x, t ? M.ground : j.position.y)),
             (L.velocity = t ? Object(e.s)(0, -2) : Object(e.e)(j.velocity, 0.5)),
-            M.particles.add(L));
+            M.effects.add(L));
     }
 
     function a(M, j) {
         const t = new N.a(i.b.groundhit);
-        ((t.frameDuration = 50), (t.position = Object(e.s)(j.position.x, M.ground - 15)), M.particles.add(t));
+        ((t.frameDuration = 50), (t.position = Object(e.s)(j.position.x, M.ground - 15)), M.effects.add(t));
     }
 
     function y(M, j) {
@@ -99,7 +99,7 @@ BitModules[6] = function (M, j, t) {
                 )),
                 (i.color = "#d80004"),
                 (i.size = 1 + Math.floor(3 * Math.random())),
-                M.particles.add(i));
+                M.effects.add(i));
         }
         let L = 20;
         for (; L-- > 0;) t();
@@ -119,7 +119,7 @@ BitModules[6] = function (M, j, t) {
                 (i.velocity = Object(e.a)(i.velocity, j.velocity)),
                 (i.color = "#d80004"),
                 (i.size = 1 + Math.floor(3 * Math.random())),
-                M.particles.add(i));
+                M.effects.add(i));
         }
         let L = 20;
         for (; L-- > 0;) t();
@@ -130,6 +130,6 @@ BitModules[6] = function (M, j, t) {
         ((t.duration = 2 * L.n),
             (t.position = Object(e.s)(j.position.x, j.position.y)),
             (t.velocity = Object(e.s)(0, -8)),
-            M.particles.add(t));
+            M.effects.add(t));
     }
 };

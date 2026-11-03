@@ -214,7 +214,7 @@ BitModules[9] = function (M, j, t) {
                     (t.fillStyle = "grey"),
                     t.fillRect(0, 0, L, N),
                     (t.globalAlpha = 1));
-                for (let j of M.players) {
+                for (let j of M.participants) {
                     let i = j.hasPlane();
                     i &&
                         ((t.fillStyle = j.color),
