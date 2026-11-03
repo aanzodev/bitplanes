@@ -266,7 +266,7 @@ async function run() {
         check((await p.evaluate(() => BitEngine.require(7).c.bullets)) > before, "F didn't fire");
     });
 
-    await test("2d", "flares: 16 per press, burning about 4 seconds", async open => {
+    await test("2d", "flares: 24 per press, out fast, burning about 4 seconds", async open => {
         const p = await open();
         await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
         await p.click(".play-btn");
@@ -281,10 +281,10 @@ async function run() {
             BitEngine.require(14).f(BitEngine.world, pl);
         });
         const count = () => p.evaluate(() => [...BitEngine.world.effects].filter(x => x.sprite === BitEngine.sprites.flare).length);
-        await p.waitForTimeout(1400);
-        check((await count()) >= 14, "flares out after 1.4 s: " + (await count()));
-        await p.waitForTimeout(2200);
-        check((await count()) >= 10, "flares still burning at 3.6 s: " + (await count()));
+        await p.waitForTimeout(900);
+        check((await count()) >= 20, "flares out after 0.9 s: " + (await count()));
+        await p.waitForTimeout(2700);
+        check((await count()) >= 14, "flares still burning at 3.6 s: " + (await count()));
     });
 
     // ---- progression

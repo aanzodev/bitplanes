@@ -312,10 +312,10 @@ BitModules[14] = function (M, j, t) {
                 t.source !== j &&
                 (t.target === j || (void 0 === t.target && Object(N.q)(t.position, j.position) < 700)) &&
                 ((t.target = void 0), (t.flared = !0), (t.elevator = 0));
-        // Release 16 flares in pairs over about a second. Like a real jet they
-        // are shot out below and behind the plane in a fan, then arc down
-        // trailing smoke, burning for 4 to 5 seconds.
-        for (let k = 0; k < 16; k++)
+        // Release 24 flares in quick pairs, all out in about two thirds of a
+        // second. Like a real jet they are shot out below and behind the plane
+        // in a fan, then arc down trailing smoke, burning for 4 to 5 seconds.
+        for (let k = 0; k < 24; k++)
             setTimeout(
                 () => {
                     if (!M.has(j)) return;
@@ -332,7 +332,7 @@ BitModules[14] = function (M, j, t) {
                         M.effects.add(t),
                         X(M, t);
                 },
-                140 * Math.floor(k / 2),
+                55 * Math.floor(k / 2),
             );
         0 !== j.flares ||
             j.flareReloading ||

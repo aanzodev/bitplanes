@@ -288,8 +288,8 @@
         function flares(pos, mine) {
             const out = mine ? own : panner(pos);
             // A long string of pops as the flares are fired in pairs.
-            for (let k = 0; k < 16; k++) {
-                const t = now() + Math.floor(k / 2) * 0.17 + (k % 2) * 0.035, o = osc("sine", 900), g = gain(0);
+            for (let k = 0; k < 24; k++) {
+                const t = now() + Math.floor(k / 2) * 0.07 + (k % 2) * 0.02, o = osc("sine", 900), g = gain(0);
                 chain(o, g, out);
                 o.frequency.setValueAtTime(900, t);
                 o.frequency.exponentialRampToValueAtTime(180, t + 0.08);

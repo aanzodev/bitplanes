@@ -237,14 +237,14 @@
             for (let k = 0; k < 6; k++) smoke.add(m.position, {color: 0xdddddd, size: 3, grow: 14, life: 1.5, vx: rnd(10), vy: rnd(10), vz: rnd(10), alpha: 0.7});
         }
 
-        // 16 flares fired in pairs over about a second and a half, each burning
-        // for about 6 seconds.
+        // 24 flares fired in quick pairs, all out in under a second, each
+        // burning for about 6 seconds.
         function dropFlares(plane, chance = 0.85) {
-            for (let k = 0; k < 16; k++) {
+            for (let k = 0; k < 24; k++) {
                 // Shot out behind, below and to the sides.
                 const out = plane.forward.clone().multiplyScalar(-55).addScaledVector(plane.up, -30).addScaledVector(plane.right, (k % 2 ? 1 : -1) * (25 + Math.random() * 35))
                     .add(V().set(rnd(20), rnd(12), rnd(20)));
-                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.17 + (k % 2) * 0.035});
+                flares.push({pos: null, vel: out, life: 5.5 + Math.random() * 1.5, owner: plane, delay: Math.floor(k / 2) * 0.07 + (k % 2) * 0.02});
             }
             // Missiles chasing this plane go for the flares instead (most of the time).
             let fooled = 0;
