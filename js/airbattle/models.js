@@ -117,21 +117,95 @@
         return g;
     }
 
-    function wing(pts, thick, opts = {}) {
-        const s = new T.Shape();
-        pts.forEach(([x, z], i) => (i ? s.lineTo(x, z) : s.moveTo(x, z)));
-        const bev = thick * 0.42;
-        const g = new T.ExtrudeGeometry(s, {depth: thick * 0.16, bevelEnabled: true, bevelThickness: bev, bevelSize: Math.min(bev, opts.edge || bev), bevelSegments: 2, curveSegments: 4});
-        g.rotateX(Math.PI / 2);
-        g.translate(0, thick * 0.08, 0);
-        const p = g.attributes.position, span = opts.span || Math.max(...pts.map(q => Math.abs(q[0] - (opts.root || 0)))) || 1;
-        const root = opts.root || 0, tip = opts.tip === undefined ? 0.35 : opts.tip, dih = opts.dihedral || 0;
-        for (let i = 0; i < p.count; i++) {
-            const d = Math.min(1, Math.abs(p.getX(i) - root) / span);
-            p.setY(i, p.getY(i) * (1 - (1 - tip) * d) + Math.abs(p.getX(i) - root) * dih + (opts.gull ? -Math.sin(Math.min(1, d * 2.2) * Math.PI) * opts.gull : 0));
+    function naca(xi) {
+        return 10 * (0.2969 * Math.sqrt(xi) - 0.126 * xi - 0.3516 * xi * xi + 0.2843 * xi ** 3 - 0.1036 * xi ** 4);
+    }
+
+    function camberLine(xi, m, p = 0.4) {
+        if (!m) return 0;
+        return xi < p ? m / (p * p) * (2 * p * xi - xi * xi) : m / ((1 - p) ** 2) * (1 - 2 * p + 2 * p * xi - xi * xi);
+    }
+
+    function airfoil(pts, thick, opts = {}) {
+        const xs = pts.map(q => q[0]), minX = Math.min(...xs), maxX = Math.max(...xs);
+        const root = opts.root || 0, span = opts.span || Math.max(...pts.map(q => Math.abs(q[0] - root))) || 1;
+        const tip = opts.tip === undefined ? 0.35 : opts.tip, dih = opts.dihedral || 0;
+        const camber = opts.camber === undefined ? (tip === 1 ? 0 : 0.022) : opts.camber;
+        const M = opts.chordSegs || 14;
+        const chordAt = X => {
+            let lo = Infinity, hi = -Infinity;
+            for (let i = 0; i < pts.length; i++) {
+                const [x1, z1] = pts[i], [x2, z2] = pts[(i + 1) % pts.length];
+                if (Math.abs(x1 - x2) < 1e-6) {
+                    if (Math.abs(x1 - X) < 1e-6) [lo, hi] = [Math.min(lo, z1, z2), Math.max(hi, z1, z2)];
+                    continue;
+                }
+                if ((X - x1) * (X - x2) > 1e-9) continue;
+                const z = z1 + (X - x1) / (x2 - x1) * (z2 - z1);
+                [lo, hi] = [Math.min(lo, z), Math.max(hi, z)];
+            }
+            return lo <= hi ? [lo, hi] : [0, 0];
+        };
+        const stations = [...new Set(xs.map(x => Math.round(x * 1e4) / 1e4))].sort((p, q) => p - q);
+        const step = (maxX - minX) / (opts.spanSegs || 18);
+        for (let i = stations.length - 2; i >= 0; i--) {
+            const gap = stations[i + 1] - stations[i], n = Math.ceil(gap / step);
+            for (let k = n - 1; k >= 1; k--) stations.splice(i + 1, 0, stations[i] + gap * k / n);
         }
+        const xi = [];
+        for (let j = 0; j <= M; j++) xi.push((1 - Math.cos(Math.PI * j / M)) / 2);
+        const R = 2 * M + 1, pos = [], idx = [];
+        const rings = stations.map(X => {
+            const [lo, hi] = chordAt(X), c = hi - lo;
+            const d = Math.min(1, Math.abs(X - root) / span);
+            let half = 0.5 * thick * (1 - (1 - tip) * d);
+            if (c > 0) half = Math.min(half, (opts.maxRatio || 0.075) * c);
+            const lift = Math.abs(X - root) * dih + (opts.gull ? -Math.sin(Math.min(1, d * 2.2) * Math.PI) * opts.gull : 0);
+            const ring = [];
+            const point = (j, side) => {
+                const t = xi[j], yc = camberLine(t, camber) * c, yt = naca(t) * half;
+                const p = [X, lift + yc + side * yt, lo + t * c];
+                if (opts.twist) {
+                    const a = opts.twist(X), cz = lo + 0.3 * c, dz = p[2] - cz, dy = p[1] - lift;
+                    p[1] = lift + dy * Math.cos(a) - dz * Math.sin(a);
+                    p[2] = cz + dy * Math.sin(a) + dz * Math.cos(a);
+                }
+                return p;
+            };
+            for (let j = M; j >= 0; j--) ring.push(point(j, 1));
+            for (let j = 1; j <= M; j++) ring.push(point(j, -1));
+            const base = pos.length / 3;
+            for (const p of ring) pos.push(...p);
+            return {base, c, ring};
+        });
+        for (let i = 0; i < rings.length - 1; i++) for (let k = 0; k < R; k++) {
+            const a = rings[i].base + k, b = rings[i].base + (k + 1) % R, c = rings[i + 1].base + k, d = rings[i + 1].base + (k + 1) % R;
+            idx.push(a, c, b, b, c, d);
+        }
+        const cap = (r, outward) => {
+            if (r.c < 1e-3) return;
+            const base = pos.length / 3;
+            let cx = 0, cy = 0, cz = 0;
+            for (const p of r.ring) [cx, cy, cz] = [cx + p[0] / R, cy + p[1] / R, cz + p[2] / R];
+            pos.push(cx, cy, cz);
+            for (const p of r.ring) pos.push(...p);
+            for (let k = 0; k < R; k++) {
+                const p = base + 1 + k, q = base + 1 + (k + 1) % R;
+                if (outward < 0) idx.push(base, p, q);
+                else idx.push(base, q, p);
+            }
+        };
+        cap(rings[0], -1);
+        cap(rings[rings.length - 1], 1);
+        const g = new T.BufferGeometry();
+        g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+        g.setIndex(idx);
         g.computeVertexNormals();
         return g;
+    }
+
+    function wing(pts, thick, opts = {}) {
+        return airfoil(pts, thick, opts);
     }
 
     function both(right) {
@@ -139,12 +213,15 @@
     }
 
     function fin(pts, thick) {
-        const s = new T.Shape();
-        pts.forEach(([z, y], i) => (i ? s.lineTo(z, y) : s.moveTo(z, y)));
-        const bev = thick * 0.4;
-        const g = new T.ExtrudeGeometry(s, {depth: thick * 0.2, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 2, curveSegments: 4});
-        g.rotateY(-Math.PI / 2);
-        g.translate(thick * 0.1, 0, 0);
+        const ys = pts.map(p => p[1]), root = Math.min(...ys), span = Math.max(...ys) - root || 1;
+        const g = airfoil(pts.map(([z, y]) => [y, z]), thick, {root, span, tip: 0.6, camber: 0, spanSegs: 8, maxRatio: 0.06});
+        const p = g.attributes.position;
+        for (let i = 0; i < p.count; i++) {
+            const x = p.getX(i), y = p.getY(i);
+            p.setXY(i, y, x);
+        }
+        g.index.array.reverse();
+        g.computeVertexNormals();
         return g;
     }
 
@@ -196,6 +273,37 @@
         return g;
     }
 
+    function superShape(hw, hh, n, segs = 40) {
+        const sh = new T.Shape();
+        for (let i = 0; i <= segs; i++) {
+            const a = i / segs * Math.PI * 2, c = Math.cos(a), sn = Math.sin(a);
+            const x = hw * Math.sign(c) * Math.abs(c) ** (2 / n), y = hh * Math.sign(sn) * Math.abs(sn) ** (2 / n);
+            i ? sh.lineTo(x, y) : sh.moveTo(x, y);
+        }
+        return sh;
+    }
+
+    function intakeMouth(wd, ht, n, lipMat) {
+        const g = new T.Group(), lip = Math.min(wd, ht) * 0.09;
+        const outer = superShape(wd / 2, ht / 2, n), inner = superShape(wd / 2 - lip, ht / 2 - lip, n);
+        outer.holes.push(new T.Path(inner.getPoints().reverse()));
+        const ring = new T.ExtrudeGeometry(outer, {depth: 0.08, bevelEnabled: true, bevelThickness: lip * 0.6, bevelSize: lip * 0.45, bevelSegments: 3, curveSegments: 24});
+        g.add(new T.Mesh(ring, lipMat));
+        const duct = [];
+        for (let k = 0; k <= 4; k++) duct.push({z: 0.05 + k * 0.25, w: wd / 2 - lip * (1 + k * 0.4), h: ht / 2 - lip * (1 + k * 0.4), n});
+        const tube = loft(duct, 32, false);
+        g.add(new T.Mesh(tube, new T.MeshStandardMaterial({color: 0x101214, roughness: 0.9, metalness: 0.2, side: T.BackSide})));
+        const face = new T.Mesh(new T.CircleGeometry(Math.min(wd, ht) * 0.32, 24), new T.MeshStandardMaterial({color: 0x2a2d31, roughness: 0.5, metalness: 0.8}));
+        face.rotation.y = Math.PI;
+        face.position.z = 1.0;
+        g.add(face);
+        const hub = new T.Mesh(new T.ConeGeometry(Math.min(wd, ht) * 0.1, 0.25, 12), new T.MeshStandardMaterial({color: 0x3a3d42, roughness: 0.4, metalness: 0.8}));
+        hub.rotation.x = Math.PI / 2;
+        hub.position.z = 0.88;
+        g.add(hub);
+        return g;
+    }
+
     function missile(len = 3.6) {
         const g = new T.Group();
         const white = plain(0xe8e8e8, 0.45, 0.2), dark = plain(0x333333, 0.5, 0.4);
@@ -210,6 +318,10 @@
             f.rotation.z = i * Math.PI / 2 + Math.PI / 4;
             f.geometry = f.geometry.clone().translate(0, 0.22, 0);
             g.add(f);
+            const c = mesh(new T.BoxGeometry(0.02, 0.32, 0.22), white, 0, 0, -len / 2 + 0.55);
+            c.rotation.z = i * Math.PI / 2 + Math.PI / 4;
+            c.geometry = c.geometry.clone().translate(0, 0.17, 0);
+            g.add(c);
         }
         return g;
     }
@@ -243,23 +355,38 @@
         return g;
     }
 
+    function bladeGeo(r, from, to) {
+        const chord = t => 0.12 + 0.2 * Math.sin(Math.min(1, t / 0.75) * Math.PI * 0.62) * (t > 0.85 ? 1 - (t - 0.85) / 0.15 * 0.55 : 1);
+        const n = 10, lead = [], trail = [];
+        for (let i = 0; i <= n; i++) {
+            const t = from + (to - from) * i / n, c = chord(t) * r * 0.55;
+            lead.push([t * r, -c * 0.35]);
+            trail.push([t * r, c * 0.65]);
+        }
+        const g = airfoil(lead.concat(trail.reverse()), 0.07 * r, {tip: 0.35, root: 0, span: r, camber: 0.04, spanSegs: 10, chordSegs: 8, maxRatio: 0.12,
+            twist: x => -(0.95 - 0.6 * (x / r))});
+        const p = g.attributes.position;
+        for (let i = 0; i < p.count; i++) {
+            const X = p.getX(i), Y = p.getY(i), Z = p.getZ(i);
+            p.setXYZ(i, Z, X, Y);
+        }
+        g.computeVertexNormals();
+        return g;
+    }
+
     function propeller(blades, r, out, z, x = 0, y = 0) {
         const p = new T.Group();
-        const bladeMat = plain(0x1c1c1c, 0.6, 0.3), tipMat = plain(0xf2c230, 0.5, 0.2);
+        const bladeMat = plain(0x1c1c1c, 0.55, 0.3), tipMat = plain(0xf2c230, 0.45, 0.2);
+        const main = bladeGeo(r, 0.1, 0.9), tipGeo = bladeGeo(r, 0.9, 1);
         for (let i = 0; i < blades; i++) {
             const b = new T.Group();
-            const blade = new T.Mesh(new T.BoxGeometry(0.32, r, 0.06), bladeMat);
-            blade.position.y = r / 2;
-            blade.rotation.y = 0.35;
-            b.add(blade);
-            const tip = new T.Mesh(new T.BoxGeometry(0.33, r * 0.08, 0.07), tipMat);
-            tip.position.y = r * 0.96;
-            tip.rotation.y = 0.35;
-            b.add(tip);
+            b.add(new T.Mesh(main, bladeMat));
+            b.add(new T.Mesh(tipGeo, tipMat));
+            b.add(mesh(new T.CylinderGeometry(r * 0.045, r * 0.05, r * 0.14, 10), bladeMat, 0, r * 0.07, 0));
             b.rotation.z = (i * Math.PI * 2) / blades;
             p.add(b);
         }
-        const disc = new T.Mesh(new T.CircleGeometry(r, 24), new T.MeshBasicMaterial({color: 0x222222, transparent: true, opacity: 0.1, side: T.DoubleSide, depthWrite: false}));
+        const disc = new T.Mesh(new T.CircleGeometry(r, 32), new T.MeshBasicMaterial({color: 0x222222, transparent: true, opacity: 0.1, side: T.DoubleSide, depthWrite: false}));
         p.add(disc);
         p.position.set(x, y, z);
         out.props.push(p);
@@ -303,7 +430,8 @@
                 {z: -2.6, w: 0.62, h: 0.62, y: -0.55, n: 3}, {z: -1.5, w: 0.66, h: 0.66, y: -0.6, n: 2.6},
                 {z: 4, w: 0.66, h: 0.66, y: -0.5, n: 2.2}, {z: L1 - 0.3, w: 0.58, h: 0.58, y: -0.4, n: 2},
             ], 20), body, s * def.spread, 0, 0));
-            const intake = mesh(new T.BoxGeometry(1.05, 0.95, 0.2), black, s * def.spread, -0.6, -2.7);
+            const intake = intakeMouth(1.3, 1.3, 3, body);
+            intake.position.set(s * def.spread, -0.55, -2.68);
             g.add(intake);
         });
         if (def.intake === "caret" || def.intake === "box") [-1, 1].forEach(s => {
@@ -312,11 +440,17 @@
             ], 16), body, s * (w + 0.25), -0.05, 0);
             if (def.intake === "caret") caret.rotation.z = s * -0.18;
             g.add(caret);
-            g.add(mesh(new T.BoxGeometry(0.8, 0.95, 0.15), black, s * (w + 0.25), -0.05, -4.62));
+            const mouth = intakeMouth(0.86, 1.02, 4, body);
+            mouth.position.set(s * (w + 0.25), -0.05, -4.66);
+            if (def.intake === "caret") mouth.rotation.z = s * -0.18;
+            g.add(mouth);
         });
         if (def.intake === "chin") {
             g.add(mesh(loft([{z: -4.2, w: 0.62, h: 0.42, n: 3.5}, {z: -2.8, w: 0.66, h: 0.48, n: 3.5}, {z: 1.0, w: 0.6, h: 0.4, n: 3}], 16), body, 0, -0.85, 0));
-            g.add(mesh(new T.BoxGeometry(1.15, 0.75, 0.15), black, 0, -0.85, -4.2));
+            const mouth = intakeMouth(1.28, 0.88, 3.5, body);
+            mouth.position.set(0, -0.85, -4.26);
+            mouth.rotation.x = 0.12;
+            g.add(mouth);
         }
         if (def.intake === "nose") {
             const ring = new T.Mesh(new T.TorusGeometry(0.5, 0.08, 8, 20), dark);
@@ -380,7 +514,7 @@
         out.canopy = canopy;
         out.helmetPos = [0, 0.98, cz + 0.4];
         out.eye = [0, 1.3, cz + 0.3];
-        g.add(mesh(new T.BoxGeometry(0.5, 0.7, 0.2), black, 0, 1.0, cz + 0.85));
+        g.add(mesh(new T.BoxGeometry(0.42, 0.5, 0.18), black, 0, 0.98, cz + 0.85));
         const nz = L1 - 0.4;
         if (def.flat) [-1, 1].forEach(s => {
             const nb = mesh(new T.BoxGeometry(0.95, 0.55, 1.2), plain(0x3a3632, 0.35, 0.85), s * def.spread, 0, nz + 0.6);
@@ -402,13 +536,19 @@
         else g.add(nozzle(0.62, 1.3, out).translateZ(nz));
         const span = Math.max(...def.wingR.map(p => p[0]));
         [-1, 1].forEach(s => {
+            const back = def.wingR[def.wingR.length - 2][1];
+            if (def.intake !== "caret") {
             const m = missile();
-            m.position.set(s * span * 0.98, -0.1, def.wingR[def.wingR.length - 2][1] - 1.5);
+            m.position.set(s * (span + 0.12), -0.05, back - 1.5);
             g.add(m);
+            g.add(mesh(new T.BoxGeometry(0.1, 0.12, 2.6), dark, s * (span + 0.06), -0.05, back - 1.3));
             const m2 = missile();
-            m2.position.set(s * span * 0.6, -0.55, def.wingR[def.wingR.length - 2][1] - 1.2);
+            m2.position.set(s * span * 0.6, -0.62, back - 1.2);
             g.add(m2);
-            g.add(mesh(new T.BoxGeometry(0.12, 0.3, 1.6), dark, s * span * 0.6, -0.3, def.wingR[def.wingR.length - 2][1] - 1.2));
+            const py = mesh(fin([[back - 2.5, -0.5], [back - 0.3, -0.5], [back + 0.1, -0.08], [back - 2.1, -0.08]], 0.14), dark);
+            py.position.x = s * span * 0.6;
+            g.add(py);
+            }
             const r = roundel(0.55, opts.team, color);
             r.rotation.x = -Math.PI / 2;
             r.position.set(s * span * 0.72, 0.06, def.wingR[def.wingR.length - 2][1] - 0.9);
@@ -430,7 +570,9 @@
         [-1, 1].forEach(s => {
             const pod = mesh(loft([{z: 2.5, w: 0.75, h: 0.75, n: 2}, {z: 3.2, w: 0.85, h: 0.85, n: 2}, {z: 6.2, w: 0.78, h: 0.78, n: 2}, {z: 6.8, w: 0.6, h: 0.6, n: 2}], 20), body, s * 1.75, 1.45, 0);
             g.add(pod);
-            g.add(mesh(new T.CircleGeometry(0.7, 18), black, s * 1.75, 1.45, 2.49).rotateY(Math.PI));
+            const mouth = intakeMouth(1.5, 1.5, 2, body);
+            mouth.position.set(s * 1.75, 1.45, 2.42);
+            g.add(mouth);
             const hot = new T.Mesh(new T.RingGeometry(0.2, 0.55, 18), glowMat(0xff7a2a, 0.3));
             hot.position.set(s * 1.75, 1.45, 6.7);
             g.add(hot);
