@@ -132,9 +132,9 @@ window.BitCatalog = {
         {id: "loader", name: "Missile loader", desc: "-12% missile reload time", max: 4, base: 60},
         {id: "flares", name: "Countermeasure pod", desc: "+1 countermeasure (Q), any plane", max: 3, base: 120},
         {id: "repair", name: "Repair kit", desc: "Fixes 1 hit point every 25s / 20s / 15s", max: 3, base: 150},
-        {id: "boost", name: "Afterburner", desc: "Flight Sessions: +25% boost time", max: 3, base: 150, df: true},
-        {id: "seeker", name: "Missile seeker", desc: "Flight Sessions: missiles lock on 15% faster", max: 3, base: 150, df: true},
-        {id: "radar", name: "Radar", desc: "Flight Sessions: +20% radar and lock range", max: 3, base: 120, df: true},
-        {id: "airframe", name: "Reinforced airframe", desc: "Flight Sessions: +10% health", max: 3, base: 160, df: true},
+        {id: "boost", name: "Afterburner", desc: "3D Flight Mode: +25% boost time", max: 3, base: 150, df: true},
+        {id: "seeker", name: "Missile seeker", desc: "3D Flight Mode: missiles lock on 15% faster", max: 3, base: 150, df: true},
+        {id: "radar", name: "Radar", desc: "3D Flight Mode: +20% radar and lock range", max: 3, base: 120, df: true},
+        {id: "airframe", name: "Reinforced airframe", desc: "3D Flight Mode: +10% health", max: 3, base: 160, df: true},
     ],
 };

@@ -67,7 +67,7 @@ async function page(opts = {}) {
     p.errors = [];
     p.on("pageerror", e => p.errors.push(e.message));
     await p.goto(base + (opts.query || "?server=off"));
-    await p.waitForFunction(() => window.BitShop && window.BitEngine && window.BitSettings);
+    await p.waitForFunction(() => window.BitMarket && window.BitEngine && window.BitSettings);
     await p.waitForTimeout(300);
     return p;
 }
@@ -111,7 +111,7 @@ async function run() {
 
     await test("lobby", "every panel opens and closes", async open => {
         const p = await open();
-        for (const sel of [".nav-tab.open-stats", ".nav-tab.open-shop", ".nav-tab.open-skins", ".open-quests",
+        for (const sel of [".nav-tab.open-statistics", ".nav-tab.open-market", ".nav-tab.open-customization", ".open-challenges",
             ".lobby-corner .open-settings", ".open-controls"]) {
             await p.click(sel);
             await p.waitForTimeout(150);
@@ -133,17 +133,17 @@ async function run() {
         check(seen.size === 3, "modes seen: " + [...seen]);
     });
 
-    async function oneLine(blockAirBattle) {
+    async function oneLine(blockFlightMode) {
         const ctx = await browser.newContext({viewport: {width: 1100, height: 700}});
         await ctx.addInitScript(() => localStorage.setItem("daily", JSON.stringify({last: new Date().toLocaleDateString("en-CA"), streak: 1})));
         await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
             body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
-        if (blockAirBattle) await ctx.route(/js\/airbattle\/deploy\.js/, r => r.abort());
+        if (blockFlightMode) await ctx.route(/js\/flightmode\/deploy\.js/, r => r.abort());
         const p = await ctx.newPage();
         p.errors = [];
         p.on("pageerror", e => p.errors.push(e.message));
         await p.goto(base + "one-line-test.html?server=off");
-        await p.waitForFunction(() => (window.BitShop && document.querySelector(".play-btn") && !document.documentElement.classList.contains("bit-loading")) ||
+        await p.waitForFunction(() => (window.BitMarket && document.querySelector(".play-btn") && !document.documentElement.classList.contains("bit-loading")) ||
             document.body.textContent.includes("could not load"), null, {timeout: 60000});
         await p.waitForTimeout(500);
         return p;
@@ -152,9 +152,9 @@ async function run() {
     await test("one-line", "the one-line loader builds the whole page", async () => {
         const p = await oneLine(false);
         try {
-            const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
-                airBattle: !!(window.BitAirBattle && window.BitAirBattle.open), modes: document.querySelectorAll('input[name="mode"]').length}));
-            check(!r.failed && r.shop && r.airBattle && r.modes === 3 && !p.errors.length, JSON.stringify(r) + p.errors);
+            const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitMarket,
+                flightMode: !!(window.BitFlightMode && window.BitFlightMode.open), modes: document.querySelectorAll('input[name="mode"]').length}));
+            check(!r.failed && r.shop && r.flightMode && r.modes === 3 && !p.errors.length, JSON.stringify(r) + p.errors);
         } finally {
             await p.context().close();
         }
@@ -187,12 +187,12 @@ async function run() {
         }
     });
 
-    await test("one-line", "a blocked Flight Sessions file doesn't stop BitPlanes", async () => {
+    await test("one-line", "a blocked 3D Flight Mode file doesn't stop BitPlanes", async () => {
         const p = await oneLine(true);
         try {
-            const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
+            const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitMarket,
                 modes: [...document.querySelectorAll('input[name="mode"]')].map(x => x.value), note: document.querySelector(".online-status").textContent}));
-            check(!r.failed && r.shop && !r.modes.includes("airbattle") && /Flight Sessions/.test(r.note), JSON.stringify(r));
+            check(!r.failed && r.shop && !r.modes.includes("flightmode") && /3D Flight Mode/.test(r.note), JSON.stringify(r));
             await p.click(".play-btn");
             await p.waitForTimeout(800);
             check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "BitPlanes didn't start");
@@ -243,7 +243,7 @@ async function run() {
 
     await test("2d", "flares: 20 per press over about 1.2 seconds, burning about 4 seconds", async open => {
         const p = await open();
-        await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
+        await p.evaluate(() => (BitMarket.give("f16"), BitMarket.selectPlane("f16")));
         await p.click(".play-btn");
         await p.waitForTimeout(800);
         await p.keyboard.down("ArrowUp");
@@ -265,23 +265,23 @@ async function run() {
     await test("career", "XP levels you up and pays coins", async open => {
         const p = await open();
         const r = await p.evaluate(() => {
-            const c0 = BitShop.state().coins;
+            const c0 = BitMarket.state().coins;
             BitProgress.addXp(5000);
-            return {level: BitProgress.levelInfo().level, coins: BitShop.state().coins - c0, bonus: BitProgress.upgradeBonus()};
+            return {level: BitProgress.levelInfo().level, coins: BitMarket.state().coins - c0, bonus: BitProgress.upgradeBonus()};
         });
         check(r.level >= 6 && r.coins > 0, JSON.stringify(r));
     });
 
-    await test("career", "Flight Sessions unlocks at level 10 or with a special plane (either one)", async open => {
+    await test("career", "3D Flight Mode unlocks at level 10 or with a special plane (either one)", async open => {
         const a = await open();
-        check(!(await a.evaluate(() => BitAirBattle.access().ok)), "new player can play Air Battle");
+        check(!(await a.evaluate(() => BitFlightMode.access().ok)), "new player can play 3D Flight Mode");
         const b = await open({storage: {shop: {coins: 0, owned: ["classic", "mig21"], selected: "classic", upgrades: {}, paint: {}, pattern: {}}}});
-        check(await b.evaluate(() => BitAirBattle.access().ok), "MiG-21 owner is locked out");
+        check(await b.evaluate(() => BitFlightMode.access().ok), "MiG-21 owner is locked out");
         const c = await open({storage: {progress: {xp: 9000, rewardedLevel: 10}}});
-        const lv = await c.evaluate(() => [BitProgress.levelInfo().level, BitAirBattle.access().ok, BitShop.state().owned.length]);
+        const lv = await c.evaluate(() => [BitProgress.levelInfo().level, BitFlightMode.access().ok, BitMarket.state().owned.length]);
         check(lv[0] === 10 && lv[1] && lv[2] === 1, "level 10 without a special plane is locked out: " + JSON.stringify(lv));
         const d = await open({storage: {progress: {xp: 8999, rewardedLevel: 9}}});
-        check(!(await d.evaluate(() => BitAirBattle.access().ok)), "level 9 without a special plane can play");
+        check(!(await d.evaluate(() => BitFlightMode.access().ok)), "level 9 without a special plane can play");
     });
 
     await test("sound", "every plane's guns sound different", async open => {
@@ -329,10 +329,10 @@ async function run() {
         check(!bad.length, "silent or broken: " + bad);
     });
 
-    await test("airbattle", "erosion (WebAssembly and the JavaScript fallback)", async open => {
+    await test("flightmode", "erosion (WebAssembly and the JavaScript fallback)", async open => {
         const p = await open();
         const r = await p.evaluate(async () => {
-            const D = BitAirBattle, w = 129, step = 100, make = () => {
+            const D = BitFlightMode, w = 129, step = 100, make = () => {
                 const g = new Float32Array(w * w);
                 for (let y = 0; y < w; y++) for (let x = 0; x < w; x++) g[y * w + x] = 600 * Math.sin(x / 9) * Math.cos(y / 7) + 600;
                 return g;
@@ -347,10 +347,10 @@ async function run() {
         check(r.wasm === "wasm" && r.js === "js" && r.changedWasm && r.changedJs && !r.nan, JSON.stringify(r));
     });
 
-    await test("airbattle", "flight model (C++ WebAssembly and the JavaScript fallback)", async open => {
+    await test("flightmode", "flight model (C++ WebAssembly and the JavaScript fallback)", async open => {
         const p = await open();
         const r = await p.evaluate(async () => {
-            const D = BitAirBattle;
+            const D = BitFlightMode;
             await D.loadFlight();
             const out = {mismatch: 0, engines: []};
             for (const id of Object.keys(D.FLIGHT_SPECS)) {
@@ -387,10 +387,10 @@ async function run() {
         check(ok, JSON.stringify(r));
     });
 
-    await test("airbattle", "every session: Team Flight 6 v 6, random environment and lighting", async open => {
+    await test("flightmode", "every session: Team Flight 6 v 6, random environment and lighting", async open => {
         const p = await open();
         const r = await p.evaluate(() => {
-            const D = BitAirBattle, maps = new Set(), skies = new Set();
+            const D = BitFlightMode, maps = new Set(), skies = new Set();
             let repeats = 0, last = "", wrong = 0;
             for (let i = 0; i < 200; i++) {
                 const s = D.pickSetup();
@@ -405,30 +405,30 @@ async function run() {
         check(!r.wrong && !r.repeats && r.all >= 11 && r.maps === r.all && r.skies === 6, JSON.stringify(r));
     });
 
-    await test("airbattle", "PLAY goes straight into a session (no menu)", async open => {
+    await test("flightmode", "PLAY goes straight into a session (no menu)", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
-        await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
-        await p.evaluate(() => (document.querySelector('input[value="airbattle"]').checked = true));
+        await p.evaluate(() => (BitMarket.give("f16"), BitMarket.selectPlane("f16")));
+        await p.evaluate(() => (document.querySelector('input[value="flightmode"]').checked = true));
         await p.click(".play-btn");
         await p.waitForTimeout(300);
         const menu = await p.evaluate(() => !!document.querySelector(".df-deploy"));
-        await p.waitForFunction(() => BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.waitForFunction(() => BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
-            const g = BitAirBattle.state();
+            const g = BitFlightMode.state();
             return {menu: false, teams: g.match.teams, planes: g.planes.length, map: g.setup.map};
         });
         check(!menu && r.teams && r.planes === 12, JSON.stringify(Object.assign(r, {menu})));
     });
 
-    await test("airbattle", "cockpits: jet, WWII and biplane build and update", async open => {
+    await test("flightmode", "cockpits: jet, WWII and biplane build and update", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         const out = [];
         for (const id of ["f16", "spitfire", "camel"]) {
-            await p.evaluate(id => (BitShop.give(id), BitShop.selectPlane(id)), id);
-            await p.evaluate(() => BitAirBattle.start({map: "farmlands", sky: "day", mode: "team", size: 2, difficulty: "normal"}));
-            await p.waitForFunction(() => BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+            await p.evaluate(id => (BitMarket.give(id), BitMarket.selectPlane(id)), id);
+            await p.evaluate(() => BitFlightMode.start({map: "farmlands", sky: "day", mode: "team", size: 2, difficulty: "normal"}));
+            await p.waitForFunction(() => BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
             out.push(await p.evaluate(() => {
-                const g = BitAirBattle.state(), pl = g.player;
+                const g = BitFlightMode.state(), pl = g.player;
                 pl.setCockpit(true);
                 pl.input.pitch = 1;
                 pl.input.roll = -1;
@@ -439,18 +439,18 @@ async function run() {
                 const stick = cp.group.children.find(o => o.isGroup && Math.abs(o.rotation.x) > 0.05);
                 return {kind: cp.kind, meshes, stickMoved: !!stick};
             }));
-            await p.evaluate(() => BitAirBattle.stop());
+            await p.evaluate(() => BitFlightMode.stop());
         }
         check(out.map(o => o.kind).join() === "jet,prop,bi" && out.every(o => o.meshes > 60 && o.stickMoved) && !p.errors.length, JSON.stringify(out) + p.errors);
     });
 
-    await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
+    await test("flightmode", "a match: guns, missile lock, flares, eject, results", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
-        await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
-        await p.evaluate(() => BitAirBattle.start({map: "alpine", mode: "team", size: 4, difficulty: "normal"}));
-        await p.waitForFunction(() => window.BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.evaluate(() => (BitMarket.give("f16"), BitMarket.selectPlane("f16")));
+        await p.evaluate(() => BitFlightMode.start({map: "alpine", mode: "team", size: 4, difficulty: "normal"}));
+        await p.waitForFunction(() => window.BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
-            const D = BitAirBattle, g = D.state(), pl = g.player;
+            const D = BitFlightMode, g = D.state(), pl = g.player;
             g.paused = true;
             const still = e => {
                 e.pilot.think = function () {
@@ -515,12 +515,12 @@ async function run() {
         for (const [k, v] of Object.entries(r)) check(v, k + " failed: " + JSON.stringify(r));
     });
 
-    await test("airbattle", "computer pilots fight (kills in 60 s, few crashes)", async open => {
+    await test("flightmode", "computer pilots fight (kills in 60 s, few crashes)", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
-        await p.evaluate(() => BitAirBattle.start({map: "canyon", mode: "team", size: 6, difficulty: "hard"}));
-        await p.waitForFunction(() => window.BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.evaluate(() => BitFlightMode.start({map: "canyon", mode: "team", size: 6, difficulty: "hard"}));
+        await p.waitForFunction(() => window.BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
-            const D = BitAirBattle, g = D.state(), pl = g.player;
+            const D = BitFlightMode, g = D.state(), pl = g.player;
             g.paused = true;
             pl.pilot = D.makePilot(g.THREE, pl, 0.8);
             g.others.push(pl);

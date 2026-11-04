@@ -36,8 +36,8 @@ window.BitDaily = (function () {
         if (!t) return null;
         const d = load();
         save({last: dateKey(), streak: t.streak, best: Math.max(d.best || 0, t.streak)});
-        if (window.BitShop) window.BitShop.addCoins(t.coins);
-        if (window.BitStats) window.BitStats.addEarned(t.coins);
+        if (window.BitMarket) window.BitMarket.addCoins(t.coins);
+        if (window.BitStatistics) window.BitStatistics.addEarned(t.coins);
         return t;
     }
 

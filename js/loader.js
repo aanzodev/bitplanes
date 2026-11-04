@@ -38,11 +38,11 @@
         }
     }
 
-    const OPTIONAL = /js\/airbattle\//;
+    const OPTIONAL = /js\/flightmode\//;
 
-    function dropAirBattle(missing) {
-        console.warn("Flight Sessions is off: these files didn't load:", missing);
-        const radio = document.querySelector('input[name="mode"][value="airbattle"]');
+    function dropFlightMode(missing) {
+        console.warn("3D Flight Mode is off: these files didn't load:", missing);
+        const radio = document.querySelector('input[name="mode"][value="flightmode"]');
         if (radio) {
             if (radio.checked) {
                 const first = document.querySelector('input[name="mode"]');
@@ -51,7 +51,7 @@
             (radio.closest("div") || radio).remove();
         }
         const note = document.querySelector(".online-status");
-        if (note) note.textContent = "Flight Sessions (3D) couldn't load here. BitPlanes works as usual.";
+        if (note) note.textContent = "3D Flight Mode couldn't load here. BitPlanes works as usual.";
     }
 
     function bodyReady() {
@@ -79,10 +79,10 @@
         "Press <b>C</b> to eject. Land at the barn to get a new plane.",
         "Every elimination earns <b>50 credits</b> to spend in Aircraft Selection.",
         "Claim your <b>daily reward</b> every day: day 7 pays 1,000 credits.",
-        "Reach <b>level 10</b> or own a special jet to unlock Flight Sessions (3D).",
-        "Change any key in <b>⚙ Settings</b>, for both BitPlanes and Flight Sessions.",
+        "Reach <b>level 10</b> or own a special jet to unlock 3D Flight Mode.",
+        "Change any key in <b>⚙ Settings</b>, for both BitPlanes and 3D Flight Mode.",
         "Quests reset every day and every week. Check them for extra credits and XP.",
-        "In Flight Sessions, press <b>V</b> for the cockpit view.",
+        "In 3D Flight Mode, press <b>V</b> for the cockpit view.",
     ];
     const PLANE_SVG = `<svg viewBox="0 0 40 24" aria-hidden="true"><path d="M3 12h27c4 0 7 1.5 7 3s-3 2-7 2H9z" fill="#e8483b"/>
         <rect x="12" y="4" width="10" height="3" rx="1.5" fill="#c23a2f"/><rect x="11" y="17" width="12" height="3" rx="1.5" fill="#c23a2f"/>
@@ -157,7 +157,7 @@
             <ul class="bit-load-stages">
                 <li data-stage="page">Page and styles<small></small></li>
                 <li data-stage="core">BitPlanes<small></small></li>
-                <li data-stage="air">Flight Sessions (3D)<small></small></li>
+                <li data-stage="air">3D Flight Mode<small></small></li>
             </ul>
             <p class="bit-load-slow" hidden></p>
             <div class="bit-load-time"><span class="bit-load-elapsed">0 s</span><span class="bit-load-left"></span></div>
@@ -278,7 +278,7 @@
             const part = OPTIONAL.test(src) ? "air" : "core";
             if (part === "air" && missing.length) continue;
             stage(part, "active");
-            step(`${part === "air" ? "Flight Sessions (3D)" : "BitPlanes"}: file ${i + 1} of ${scripts.length}`,
+            step(`${part === "air" ? "3D Flight Mode" : "BitPlanes"}: file ${i + 1} of ${scripts.length}`,
                 src.replace(/^.*\//, ""));
             try {
                 await loadScript(/^https?:/.test(src) ? src : base + src);
@@ -300,8 +300,8 @@
         step("Ready!");
         progress(100);
         if (missing.length) {
-            window.BitAirBattle = null;
-            dropAirBattle(missing);
+            window.BitFlightMode = null;
+            dropFlightMode(missing);
         }
         done();
     }

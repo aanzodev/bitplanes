@@ -1,33 +1,33 @@
-window.BitQuests = (function () {
+window.BitChallenges = (function () {
     const KEY = "quests";
     const DAILY = [
         {id: "kills5", text: "Shoot down 5 planes", stat: "killed", goal: 5, coins: 250},
         {id: "kills15", text: "Shoot down 15 planes", stat: "killed", goal: 15, coins: 600},
         {id: "fly5", text: "Fly for 5 minutes", stat: "flySeconds", goal: 300, coins: 200, time: true},
         {id: "fly15", text: "Fly for 15 minutes", stat: "flySeconds", goal: 900, coins: 500, time: true},
-        {id: "mp1", text: "Play an Online Mode session", stat: "onlineMatches", goal: 1, coins: 300},
+        {id: "mp1", text: "Play an Online Multiplayer session", stat: "onlineMatches", goal: 1, coins: 300},
         {id: "matches3", text: "Play 3 sessions", stat: "matches", goal: 3, coins: 250},
         {id: "missiles10", text: "Fire 10 missiles", stat: "missiles", goal: 10, coins: 200},
         {id: "hits50", text: "Land 50 hits with your gun", stat: "hits", goal: 50, coins: 250},
         {id: "cows3", text: "Hit 3 cows (oops)", stat: "cowKilled", goal: 3, coins: 150},
         {id: "streak3", text: "Get a 3 score streak", stat: "streak", goal: 3, coins: 400, max: true},
         {id: "streak5", text: "Get a 5 score streak", stat: "streak", goal: 5, coins: 800, max: true},
-        {id: "df5", text: "Shoot down 5 planes in Flight Sessions", stat: "dfKills", goal: 5, coins: 450},
-        {id: "dfmatch", text: "Play a Flight Session", stat: "dfMatches", goal: 1, coins: 250},
-        {id: "dfmissile3", text: "Get 3 missile eliminations in Flight Sessions", stat: "dfMissileKills", goal: 3, coins: 450},
-        {id: "dfflare2", text: "Dodge 2 missiles with countermeasures in Flight Sessions", stat: "dfFlareSaves", goal: 2, coins: 400},
+        {id: "df5", text: "Shoot down 5 planes in 3D Flight Mode", stat: "dfKills", goal: 5, coins: 450},
+        {id: "dfmatch", text: "Play a 3D Flight Mode session", stat: "dfMatches", goal: 1, coins: 250},
+        {id: "dfmissile3", text: "Get 3 missile eliminations in 3D Flight Mode", stat: "dfMissileKills", goal: 3, coins: 450},
+        {id: "dfflare2", text: "Dodge 2 missiles with countermeasures in 3D Flight Mode", stat: "dfFlareSaves", goal: 2, coins: 400},
     ];
     const WEEKLY = [
         {id: "w-kills75", text: "Shoot down 75 planes", stat: "killed", goal: 75, coins: 2500},
         {id: "w-fly60", text: "Fly for 1 hour", stat: "flySeconds", goal: 3600, coins: 2000, time: true},
-        {id: "w-mp5", text: "Play 5 Online Mode sessions", stat: "onlineMatches", goal: 5, coins: 2000},
+        {id: "w-mp5", text: "Play 5 Online Multiplayer sessions", stat: "onlineMatches", goal: 5, coins: 2000},
         {id: "w-matches15", text: "Play 15 sessions", stat: "matches", goal: 15, coins: 1800},
         {id: "w-hits500", text: "Land 500 hits", stat: "hits", goal: 500, coins: 2000},
         {id: "w-streak8", text: "Get an 8 score streak", stat: "streak", goal: 8, coins: 3000, max: true},
-        {id: "w-df30", text: "Shoot down 30 planes in Flight Sessions", stat: "dfKills", goal: 30, coins: 3000},
+        {id: "w-df30", text: "Shoot down 30 planes in 3D Flight Mode", stat: "dfKills", goal: 30, coins: 3000},
         {id: "w-dfwin3", text: "Win 3 Team Flight sessions", stat: "dfWins", goal: 3, coins: 3000},
-        {id: "w-dfmissile10", text: "Get 10 missile eliminations in Flight Sessions", stat: "dfMissileKills", goal: 10, coins: 2500},
-        {id: "w-dfgun15", text: "Get 15 gun eliminations in Flight Sessions", stat: "dfGunKills", goal: 15, coins: 2500},
+        {id: "w-dfmissile10", text: "Get 10 missile eliminations in 3D Flight Mode", stat: "dfMissileKills", goal: 10, coins: 2500},
+        {id: "w-dfgun15", text: "Get 15 gun eliminations in 3D Flight Mode", stat: "dfGunKills", goal: 15, coins: 2500},
     ];
     const ALL = DAILY.concat(WEEKLY);
     for (const q of ALL) q.xp = Math.round(q.coins / 2);
@@ -58,7 +58,7 @@ window.BitQuests = (function () {
     }
 
     function stats() {
-        return window.BitStats && window.BitStats.get();
+        return window.BitStatistics && window.BitStatistics.get();
     }
 
     function fresh(pool, key, s) {
@@ -117,8 +117,8 @@ window.BitQuests = (function () {
         const entry = state.list.concat(state.weekly).find(x => x.id === id);
         entry.claimed = true;
         save();
-        window.BitShop && window.BitShop.addCoins(q.coins);
-        window.BitStats && window.BitStats.addEarned(q.coins);
+        window.BitMarket && window.BitMarket.addCoins(q.coins);
+        window.BitStatistics && window.BitStatistics.addEarned(q.coins);
         window.BitProgress && window.BitProgress.addXp(q.xp, "quest complete");
         render();
     }
@@ -130,7 +130,7 @@ window.BitQuests = (function () {
 
     function render() {
         const all = list("all");
-        const dot = document.querySelector(".open-quests .nav-dot");
+        const dot = document.querySelector(".open-challenges .nav-dot");
         if (dot) dot.hidden = !all.some(q => q.done && !q.claimed);
         if (!el || el.hidden) return;
         const quests = tab === "weekly" ? list("weekly") : list("daily");
@@ -167,7 +167,7 @@ window.BitQuests = (function () {
         el.className = "quests panel-backdrop";
         el.hidden = true;
         el.innerHTML = `<div class="panel" role="dialog" aria-label="Quests">
-            <div class="shop-header"><h2>Quests</h2><button type="button" class="close-shop quest-close" aria-label="Close">×</button></div>
+            <div class="shop-header"><h2>Flight Challenges</h2><button type="button" class="close-shop quest-close" aria-label="Close">×</button></div>
             <div class="set-tabs">
                 <button type="button" class="set-tab" data-tab="daily">Daily <i class="nav-dot" hidden></i></button>
                 <button type="button" class="set-tab" data-tab="weekly">Weekly <i class="nav-dot" hidden></i></button>
@@ -187,7 +187,7 @@ window.BitQuests = (function () {
             if (b) claim(b.dataset.quest);
         });
         document.addEventListener("keydown", ev => ev.key === "Escape" && (el.hidden = true));
-        const btn = document.querySelector(".open-quests");
+        const btn = document.querySelector(".open-challenges");
         if (btn) btn.addEventListener("click", () => {
             el.hidden = false;
             render();

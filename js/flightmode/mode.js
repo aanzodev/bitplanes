@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
     const COINS_PER_KILL = 50;
     const MATCH_S = 600;
     const PLAYER_RESPAWN = 5, AI_RESPAWN = 6;
@@ -29,7 +29,7 @@
     }
 
     function stats() {
-        return window.BitStats && window.BitStats.get();
+        return window.BitStatistics && window.BitStatistics.get();
     }
 
     function setting(k) {
@@ -64,7 +64,7 @@
     const UNLOCK_LEVEL = 10;
 
     function access() {
-        const P = window.BitProgress, shop = window.BitShop;
+        const P = window.BitProgress, shop = window.BitMarket;
         const level = P ? P.levelInfo().level : 1;
         const owned = shop ? shop.state().owned : [];
         const special = shop ? shop.planes.filter(p => (p.special || p.exclusive) && owned.includes(p.id)) : [];
@@ -76,10 +76,10 @@
         const el = document.createElement("div");
         el.className = "df-deploy df-locked";
         const P = window.BitProgress, info = P ? P.levelInfo() : {frac: 0};
-        const coins = window.BitShop ? window.BitShop.state().coins : 0;
+        const coins = window.BitMarket ? window.BitMarket.state().coins : 0;
         el.innerHTML = `<div class="df-deploy-box df-lock-box">
-            <div class="df-deploy-head"><h2>🔒 Flight Sessions <span class="beta-tag">Beta</span></h2><button type="button" class="df-x" aria-label="Close">×</button></div>
-            <p class="df-lock-lead">Flight Sessions is for experienced pilots. Unlock it either way:</p>
+            <div class="df-deploy-head"><h2>🔒 3D Flight Mode <span class="beta-tag">Beta</span></h2><button type="button" class="df-x" aria-label="Close">×</button></div>
+            <p class="df-lock-lead">3D Flight Mode is for experienced pilots. Unlock it either way:</p>
             <div class="df-lock-ways">
                 <div class="df-lock-way"><b>⭐ Reach level ${a.need}</b>
                     <span>You're level ${a.level}${a.level < a.need ? ` · ${a.need - a.level} to go` : ""}</span>
@@ -107,7 +107,7 @@
             if (ev.target === el || ev.target.closest(".df-x")) close();
             if (ev.target.closest(".df-lock-hangar")) {
                 close();
-                const h = document.querySelector(".open-shop");
+                const h = document.querySelector(".open-market");
                 if (h) h.click();
             }
         });
@@ -123,7 +123,7 @@
     async function start(setup) {
         if (fight) return;
         setup = Object.assign({map: "alpine", sky: "", mode: "team", size: 6, difficulty: "normal"}, setup || {});
-        status("Loading 3D Flight Sessions…");
+        status("Loading 3D Flight Mode…");
         let THREE;
         try {
             [THREE] = await Promise.all([loadThree(), D.loadErosion ? D.loadErosion() : null, D.loadFlight ? D.loadFlight() : null]);
@@ -174,17 +174,17 @@
         const post = hdr ? D.makePost(THREE, renderer, {samples: quality === "ultra" ? 8 : 4, exposure: sky.stars ? 1.3 : 0.82, bloom: quality === "ultra" ? 0.95 : 0.8}) : null;
         const hud = D.makeHud(root);
 
-        const shop = window.BitShop;
+        const shop = window.BitMarket;
         const selected = shop.selected();
         const lvl = id => shop.level(id);
         const extra = {boost: lvl("boost"), seeker: lvl("seeker"), radar: lvl("radar"), airframe: lvl("airframe")};
         const teams = setup.mode === "team";
         const player = makePlane(scene, selected, shop.colorOf(selected), cleanName(), {isPlayer: true, team: teams ? "blue" : null, loadout: shop.loadout(), extra, pattern: shop.patternOf(selected)});
-        player.setPilot(window.BitSkins ? window.BitSkins.selected() : null);
+        player.setPilot(window.BitCustomization ? window.BitCustomization.selected() : null);
         const pool = shop.planes.filter(p => !p.exclusive);
         const names = CALLSIGNS.slice().sort(() => Math.random() - 0.5);
         const [lo, hi] = SKILL[setup.difficulty] || SKILL.normal;
-        const skins = window.BitSkins ? window.BitSkins.list : [];
+        const skins = window.BitCustomization ? window.BitCustomization.list : [];
         const others = [];
         const count = teams ? setup.size * 2 - 1 : setup.size - 1;
         for (let k = 0; k < count; k++) {
@@ -457,7 +457,7 @@
         }
         if (killer === g.player) {
             g.coins += COINS_PER_KILL;
-            window.BitShop && window.BitShop.addCoins(COINS_PER_KILL);
+            window.BitMarket && window.BitMarket.addCoins(COINS_PER_KILL);
             g.hud.kill();
             g.audio.killConfirm();
             g.hud.ribbon(100, `Target down · ${plane.name}`, true);
@@ -649,7 +649,7 @@
         const winBonus = won ? 500 : 150;
         const xp = p.score + winBonus;
         const coins = won ? 300 : 0;
-        if (coins && window.BitShop) window.BitShop.addCoins(coins);
+        if (coins && window.BitMarket) window.BitMarket.addCoins(coins);
         const st = stats();
         if (st) {
             if (won) st.dfWins++;
@@ -1006,7 +1006,7 @@
             const form = ev.target;
             if (!form || form.id !== "activity") return;
             const mode = form.querySelector('input[name="mode"]:checked');
-            if (!mode || mode.value !== "airbattle") return;
+            if (!mode || mode.value !== "flightmode") return;
             ev.preventDefault();
             ev.stopImmediatePropagation();
             open();

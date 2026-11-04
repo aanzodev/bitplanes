@@ -123,7 +123,7 @@ BitModules[87] = function (M, j, t) {
         window.BitEngine.stopDemo = r;
         Object(z.a)("#activity").addEventListener("submit", (M) => {
             M.preventDefault();
-            let j = "death-match",
+            let j = "combat",
                 t = document.getElementsByName("mode");
             for (let M = 0, L = t.length; M < L; M++) {
                 let L = t[M];
@@ -141,7 +141,7 @@ BitModules[87] = function (M, j, t) {
                         (Object(z.a)(".ui").style.display = "block"),
                         M)
                     ) {
-                        case "death-match":
+                        case "combat":
                             !(function () {
                                 const M = new S.a({
                                     width: 15e3,

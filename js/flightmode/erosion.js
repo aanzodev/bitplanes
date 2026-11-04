@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
     let wasm = null, loading = null;
 
     D.loadErosion = function () {
@@ -7,7 +7,7 @@
         loading = (async () => {
             try {
                 if (typeof WebAssembly === "undefined") return null;
-                const res = await fetch((window.BitBase || "") + "js/airbattle/erosion.wasm");
+                const res = await fetch((window.BitBase || "") + "js/flightmode/erosion.wasm");
                 if (!res.ok) return null;
                 const {instance} = await WebAssembly.instantiate(await res.arrayBuffer(), {});
                 wasm = instance.exports;

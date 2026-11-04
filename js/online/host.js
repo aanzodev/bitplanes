@@ -18,8 +18,8 @@
         peer.on("waking", () => status("Waking up the online server… (the first room of the day can take up to a minute)"));
         peer.on("open", () => {
             host.code = code;
-            status(O.mode === "multiplayer" ? "Online Mode match ready." : "Room " + code + " is open.");
-            const dm = document.querySelector('input[name="mode"][value="death-match"]');
+            status(O.mode === "multiplayer" ? "Online Multiplayer match ready." : "Room " + code + " is open.");
+            const dm = document.querySelector('input[name="mode"][value="combat"]');
             if (dm) dm.checked = true;
             document.getElementById("activity").requestSubmit();
         });
@@ -100,7 +100,7 @@
 
     function updateHostBanner() {
         const n = [...host.clients.values()].filter(c => c.player).length;
-        if (O.mode === "multiplayer") banner(`🌐 Online Mode · ${n + 1} real player${n ? "s" : ""}`);
+        if (O.mode === "multiplayer") banner(`🌐 Online Multiplayer · ${n + 1} real player${n ? "s" : ""}`);
         else banner(`Room code: ${host.code} · ${n} friend${n === 1 ? "" : "s"} connected`);
     }
 

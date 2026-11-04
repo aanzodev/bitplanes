@@ -1,4 +1,4 @@
-window.BitStats = (function () {
+window.BitStatistics = (function () {
     const COINS_PER_KILL = 50;
     let el, lastKilled = null, lastDeaths = null, uiShown = false;
 
@@ -66,12 +66,12 @@ window.BitStats = (function () {
     }
 
     function planeImg(p) {
-        const shop = window.BitShop;
+        const shop = window.BitMarket;
         return window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(p), true, p.skin, shop.patternOf(p)) : "";
     }
 
     function render() {
-        const s = S(), shop = window.BitShop;
+        const s = S(), shop = window.BitMarket;
         if (!s || !shop) return;
         const n = v => (v || 0).toLocaleString();
         const kd = s.deaths ? (s.killed / s.deaths).toFixed(2) : n(s.killed);
@@ -98,7 +98,7 @@ window.BitStats = (function () {
                 ${card("Daily streak", n(daily.streak), `best: ${n(daily.best)}`)}
                 ${card("Cows hit", n(s.cowKilled), "oops")}
             </div>
-            <h3>Flight Sessions (3D)</h3>
+            <h3>3D Flight Mode</h3>
             <div class="stat-grid">
                 ${card("Eliminations", n(s.dfKills), `${n(s.dfGunKills)} guns · ${n(s.dfMissileKills)} missiles`)}
                 ${card("Deaths", n(s.dfDeaths))}
@@ -131,7 +131,7 @@ window.BitStats = (function () {
         el.className = "stats-page panel-backdrop";
         el.hidden = true;
         el.innerHTML = `<div class="panel" role="dialog" aria-label="Stats">
-            <div class="shop-header"><h2>Stats</h2><button type="button" class="close-shop stats-close" aria-label="Close">×</button></div>
+            <div class="shop-header"><h2>Flight Statistics</h2><button type="button" class="close-shop stats-close" aria-label="Close">×</button></div>
             <div class="stats-body"></div>
             <button type="button" class="stats-reset">Reset stats</button>
         </div>`;
@@ -144,7 +144,7 @@ window.BitStats = (function () {
             }
         });
         document.addEventListener("keydown", ev => ev.key === "Escape" && (el.hidden = true));
-        const btn = document.querySelector(".open-stats");
+        const btn = document.querySelector(".open-statistics");
         if (btn) btn.addEventListener("click", () => {
             render();
             el.hidden = false;

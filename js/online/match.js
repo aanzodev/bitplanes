@@ -13,7 +13,7 @@
     function connect() {
         const url = O.serverUrl();
         return new Promise((resolve, reject) => {
-            if (!url) return reject(new Error("Online Mode needs the online server (see js/online/config.js)."));
+            if (!url) return reject(new Error("Online Multiplayer needs the online server (see js/online/config.js)."));
             let ws, v = 0, opened = false;
             try {
                 ws = new WebSocket(url);
@@ -37,7 +37,7 @@
                 if (!msg) return;
                 if (msg.op === "hello") {
                     v = msg.v || 0;
-                    if (v < 3) return fail("The online server needs its update for Online Mode. Render installs it a few minutes after the change is merged.");
+                    if (v < 3) return fail("The online server needs its update for Online Multiplayer. Render installs it a few minutes after the change is merged.");
                     if (v < 4) return done(null);
                     ws.send(JSON.stringify({op: "ping", t: performance.now()}));
                 } else if (msg.op === "pong") done(Math.round(performance.now() - msg.t));
@@ -189,8 +189,8 @@
         browser = document.createElement("div");
         browser.className = "servers panel-backdrop";
         browser.hidden = true;
-        browser.innerHTML = `<div class="panel" role="dialog" aria-label="Online Mode servers">
-            <div class="shop-header"><h2>Online Mode servers</h2><button type="button" class="close-shop srv-close" aria-label="Close">×</button></div>
+        browser.innerHTML = `<div class="panel" role="dialog" aria-label="Multiplayer Servers">
+            <div class="shop-header"><h2>Multiplayer Servers</h2><button type="button" class="close-shop srv-close" aria-label="Close">×</button></div>
             <p class="shop-note">Up to 10 real players per server; bots fill the empty spots. Ping is an estimate.</p>
             <div class="srv-tools">
                 <input type="text" class="srv-search" placeholder="Find a friend or server…" autocomplete="off" spellcheck="false">
@@ -357,7 +357,7 @@
         const plane = p.hasPlane() || p.lastPlane;
         if (plane) p.lastPlane = plane;
         const key = plane && plane.sprite && plane.sprite.planeKey;
-        const info = window.BitShop && plane && window.BitShop.planes.find(x => x.id === plane.planeId);
+        const info = window.BitMarket && plane && window.BitMarket.planes.find(x => x.id === plane.planeId);
         return {look: key ? [key[0], key[2], key[3]] : [p.color, "", ""], plane: info ? info.name : "Biplane"};
     }
 

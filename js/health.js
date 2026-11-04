@@ -9,7 +9,7 @@
     }
 
     function planeName(plane) {
-        const p = window.BitShop && window.BitShop.planes.find(x => x.id === plane.planeId);
+        const p = window.BitMarket && window.BitMarket.planes.find(x => x.id === plane.planeId);
         return p ? p.name : "Plane";
     }
 

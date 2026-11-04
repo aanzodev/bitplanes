@@ -72,7 +72,7 @@
     function loadout() {
         const p = selectedPlane();
         return Object.assign(statsOf(p, colorOf(p), level), {pattern: patternOf(p),
-            pilotSkin: window.BitSkins ? window.BitSkins.selected().id : ""});
+            pilotSkin: window.BitCustomization ? window.BitCustomization.selected().id : ""});
     }
 
     const BOT_PLANES = PLANES.filter(p => !p.exclusive && (!p.special || p.bots));
@@ -235,7 +235,7 @@
         history.replaceState(null, "", location.pathname + (query ? "?" + query : "") + location.hash);
     }
 
-    window.BitShop = {
+    window.BitMarket = {
         apply, reward, onKill, loadout, addCoins, setCoins, spend,
         buyPlane, selectPlane, buyUpgrade, setPaint, colorOf, setPattern, patternOf, level, upgradeCost, maxOf, give, unlockAll, resetShop,
         planes: PLANES,

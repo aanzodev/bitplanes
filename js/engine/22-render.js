@@ -379,7 +379,7 @@ BitModules[22] = function (M, j, t) {
                             t.source.player && j.player && Object(S.d)(t.source.player, j.player, S.a)));
         })(M);
         for (let t of M) {
-            t instanceof e.a && window.BitShop && window.BitShop.apply(t);
+            t instanceof e.a && window.BitMarket && window.BitMarket.apply(t);
             ((t.forward = Object(g.s)(Math.sin(-t.angle - Math.PI / 2), Math.cos(-t.angle - Math.PI / 2))),
                 (t.normal = Object(g.s)(Math.sin(-t.angle + Math.PI), Math.cos(-t.angle + Math.PI))),
                 t instanceof u.a && (C(t, M), t.thrust > 0 && Object(A.f)(M, t)),

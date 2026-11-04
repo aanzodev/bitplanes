@@ -83,7 +83,7 @@
         plane.angle = last[3];
         plane.landed = !!(hud && hud[8]);
         plane.player = {isHuman: true, loadoutColor: color};
-        window.BitShop && window.BitShop.apply(plane);
+        window.BitMarket && window.BitMarket.apply(plane);
         plane.player = undefined;
         p.sim.add(plane);
         p.plane = plane;

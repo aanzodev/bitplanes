@@ -44,7 +44,7 @@
                 conn.send({
                     t: "hello",
                     name: (document.getElementsByName("nickname")[0] || {}).value || "Guest",
-                    loadout: window.BitShop ? window.BitShop.loadout() : {},
+                    loadout: window.BitMarket ? window.BitMarket.loadout() : {},
                 });
             });
             conn.on("data", onGuestData);
@@ -87,7 +87,7 @@
         else if (msg.t === "s" && guest.world) applySnapshot(msg);
         else if (msg.t === "pong") onPong(msg);
         else if (msg.t === "log") addLog(String(msg.h || ""));
-        else if (msg.t === "coins" && window.BitShop) window.BitShop.reward();
+        else if (msg.t === "coins" && window.BitMarket) window.BitMarket.reward();
         else if (msg.t === "map" && O.match) O.match.onGuestMap(msg);
         else if (msg.t === "results" && O.match) O.match.onGuestResults(msg.r);
     }
@@ -111,7 +111,7 @@
         e.decorate(world);
         world.remote = {alpha: guestAlpha};
         guest.world = world;
-        window.BitStats && window.BitStats.resetGuest();
+        window.BitStatistics && window.BitStatistics.resetGuest();
         O.prediction.start(world, m => guest.conn && guest.conn.open && guest.conn.send(m));
 
         const me = {
@@ -131,7 +131,7 @@
         e.loop(camera, ctx, world, (cam, alpha) => e.follow(cam, world, me, alpha), g => e.scoreboard(g, world.participants));
         e.minimap(world);
         bindGuestKeys();
-        banner(O.mode === "multiplayer" ? "🌐 Online Mode" : "Room " + guest.code);
+        banner(O.mode === "multiplayer" ? "🌐 Online Multiplayer" : "Room " + guest.code);
         window.BitWeather && window.BitWeather.force(w.weather);
         window.BitMaps && window.BitMaps.announce(world.map);
         setInterval(() => {
@@ -320,7 +320,7 @@
         if (msg.m && O.match) O.match.onGuestState(msg.m);
 
         const row = guest.me && (msg.p || []).find(r => r[4] === guest.me);
-        if (row && window.BitStats) window.BitStats.guestScore(row[2], row[3]);
+        if (row && window.BitStatistics) window.BitStatistics.guestScore(row[2], row[3]);
 
         O.prediction.sync(guest.objects.get(guest.me), msg.h);
         const plane = guest.objects.get(guest.me);

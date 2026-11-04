@@ -1,5 +1,5 @@
 (function () {
-    const shop = window.BitShop;
+    const shop = window.BitMarket;
     let open = false;
 
     function inActivity() {

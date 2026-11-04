@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
 
     const SPECS = {
         classic: [800, 30, 11, 82e3, 1], cub: [550, 16.6, 10.7, 48e3, 1], tigermoth: [830, 22.2, 8.9, 97e3, 1],
@@ -57,7 +57,7 @@
         loading = (async () => {
             try {
                 if (typeof WebAssembly === "undefined") return null;
-                const res = await fetch((window.BitBase || "") + "js/airbattle/flight.wasm");
+                const res = await fetch((window.BitBase || "") + "js/flightmode/flight.wasm");
                 if (!res.ok) return null;
                 const {instance} = await WebAssembly.instantiate(await res.arrayBuffer(), {});
                 wasm = instance.exports;

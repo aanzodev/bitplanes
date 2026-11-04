@@ -1,5 +1,5 @@
 (function () {
-    const shop = window.BitShop;
+    const shop = window.BitMarket;
 
     function planeImage(p, color = shop.colorOf(p), pattern = shop.patternOf(p)) {
         return window.bitPlaneImage ? window.bitPlaneImage(color, true, p.skin, pattern) : "";
@@ -97,7 +97,7 @@
 
     function init() {
         const panel = document.querySelector(".shop");
-        const opens = document.querySelectorAll(".open-shop");
+        const opens = document.querySelectorAll(".open-market");
         const close = panel && panel.querySelector(".close-shop");
         if (panel) opens.forEach(open => open.addEventListener("click", () => {
             render();
