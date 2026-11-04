@@ -172,6 +172,97 @@
                 return [0xc4ae62, 0x6e8f42, 0x7a5f42, 0x58803a, 0xb59f60, 0x7f9a4c][Math.floor(k * 6)];
             },
         },
+        {
+            id: "savanna", name: "Savanna Plains", icon: "🦒", desc: "Golden grassland, rocky outcrops and a winding river.", shallow: 0x6f8f5a, erosion: 0.5,
+            sky: "sunset", water: 0, cloudHeight: 2800, cloudAmount: 0.5, trees: {kind: "broad", count: 2600, min: 4, max: 700}, rock: 0x7a6a58,
+            height(n, x, z) {
+                let h = 50 + (n.fbm(x / 4200, z / 4200) - 0.4) * 260;
+                const k = n.fbm(x / 1500 + 13, z / 1500 - 8, 4);
+                h += smoothstep(0.6, 0.7, k) * (220 + n.fbm(x / 300, z / 300, 2) * 160);
+                const river = Math.abs(n.fbm(x / 9000 - 7, z / 9000 + 15, 3) - 0.5);
+                h = mix(-25, h, smoothstep(0.01, 0.035, river));
+                return h + rim(x, z, 0.82, 1200);
+            },
+            color(h, slope, n, x, z) {
+                if (h < 2) return 0x8f7a50;
+                if (slope > 0.6) return 0x7a6a58;
+                const g = n.fbm(x / 700, z / 700, 2);
+                return g > 0.6 ? 0x9a8a44 : g > 0.42 ? 0xc9a94e : 0xd6b85e;
+            },
+        },
+        {
+            id: "glacier", name: "Glacier Pass", icon: "❄", desc: "Towering ice walls and a frozen pass between them.",
+            sky: "day", water: -9999, cloudHeight: 3200, cloudAmount: 0.9, trees: {kind: "snowpine", count: 1600, min: 60, max: 700}, snowLevel: 500, rock: 0x5b636b,
+            height(n, x, z) {
+                const r = n.ridge(x / 4200 + 8, z / 4200 - 21, 5);
+                let h = Math.pow(r, 2.2) * 2900 + n.fbm(x / 1700, z / 1700) * 400 + 200;
+                const pass = Math.abs(n.fbm(x / 10000 + 2, z / 7000 - 9, 3) - 0.5);
+                h = mix(120 + n.fbm(x / 900, z / 900, 2) * 40, h, smoothstep(0.03, 0.13, pass));
+                return h + rim(x, z, 0.8, 2000);
+            },
+            color(h, slope, n, x, z) {
+                if (slope < 0.3 && h < 260) return n.fbm(x / 500, z / 500, 2) > 0.5 ? 0xcfe6f2 : 0xbcdbeb;
+                if (slope > 0.85) return 0x5b636b;
+                return n.fbm(x / 600, z / 600, 2) > 0.4 ? 0xf3f7fa : 0xe2ebf2;
+            },
+        },
+        {
+            id: "atolls", name: "Coral Atolls", icon: "🐚", desc: "Ring-shaped reefs around turquoise lagoons.", shallow: 0x3fe0d0, erosion: 0.3,
+            sky: "day", water: 0, cloudHeight: 2000, cloudAmount: 1.1, trees: {kind: "palm", count: 3200, min: 2, max: 140},
+            carrier: {x: -5200, z: -3800, rot: 1.1},
+            rings: [[-2600, 1800, 1700], [3600, -1400, 2100], [600, -5600, 1300], [-5800, -2000, 1100], [5200, 4600, 1500], [-1200, 6200, 1200]],
+            height(n, x, z) {
+                let h = -260 + n.fbm(x / 3000, z / 3000) * 120;
+                for (const [cx, cz, r] of this.rings) {
+                    const d = Math.hypot(x - cx, z - cz), wob = (n.fbm(x / 600, z / 600, 3) - 0.5) * 320;
+                    const ring = Math.exp(-Math.pow(d - r - wob, 2) / (2 * 140 * 140));
+                    const lagoon = d < r ? -24 + 10 * n.fbm(x / 400, z / 400, 2) : -260;
+                    h = Math.max(h, mix(lagoon, 28 + n.fbm(x / 250, z / 250, 2) * 26, ring));
+                }
+                return h;
+            },
+            color(h, slope, n, x, z) {
+                if (h < 0) return 0xd9cfa4;
+                if (h < 12) return 0xeadcae;
+                return n.fbm(x / 300, z / 300, 2) > 0.5 ? 0x4f9a46 : 0x5aa84e;
+            },
+        },
+        {
+            id: "highlands", name: "Highland Lochs", icon: "🏞", desc: "Misty green hills cut by long, dark lochs.", shallow: 0x3d5a5a,
+            sky: "overcast", water: 0, cloudHeight: 1700, cloudAmount: 1.4, trees: {kind: "pine", count: 4200, min: 10, max: 600}, rock: 0x6a6a62,
+            height(n, x, z) {
+                let h = (n.fbm(x / 2800, z / 2800) - 0.3) * 1100 + Math.pow(n.ridge(x / 5200 - 4, z / 5200 + 6, 4), 2) * 600;
+                const loch = Math.abs(n.fbm(x / 11000 + 40, z / 3200 - 12, 3) - 0.5);
+                h = mix(-90, h, smoothstep(0.015, 0.07, loch));
+                return h + rim(x, z, 0.8, 1500);
+            },
+            color(h, slope, n, x, z) {
+                if (h < 4) return 0x6f6a55;
+                if (slope > 0.8) return 0x6a6a62;
+                const p = n.fbm(x / 650, z / 650, 2);
+                if (h > 450 && p > 0.62) return 0x6f6268;
+                return p > 0.45 ? 0x5d7a3a : 0x4e6c33;
+            },
+        },
+        {
+            id: "ashlands", name: "Ash Wastes", icon: "🌋", desc: "Black lava plains around a smoking caldera.",
+            sky: "dusk", water: -9999, cloudHeight: 3000, cloudAmount: 0.7, trees: {kind: "pine", count: 400, min: 0, max: 400}, rock: 0x2e2a28,
+            height(n, x, z) {
+                let h = 80 + (n.fbm(x / 3000, z / 3000) - 0.4) * 400;
+                h += Math.pow(n.ridge(x / 2200 + 3, z / 2200 + 3, 4), 4) * 300;
+                const d = Math.hypot(x - 800, z + 1200);
+                const cone = 2100 * Math.exp(-d * d / (2 * 2600 * 2600));
+                const caldera = d < 700 ? (700 - d) * 1.6 : 0;
+                return Math.max(h, cone - caldera) + rim(x, z, 0.82, 1600);
+            },
+            color(h, slope, n, x, z) {
+                const d = Math.hypot(x - 800, z + 1200);
+                if (d < 900 && h > 1200) return 0x6b3a26;
+                if (slope > 0.7) return 0x2e2a28;
+                const a = n.fbm(x / 500, z / 500, 2);
+                return a > 0.6 ? 0x5a5652 : a > 0.4 ? 0x3a3634 : 0x45403c;
+            },
+        },
     ];
 
     const SKIES = {
