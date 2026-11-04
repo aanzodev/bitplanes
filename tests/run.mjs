@@ -138,7 +138,7 @@ async function run() {
         await ctx.addInitScript(() => localStorage.setItem("daily", JSON.stringify({last: new Date().toLocaleDateString("en-CA"), streak: 1})));
         await ctx.route(/one-line-test\.html/, r => r.fulfill({contentType: "text/html",
             body: `<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${base}js/loader.js"></script></body></html>`}));
-        if (blockFlightMode) await ctx.route(/js\/flightmode\/deploy\.js/, r => r.abort());
+        if (blockFlightMode) await ctx.route(/js\/flightmode\/session\.js/, r => r.abort());
         const p = await ctx.newPage();
         p.errors = [];
         p.on("pageerror", e => p.errors.push(e.message));
@@ -411,8 +411,8 @@ async function run() {
         await p.evaluate(() => (document.querySelector('input[value="flightmode"]').checked = true));
         await p.click(".play-btn");
         await p.waitForTimeout(300);
-        const menu = await p.evaluate(() => !!document.querySelector(".df-deploy"));
-        await p.waitForFunction(() => BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        const menu = await p.evaluate(() => !!document.querySelector(".fm-overlay"));
+        await p.waitForFunction(() => BitFlightMode.state() && !document.querySelector(".fm-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
             const g = BitFlightMode.state();
             return {menu: false, teams: g.match.teams, planes: g.planes.length, map: g.setup.map};
@@ -426,7 +426,7 @@ async function run() {
         for (const id of ["f16", "spitfire", "camel"]) {
             await p.evaluate(id => (BitMarket.give(id), BitMarket.selectPlane(id)), id);
             await p.evaluate(() => BitFlightMode.start({map: "farmlands", sky: "day", mode: "team", size: 2, difficulty: "normal"}));
-            await p.waitForFunction(() => BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+            await p.waitForFunction(() => BitFlightMode.state() && !document.querySelector(".fm-loading"), null, {timeout: 120000});
             out.push(await p.evaluate(() => {
                 const g = BitFlightMode.state(), pl = g.player;
                 pl.setCockpit(true);
@@ -448,7 +448,7 @@ async function run() {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => (BitMarket.give("f16"), BitMarket.selectPlane("f16")));
         await p.evaluate(() => BitFlightMode.start({map: "alpine", mode: "team", size: 4, difficulty: "normal"}));
-        await p.waitForFunction(() => window.BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.waitForFunction(() => window.BitFlightMode.state() && !document.querySelector(".fm-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
             const D = BitFlightMode, g = D.state(), pl = g.player;
             g.paused = true;
@@ -509,7 +509,7 @@ async function run() {
             out.respawned = pl.alive;
             g.match.blue = g.match.goal;
             D.advance(0.1);
-            out.results = !document.querySelector(".df-results").hidden;
+            out.results = !document.querySelector(".fm-results").hidden;
             return out;
         });
         for (const [k, v] of Object.entries(r)) check(v, k + " failed: " + JSON.stringify(r));
@@ -518,7 +518,7 @@ async function run() {
     await test("flightmode", "computer pilots fight (kills in 60 s, few crashes)", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => BitFlightMode.start({map: "canyon", mode: "team", size: 6, difficulty: "hard"}));
-        await p.waitForFunction(() => window.BitFlightMode.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        await p.waitForFunction(() => window.BitFlightMode.state() && !document.querySelector(".fm-loading"), null, {timeout: 120000});
         const r = await p.evaluate(() => {
             const D = BitFlightMode, g = D.state(), pl = g.player;
             g.paused = true;

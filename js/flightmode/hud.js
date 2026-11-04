@@ -15,65 +15,65 @@
 
     D.makeHud = function (root) {
         const hud = document.createElement("div");
-        hud.className = "df-hud";
+        hud.className = "fm-hud";
         hud.innerHTML = `
-            <div class="df-top">
-                <div class="df-teams">
-                    <div class="df-team blue"><b class="df-blue">0</b><span><i class="df-blue-bar"></i></span></div>
-                    <div class="df-clock">10:00</div>
-                    <div class="df-team red"><span><i class="df-red-bar"></i></span><b class="df-red">0</b></div>
+            <div class="fm-top">
+                <div class="fm-teams">
+                    <div class="fm-team blue"><b class="fm-blue">0</b><span><i class="fm-blue-bar"></i></span></div>
+                    <div class="fm-clock">10:00</div>
+                    <div class="fm-team red"><span><i class="fm-red-bar"></i></span><b class="fm-red">0</b></div>
                 </div>
-                <div class="df-goal"></div>
+                <div class="fm-goal"></div>
             </div>
-            <div class="df-feed"></div>
-            <div class="df-marks"></div>
-            <div class="df-dmg"></div>
-            <div class="df-cross"><i></i></div>
-            <div class="df-lead" hidden></div>
-            <div class="df-lockbox" hidden><i></i><span></span></div>
-            <div class="df-hitmark" hidden></div>
-            <div class="df-warn"></div>
-            <div class="df-ribbons"></div>
-            <div class="df-msg"></div>
-            <div class="df-killcam" hidden></div>
-            <canvas class="df-radar" width="200" height="200"></canvas>
-            <div class="df-panel">
-                <div class="df-hp-row"><span class="df-plane"></span><b class="df-hp">100%</b></div>
-                <div class="df-bar df-health"><i></i></div>
-                <div class="df-nums">
-                    <div><b class="df-speed">0</b><small>KM/H</small></div>
-                    <div><b class="df-alt">0</b><small>ALT M</small></div>
-                    <div><b class="df-gs">1.0</b><small>G</small></div>
+            <div class="fm-feed"></div>
+            <div class="fm-marks"></div>
+            <div class="fm-dmg"></div>
+            <div class="fm-cross"><i></i></div>
+            <div class="fm-lead" hidden></div>
+            <div class="fm-lockbox" hidden><i></i><span></span></div>
+            <div class="fm-hitmark" hidden></div>
+            <div class="fm-warn"></div>
+            <div class="fm-ribbons"></div>
+            <div class="fm-msg"></div>
+            <div class="fm-killcam" hidden></div>
+            <canvas class="fm-radar" width="200" height="200"></canvas>
+            <div class="fm-panel">
+                <div class="fm-hp-row"><span class="fm-plane"></span><b class="fm-hp">100%</b></div>
+                <div class="fm-bar fm-health"><i></i></div>
+                <div class="fm-nums">
+                    <div><b class="fm-speed">0</b><small>KM/H</small></div>
+                    <div><b class="fm-alt">0</b><small>ALT M</small></div>
+                    <div><b class="fm-gs">1.0</b><small>G</small></div>
                 </div>
-                <div class="df-row"><small>THR</small><div class="df-bar df-throttle"><i></i></div></div>
-                <div class="df-row"><small>BOOST</small><div class="df-bar df-boost"><i></i></div></div>
-                <div class="df-weapons">
-                    <div><small>GUNS</small><b class="df-ammo">0</b></div>
-                    <div><small>MISSILES</small><b class="df-missiles">0</b></div>
-                    <div><small>COUNTER&shy;MEASURES</small><b class="df-flares">0</b></div>
+                <div class="fm-row"><small>THR</small><div class="fm-bar fm-throttle"><i></i></div></div>
+                <div class="fm-row"><small>BOOST</small><div class="fm-bar fm-boost"><i></i></div></div>
+                <div class="fm-weapons">
+                    <div><small>GUNS</small><b class="fm-ammo">0</b></div>
+                    <div><small>MISSILES</small><b class="fm-missiles">0</b></div>
+                    <div><small>COUNTER&shy;MEASURES</small><b class="fm-flares">0</b></div>
                 </div>
-                <div class="df-repair"></div>
+                <div class="fm-repair"></div>
             </div>
-            <div class="df-score"></div>
-            <div class="df-fps" hidden></div>
-            <div class="df-vignette"></div>
-            <div class="df-blackout"></div>
-            <div class="df-board" hidden></div>
-            <div class="df-pause" hidden>
-                <div class="df-pause-box">
+            <div class="fm-score"></div>
+            <div class="fm-fps" hidden></div>
+            <div class="fm-vignette"></div>
+            <div class="fm-blackout"></div>
+            <div class="fm-board" hidden></div>
+            <div class="fm-pause" hidden>
+                <div class="fm-pause-box">
                     <h2>Paused</h2>
-                    <div class="df-pause-buttons">
-                        <button type="button" class="btn df-resume">▶ Resume</button>
-                        <button type="button" class="btn df-settings">⚙ Settings</button>
-                        <button type="button" class="btn df-leave">Leave to lobby</button>
+                    <div class="fm-pause-buttons">
+                        <button type="button" class="btn fm-resume">▶ Resume</button>
+                        <button type="button" class="btn fm-settings">⚙ Settings</button>
+                        <button type="button" class="btn fm-leave">Leave to lobby</button>
                     </div>
-                    <table class="df-keys"></table>
+                    <table class="fm-keys"></table>
                 </div>
             </div>
-            <div class="df-results" hidden></div>`;
+            <div class="fm-results" hidden></div>`;
         root.appendChild(hud);
         const $ = s => hud.querySelector(s);
-        const radar = $(".df-radar").getContext("2d");
+        const radar = $(".fm-radar").getContext("2d");
         const marks = new Map();
         let hitT = 0, killT = 0, msgUntil = 0;
 
@@ -81,9 +81,9 @@
             let m = marks.get(plane);
             if (!m) {
                 m = document.createElement("div");
-                m.className = "df-box";
+                m.className = "fm-box";
                 m.innerHTML = `<i></i><span></span>`;
-                $(".df-marks").appendChild(m);
+                $(".fm-marks").appendChild(m);
                 marks.set(plane, m);
             }
             return m;
@@ -97,34 +97,34 @@
         const api = {
             el: hud,
             pause(show) {
-                $(".df-pause").hidden = !show;
-                if (show) $(".df-keys").innerHTML = keyList();
+                $(".fm-pause").hidden = !show;
+                if (show) $(".fm-keys").innerHTML = keyList();
             },
-            onResume: fn => $(".df-resume").addEventListener("click", fn),
-            onLeave: fn => $(".df-leave").addEventListener("click", fn),
-            onSettings: fn => $(".df-settings").addEventListener("click", fn),
+            onResume: fn => $(".fm-resume").addEventListener("click", fn),
+            onLeave: fn => $(".fm-leave").addEventListener("click", fn),
+            onSettings: fn => $(".fm-settings").addEventListener("click", fn),
 
             message(text, ms = 2500) {
-                $(".df-msg").innerHTML = text;
+                $(".fm-msg").innerHTML = text;
                 msgUntil = performance.now() + ms;
             },
 
             feed(html) {
                 const div = document.createElement("div");
                 div.innerHTML = html;
-                $(".df-feed").prepend(div);
+                $(".fm-feed").prepend(div);
                 setTimeout(() => div.remove(), 7000);
-                while ($(".df-feed").children.length > 6) $(".df-feed").lastChild.remove();
+                while ($(".fm-feed").children.length > 6) $(".fm-feed").lastChild.remove();
             },
 
             ribbon(points, text, big) {
                 const div = document.createElement("div");
-                div.className = "df-ribbon" + (big ? " big" : "");
+                div.className = "fm-ribbon" + (big ? " big" : "");
                 div.innerHTML = `${points ? `<b>+${points}</b> ` : ""}${esc(text)}`;
-                $(".df-ribbons").prepend(div);
+                $(".fm-ribbons").prepend(div);
                 setTimeout(() => div.classList.add("out"), 2600);
                 setTimeout(() => div.remove(), 3200);
-                while ($(".df-ribbons").children.length > 5) $(".df-ribbons").lastChild.remove();
+                while ($(".fm-ribbons").children.length > 5) $(".fm-ribbons").lastChild.remove();
             },
 
             hit() {
@@ -136,106 +136,106 @@
             },
 
             hurt(angle) {
-                const v = $(".df-vignette");
+                const v = $(".fm-vignette");
                 v.classList.remove("on");
                 void v.offsetWidth;
                 v.classList.add("on");
                 if (angle === undefined) return;
                 const a = document.createElement("i");
                 a.style.transform = `rotate(${angle}rad)`;
-                $(".df-dmg").appendChild(a);
+                $(".fm-dmg").appendChild(a);
                 setTimeout(() => a.remove(), 900);
             },
 
             killcam(html) {
-                const k = $(".df-killcam");
+                const k = $(".fm-killcam");
                 k.hidden = !html;
                 if (html) k.innerHTML = html;
             },
 
             scoreboard(show, teams) {
-                const b = $(".df-board");
+                const b = $(".fm-board");
                 b.hidden = !show;
                 if (!show) return;
-                const table = (list, cls, title) => `<div class="df-board-team ${cls}"><h3>${title}</h3><table>
+                const table = (list, cls, title) => `<div class="fm-board-team ${cls}"><h3>${title}</h3><table>
                     <tr><th>Pilot</th><th>Plane</th><th>E</th><th>D</th><th>Score</th></tr>
                     ${list.sort((a, b) => b.score - a.score || b.kills - a.kills).map(p => `<tr class="${p.isPlayer ? "me" : ""}"><td>${esc(p.name)}</td><td>${esc(p.label)}</td><td>${p.kills}</td><td>${p.deaths}</td><td>${p.score}</td></tr>`).join("")}</table></div>`;
                 b.innerHTML = teams.length > 1 ? table(teams[0].list, "blue", teams[0].name) + table(teams[1].list, "red", teams[1].name) : table(teams[0].list, "ffa", teams[0].name);
             },
 
             results(html, onAgain, onLeave) {
-                const r = $(".df-results");
+                const r = $(".fm-results");
                 r.hidden = !html;
                 if (!html) return;
                 r.innerHTML = html;
-                r.querySelector(".df-again").addEventListener("click", onAgain);
-                r.querySelector(".df-out").addEventListener("click", onLeave);
+                r.querySelector(".fm-again").addEventListener("click", onAgain);
+                r.querySelector(".fm-out").addEventListener("click", onLeave);
             },
 
             update(dt, s) {
                 const {player: p, planes, camera, width: W, height: H, lock, time} = s;
-                if (performance.now() > msgUntil) $(".df-msg").innerHTML = "";
+                if (performance.now() > msgUntil) $(".fm-msg").innerHTML = "";
                 hud.classList.toggle("in-cockpit", !!s.cockpit);
                 const m = s.match;
                 const clock = Math.max(0, Math.ceil(m.timeLeft));
-                $(".df-clock").textContent = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, "0")}`;
+                $(".fm-clock").textContent = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, "0")}`;
                 if (m.teams) {
-                    $(".df-blue").textContent = m.blue;
-                    $(".df-red").textContent = m.red;
-                    $(".df-blue-bar").style.width = Math.min(100, 100 * m.blue / m.goal) + "%";
-                    $(".df-red-bar").style.width = Math.min(100, 100 * m.red / m.goal) + "%";
-                    $(".df-goal").textContent = `First to ${m.goal} eliminations`;
+                    $(".fm-blue").textContent = m.blue;
+                    $(".fm-red").textContent = m.red;
+                    $(".fm-blue-bar").style.width = Math.min(100, 100 * m.blue / m.goal) + "%";
+                    $(".fm-red-bar").style.width = Math.min(100, 100 * m.red / m.goal) + "%";
+                    $(".fm-goal").textContent = `First to ${m.goal} eliminations`;
                 } else {
-                    $(".df-blue").textContent = p.kills;
-                    $(".df-red").textContent = m.leader;
-                    $(".df-blue-bar").style.width = Math.min(100, 100 * p.kills / m.goal) + "%";
-                    $(".df-red-bar").style.width = Math.min(100, 100 * m.leader / m.goal) + "%";
-                    $(".df-goal").textContent = `You vs the leader · first to ${m.goal}`;
+                    $(".fm-blue").textContent = p.kills;
+                    $(".fm-red").textContent = m.leader;
+                    $(".fm-blue-bar").style.width = Math.min(100, 100 * p.kills / m.goal) + "%";
+                    $(".fm-red-bar").style.width = Math.min(100, 100 * m.leader / m.goal) + "%";
+                    $(".fm-goal").textContent = `You vs the leader · first to ${m.goal}`;
                 }
-                $(".df-score").innerHTML = `Score <b>${p.score}</b> · E <b>${p.kills}</b> · D <b>${p.deaths}</b> · <i class="coin"></i> +${s.coins}`;
+                $(".fm-score").innerHTML = `Score <b>${p.score}</b> · E <b>${p.kills}</b> · D <b>${p.deaths}</b> · <i class="coin"></i> +${s.coins}`;
 
                 const hp = Math.max(0, p.health) / p.maxHealth;
-                $(".df-plane").textContent = p.label;
-                $(".df-hp").textContent = Math.ceil(hp * 100) + "%";
-                $(".df-health i").style.width = hp * 100 + "%";
-                $(".df-health").className = "df-bar df-health " + (hp > 0.6 ? "good" : hp > 0.3 ? "ok" : "bad");
-                $(".df-speed").textContent = Math.round(p.speed * 3.6);
-                $(".df-alt").textContent = Math.round(Math.max(0, p.pos.y));
-                $(".df-gs").textContent = p.g.toFixed(1);
-                $(".df-gs").className = "df-gs" + (p.g > 7 ? " hot" : "");
-                $(".df-throttle i").style.width = Math.round(p.throttle * 100) + "%";
-                $(".df-boost i").style.width = Math.round(100 * p.boost / p.maxBoost) + "%";
-                $(".df-boost").classList.toggle("on", !!p.boosting);
-                $(".df-ammo").textContent = p.reloadAt ? "RELOAD" : p.ammo;
-                $(".df-missiles").textContent = p.missiles ? p.missiles : p.missileReloadAt ? `${Math.ceil(p.missileReloadAt - time)}s` : "0";
-                $(".df-flares").textContent = p.flares ? p.flares : p.flareReloadAt ? `${Math.ceil(p.flareReloadAt - time)}s` : "0";
-                $(".df-repair").innerHTML = s.repair || "";
-                $(".df-warn").innerHTML = s.warning || "";
+                $(".fm-plane").textContent = p.label;
+                $(".fm-hp").textContent = Math.ceil(hp * 100) + "%";
+                $(".fm-health i").style.width = hp * 100 + "%";
+                $(".fm-health").className = "fm-bar fm-health " + (hp > 0.6 ? "good" : hp > 0.3 ? "ok" : "bad");
+                $(".fm-speed").textContent = Math.round(p.speed * 3.6);
+                $(".fm-alt").textContent = Math.round(Math.max(0, p.pos.y));
+                $(".fm-gs").textContent = p.g.toFixed(1);
+                $(".fm-gs").className = "fm-gs" + (p.g > 7 ? " hot" : "");
+                $(".fm-throttle i").style.width = Math.round(p.throttle * 100) + "%";
+                $(".fm-boost i").style.width = Math.round(100 * p.boost / p.maxBoost) + "%";
+                $(".fm-boost").classList.toggle("on", !!p.boosting);
+                $(".fm-ammo").textContent = p.reloadAt ? "RELOAD" : p.ammo;
+                $(".fm-missiles").textContent = p.missiles ? p.missiles : p.missileReloadAt ? `${Math.ceil(p.missileReloadAt - time)}s` : "0";
+                $(".fm-flares").textContent = p.flares ? p.flares : p.flareReloadAt ? `${Math.ceil(p.flareReloadAt - time)}s` : "0";
+                $(".fm-repair").innerHTML = s.repair || "";
+                $(".fm-warn").innerHTML = s.warning || "";
 
                 hitT -= dt;
                 killT -= dt;
-                const hm = $(".df-hitmark");
+                const hm = $(".fm-hitmark");
                 hm.hidden = hitT <= 0 && killT <= 0;
-                hm.className = "df-hitmark" + (killT > 0 ? " kill" : "");
+                hm.className = "fm-hitmark" + (killT > 0 ? " kill" : "");
 
-                $(".df-blackout").style.opacity = Math.min(0.85, s.blackout || 0);
+                $(".fm-blackout").style.opacity = Math.min(0.85, s.blackout || 0);
                 hud.classList.toggle("low-hp", p.alive && hp < 0.3);
 
-                const cross = $(".df-cross");
+                const cross = $(".fm-cross");
                 if (p.alive && !s.deadView) {
                     const c = project(p.pos.clone().addScaledVector(p.forward, 600), camera, W, H);
                     cross.style.transform = `translate(${c.x}px, ${c.y}px)`;
                     cross.style.visibility = c.on ? "visible" : "hidden";
                 } else cross.style.visibility = "hidden";
 
-                const lead = $(".df-lead");
+                const lead = $(".fm-lead");
                 if (s.lead && p.alive && !s.deadView) {
                     const c = project(s.lead, camera, W, H);
                     lead.hidden = !c.on;
                     lead.style.transform = `translate(${c.x}px, ${c.y}px)`;
                 } else lead.hidden = true;
 
-                const lb = $(".df-lockbox");
+                const lb = $(".fm-lockbox");
                 if (lock && lock.target && p.alive && !s.deadView) {
                     const c = project(lock.target.pos, camera, W, H);
                     lb.hidden = !c.on;
@@ -265,13 +265,13 @@
                     const span = mk.querySelector("span");
                     if (span.innerHTML !== label) span.innerHTML = label;
                     if (c.on) {
-                        mk.className = "df-box" + (friend ? " friend" : " foe") + (lock && lock.target === e ? " target" : "") + (dist > 3000 && !(lock && lock.target === e) ? " far" : "");
+                        mk.className = "fm-box" + (friend ? " friend" : " foe") + (lock && lock.target === e ? " target" : "") + (dist > 3000 && !(lock && lock.target === e) ? " far" : "");
                         mk.style.transform = `translate(${c.x}px, ${c.y}px)`;
                     } else if (!friend) {
                         let x = c.px, y = c.py;
                         if (c.z > 1) [x, y] = [-x, -y];
                         const ang = Math.atan2(-y, x), r = Math.min(W, H) * 0.42;
-                        mk.className = "df-box df-arrow";
+                        mk.className = "fm-box fm-arrow";
                         mk.style.transform = `translate(${W / 2 + Math.cos(ang) * r}px, ${H / 2 + Math.sin(ang) * r}px) rotate(${ang}rad)`;
                     } else mk.style.display = "none";
                 }
