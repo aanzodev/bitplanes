@@ -17,64 +17,6 @@
     }
     D.pickSetup = pickSetup;
 
-    D.showDeploy = function (go) {
-        const S = window.BitSettings;
-        const el = document.createElement("div");
-        el.className = "df-deploy";
-        document.body.appendChild(el);
-        const shop = window.BitShop, plane = shop && shop.selected();
-        el.innerHTML = `<div class="df-deploy-box">
-            <div class="df-deploy-head"><h2>Flight Sessions <span class="beta-tag">Beta</span></h2>
-                <button type="button" class="df-x" aria-label="Back to the lobby">×</button></div>
-            <div class="df-summary">
-                <div><span>🛩</span><b>Team Flight</b><small>Blue vs red</small></div>
-                <div><span>👥</span><b>6 v 6</b><small>You and 5 wingmen</small></div>
-                <div><span>🎲</span><b>Random environment</b><small>One of ${D.MAPS.length}</small></div>
-                <div><span>🌗</span><b>Random lighting</b><small>Dawn to night</small></div>
-            </div>
-            <div class="df-pool">${D.MAPS.map(m => `<span title="${m.name}: ${m.desc}">${m.icon} ${m.name}</span>`).join("")}</div>
-            <div class="df-deploy-foot">
-                <div class="df-your-plane">${plane ? `<img src="${window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(plane), true, plane.skin, shop.patternOf(plane)) : ""}" alt="">
-                    <div><small>Selected Aircraft</small><b>${plane.name}</b></div>` : ""}
-                    <button type="button" class="pill df-hangar">Aircraft Selection</button>
-                    <button type="button" class="pill df-set">⚙ Settings</button></div>
-                <p class="df-tip">Blue team vs red team. First team to the score goal wins, or the most points in 10 minutes.</p>
-                <button type="button" class="btn df-go">Enter Session</button>
-            </div>
-        </div>`;
-
-        function close() {
-            el.remove();
-            document.removeEventListener("keydown", onKey, true);
-        }
-        function onKey(ev) {
-            if (ev.key === "Escape" && !(S && S.isOpen())) {
-                ev.stopImmediatePropagation();
-                close();
-            }
-            if (ev.key === "Enter" && !(S && S.isOpen())) {
-                ev.preventDefault();
-                el.querySelector(".df-go").click();
-            }
-        }
-        el.addEventListener("click", ev => {
-            const t = ev.target;
-            if (t === el || t.closest(".df-x")) return close();
-            if (t.closest(".df-hangar")) {
-                close();
-                const h = document.querySelector(".open-shop");
-                if (h) h.click();
-                return;
-            }
-            if (t.closest(".df-set") && S) return S.show("general");
-            if (t.closest(".df-go")) {
-                close();
-                return go(pickSetup());
-            }
-        });
-        document.addEventListener("keydown", onKey, true);
-        return close;
-    };
     D.makeChute = function (THREE, skin) {
         const s = skin || {jacket: "#6b7a4b", pants: "#4a4f3a", capColor: "#7b4a2a", skin: "#f1c27d", scarf: "#f2f2f2", gloves: "#5a3b22"};
         const mat = c => new THREE.MeshLambertMaterial({color: c, flatShading: true});

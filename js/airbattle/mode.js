@@ -117,7 +117,7 @@
         if (fight) return;
         const a = access();
         if (!a.ok) return showLocked(a);
-        D.showDeploy(start);
+        start(D.pickSetup());
     }
 
     async function start(setup) {

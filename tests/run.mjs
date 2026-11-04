@@ -272,11 +272,16 @@ async function run() {
         check(r.level >= 6 && r.coins > 0, JSON.stringify(r));
     });
 
-    await test("career", "Air Battle stays locked until level 10 or a special plane", async open => {
+    await test("career", "Flight Sessions unlocks at level 10 or with a special plane (either one)", async open => {
         const a = await open();
         check(!(await a.evaluate(() => BitAirBattle.access().ok)), "new player can play Air Battle");
         const b = await open({storage: {shop: {coins: 0, owned: ["classic", "mig21"], selected: "classic", upgrades: {}, paint: {}, pattern: {}}}});
         check(await b.evaluate(() => BitAirBattle.access().ok), "MiG-21 owner is locked out");
+        const c = await open({storage: {progress: {xp: 9000, rewardedLevel: 10}}});
+        const lv = await c.evaluate(() => [BitProgress.levelInfo().level, BitAirBattle.access().ok, BitShop.state().owned.length]);
+        check(lv[0] === 10 && lv[1] && lv[2] === 1, "level 10 without a special plane is locked out: " + JSON.stringify(lv));
+        const d = await open({storage: {progress: {xp: 8999, rewardedLevel: 9}}});
+        check(!(await d.evaluate(() => BitAirBattle.access().ok)), "level 9 without a special plane can play");
     });
 
     await test("sound", "every plane's guns sound different", async open => {
@@ -398,6 +403,21 @@ async function run() {
             return {wrong, repeats, maps: maps.size, all: D.MAPS.length, skies: skies.size};
         });
         check(!r.wrong && !r.repeats && r.all >= 11 && r.maps === r.all && r.skies === 6, JSON.stringify(r));
+    });
+
+    await test("airbattle", "PLAY goes straight into a session (no menu)", async open => {
+        const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
+        await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
+        await p.evaluate(() => (document.querySelector('input[value="airbattle"]').checked = true));
+        await p.click(".play-btn");
+        await p.waitForTimeout(300);
+        const menu = await p.evaluate(() => !!document.querySelector(".df-deploy"));
+        await p.waitForFunction(() => BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        const r = await p.evaluate(() => {
+            const g = BitAirBattle.state();
+            return {menu: false, teams: g.match.teams, planes: g.planes.length, map: g.setup.map};
+        });
+        check(!menu && r.teams && r.planes === 12, JSON.stringify(Object.assign(r, {menu})));
     });
 
     await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
