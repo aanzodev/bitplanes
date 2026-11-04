@@ -251,7 +251,7 @@
 
     function removeBot(p) {
         const world = m.world;
-        p.disableAI();
+        p.disableBot();
         const obj = p.object;
         if (obj) {
             obj.player = undefined;
@@ -278,7 +278,7 @@
         plane.move(vec(world.width * Math.random(), world.ground));
         world.participants.push(p);
         world.add(plane);
-        p.disableAI = e.require(19).a(world, p);
+        p.disableBot = e.require(19).a(world, p);
         tag(p);
     }
 
