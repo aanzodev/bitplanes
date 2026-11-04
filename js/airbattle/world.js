@@ -372,7 +372,7 @@
         const style = {canyon: {rock: 0.9, dry: 1}, islands: {rock: 0.3, dry: 0}, fjords: {rock: 0.15, dry: 0}, harbor: {rock: 0.35, dry: 0}, farmlands: {rock: 0.45, dry: 0.2}}[map.id] || {rock: 0.3, dry: 0};
         mat.onBeforeCompile = sh => {
             sh.uniforms.waterLevel = {value: map.water > -1000 ? map.water : -9999};
-            sh.uniforms.snowLevel = {value: map.id === "alpine" ? 1750 : map.id === "fjords" ? 250 : 99999};
+            sh.uniforms.snowLevel = {value: map.snowLevel !== undefined ? map.snowLevel : map.id === "alpine" ? 1750 : map.id === "fjords" ? 250 : 99999};
             sh.uniforms.rockTint = {value: style.rock};
             sh.uniforms.dry = {value: style.dry};
             sh.vertexShader = sh.vertexShader
@@ -422,7 +422,7 @@
             p.setXYZ(i, p.getX(i) * k, p.getY(i) * k * 0.7, p.getZ(i) * k);
         }
         geo.computeVertexNormals();
-        const color = map.id === "canyon" ? 0x8e4a2c : map.id === "fjords" ? 0x5a6066 : 0x6e6a63;
+        const color = map.rock !== undefined ? map.rock : map.id === "canyon" ? 0x8e4a2c : map.id === "fjords" ? 0x5a6066 : 0x6e6a63;
         const mat = fancy ? new THREE.MeshStandardMaterial({color, roughness: 0.9}) : new THREE.MeshLambertMaterial({color, flatShading: true});
         const rocks = new THREE.InstancedMesh(geo, mat, count);
         const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), v = new THREE.Vector3(), c = new THREE.Color();

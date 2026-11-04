@@ -382,6 +382,24 @@ async function run() {
         check(ok, JSON.stringify(r));
     });
 
+    await test("airbattle", "every session: Team Flight 6 v 6, random environment and lighting", async open => {
+        const p = await open();
+        const r = await p.evaluate(() => {
+            const D = BitAirBattle, maps = new Set(), skies = new Set();
+            let repeats = 0, last = "", wrong = 0;
+            for (let i = 0; i < 200; i++) {
+                const s = D.pickSetup();
+                if (s.mode !== "team" || s.size !== 6 || s.difficulty !== "normal" || !D.MAPS.some(m => m.id === s.map) || !D.SKIES[s.sky]) wrong++;
+                if (s.map === last) repeats++;
+                last = s.map;
+                maps.add(s.map);
+                skies.add(s.sky);
+            }
+            return {wrong, repeats, maps: maps.size, all: D.MAPS.length, skies: skies.size};
+        });
+        check(!r.wrong && !r.repeats && r.all >= 11 && r.maps === r.all && r.skies === 6, JSON.stringify(r));
+    });
+
     await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));

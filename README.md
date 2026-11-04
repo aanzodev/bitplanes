@@ -77,7 +77,7 @@ styles, scripts and images, with a loading screen that shows its progress.
 and **Guns** volume sliders, every key for Bit Planes
 and for Flight Sessions (two keys per action; Flight Sessions also takes mouse buttons),
 and the Flight Sessions options: graphics quality, starting camera, field of view,
-AI pilot skill, flying with the mouse, mouse sensitivity, inverted mouse or
+flying with the mouse, mouse sensitivity, inverted mouse or
 pitch keys, camera shake, keeping it smooth (Flight Sessions lowers its
 resolution by itself when frames get slow, and raises it again when there's
 room), and showing the frame rate. The **Controls** pop-up always lists your
@@ -296,11 +296,12 @@ a **special plane** (the black or gold bordered ones in Aircraft Selection: the 
 and the B-2). Until then the mode card says 🔒 Locked and shows how far you
 are.
 
-Pick **Flight Sessions** on the mode card and press **PLAY**. The session setup screen picks
-the **environment**, **lighting**, **Team Flight** (blue vs red, 4v4 to 8v8, first
-team to the score goal or the most takedowns in 10 minutes) or **Open Flight**,
-and how good the **AI Pilots** are (Beginner, Standard, Advanced, Expert). You fly your
-selected aircraft with its paint, speed, armor, real gun sound and upgrades.
+Pick **Flight Sessions** on the mode card and press **PLAY**, then **Enter
+Session**. Every session is **Team Flight, 6 v 6** (blue vs red, first team to
+the score goal or the most takedowns in 10 minutes) in a **random
+environment** (never the same one twice in a row) with **random lighting**.
+You fly your selected aircraft with its paint, speed, armor, real gun sound
+and upgrades.
 
 **Environments** (24 km across):
 
@@ -312,8 +313,14 @@ selected aircraft with its paint, speed, armor, real gun sound and upgrades.
 | 🧊 Arctic Fjords | Icy cliffs, narrow fjords and icebergs |
 | 🏙 Harbor City | Skyscrapers to fly between (their windows light up at dusk and night), a harbor and a carrier |
 | 🌾 Farmlands | Patchwork fields, red barns and silos, and a river |
+| 🦒 Savanna Plains | Golden grassland, rocky outcrops and a winding river |
+| ❄ Glacier Pass | Towering ice walls and a frozen pass between them |
+| 🐚 Coral Atolls | Ring-shaped reefs around turquoise lagoons, and a carrier |
+| 🏞 Highland Lochs | Misty green hills with heather, cut by long, dark lochs |
+| 🌋 Ash Wastes | Black lava plains around a smoking caldera |
 
-Each comes in Day, Dawn, Sunset, Overcast, Dusk or Night (stars and moon).
+Each session's lighting is picked at random: Day, Dawn, Sunset, Overcast, Dusk
+or Night (stars and moon).
 
 **Terrain:** every environment is worn down by simulated rain before you fly
 (hydraulic erosion: thousands of raindrops carve gullies and ravines into the
@@ -551,7 +558,7 @@ js/
     assets.js           Sprite file paths
     boot.js             …and boot.js starts the activity
   airbattle/            Flight Sessions (3D beta):
-    maps.js             The six environments and their lighting
+    maps.js             The 11 environments and their lighting
     world.js            Terrain, sky and water (GLSL), forests, city, carrier, clouds, shadows
     erosion.js          Loads erosion.wasm (rain wearing the terrain), JavaScript fallback
     erosion.wasm        Built from native/erosion.c
@@ -564,7 +571,7 @@ js/
     ai.js               Computer pilots
     audio.js            3D synthesized sound
     hud.js              The on-screen display, scoreboard and results
-    deploy.js           The session setup screen, and the parachuting pilot
+    deploy.js           The session screen (random environment and lighting), and the parachuting pilot
     mode.js             The session itself: teams, scoring, cameras, input
   vendor/peerjs.min.js, three.min.js
 assets/

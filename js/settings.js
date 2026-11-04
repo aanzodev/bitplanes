@@ -46,7 +46,6 @@ window.BitSettings = (function () {
         dfShake: true,
         dfAutoRes: true,
         dfShowFps: false,
-        dfDifficulty: "normal",
         keys2d: {},
         keysDf: {},
     };
@@ -194,7 +193,6 @@ window.BitSettings = (function () {
                 ${option("dfQuality", "Graphics", [["low", "Low (fastest)"], ["medium", "Medium"], ["high", "High (shadows, reflections, cinematic look)"], ["ultra", "Ultra (strong graphics card)"]])}
                 ${option("dfView", "Starting camera", [["chase", "Chase (third person)"], ["cockpit", "Cockpit (first person)"]])}
                 ${slider("dfFov", "Field of view", 55, 100, 1, v => v + "°")}
-                ${option("dfDifficulty", "AI Pilots", [["easy", "Beginner"], ["normal", "Standard"], ["hard", "Advanced"], ["ace", "Expert"]])}
                 ${check("dfMouse", "Fly with the mouse (Battlefield style: mouse pitches and rolls)")}
                 ${slider("dfMouseSens", "Mouse sensitivity", 0.3, 2.5, 0.05, v => Number(v).toFixed(2) + "×")}
                 ${check("dfInvertMouse", "Invert mouse up / down")}
