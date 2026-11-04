@@ -187,7 +187,7 @@ async function run() {
         }
     });
 
-    await test("one-line", "a blocked Flight Sessions file doesn't stop Bit Planes", async () => {
+    await test("one-line", "a blocked Flight Sessions file doesn't stop BitPlanes", async () => {
         const p = await oneLine(true);
         try {
             const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
@@ -195,7 +195,7 @@ async function run() {
             check(!r.failed && r.shop && !r.modes.includes("airbattle") && /Flight Sessions/.test(r.note), JSON.stringify(r));
             await p.click(".play-btn");
             await p.waitForTimeout(800);
-            check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "Bit Planes didn't start");
+            check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "BitPlanes didn't start");
         } finally {
             await p.context().close();
         }
@@ -575,7 +575,7 @@ const files = await staticServer();
 base = `http://127.0.0.1:${files.address().port}/`;
 relay = await relayServer();
 browser = await chromium.launch({args: GL});
-console.log("Bit Planes tests\n");
+console.log("BitPlanes tests\n");
 try {
     await run();
 } finally {

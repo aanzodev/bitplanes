@@ -84,7 +84,7 @@
                 <div class="df-lock-way"><b>⭐ Reach level ${a.need}</b>
                     <span>You're level ${a.level}${a.level < a.need ? ` · ${a.need - a.level} to go` : ""}</span>
                     <div class="df-lock-bar"><i style="width: ${Math.min(100, ((a.level - 1 + (info.frac || 0)) / (a.need - 1)) * 100)}%"></i></div>
-                    <small>XP comes from points, sessions and quests in Bit Planes.</small></div>
+                    <small>XP comes from eliminations, sessions and quests in BitPlanes.</small></div>
                 <div class="df-lock-way"><b>✈ Own a special plane</b>
                     <span>The jets with a black border in the Aircraft Market${a.cheapest ? `, from the ${a.cheapest.name} (${a.cheapest.price.toLocaleString()} credits)` : ""}.</span>
                     <small>You have ${coins.toLocaleString()} credits.</small>
@@ -243,7 +243,7 @@
         g.offSettings = window.BitSettings && window.BitSettings.onChange(applySettings);
         applySettings();
         loading.remove();
-        hud.message(`<b>${world.theme.name}</b><br>${teams ? `You fly for the <span class="df-blue-t">blue team</span>. First to ${g.match.goal} points wins.` : `Open Flight: first to ${g.match.goal} points.`}<br><small>Esc pauses · ${keyName("camera")} cockpit view · ${setting("dfMouse") ? "click to fly with the mouse" : "keys to fly"}</small>`, 6000);
+        hud.message(`<b>${world.theme.name}</b><br>${teams ? `You fly for the <span class="df-blue-t">blue team</span>. First to ${g.match.goal} eliminations wins.` : `Open Flight: first to ${g.match.goal} eliminations.`}<br><small>Esc pauses · ${keyName("camera")} cockpit view · ${setting("dfMouse") ? "click to fly with the mouse" : "keys to fly"}</small>`, 6000);
         loop();
     }
 
@@ -403,7 +403,7 @@
             g.hud.hit();
             g.audio.hitTick();
             if (st && kind === "gun") st.hits++;
-            if (kind === "missile") g.hud.ribbon(0, "Guided missile hit");
+            if (kind === "missile") g.hud.ribbon(0, "Missile hit");
         }
         if (target === g.player) {
             g.audio.clang();
@@ -423,7 +423,7 @@
     function flareSave(plane) {
         const g = fight;
         if (plane === g.player) {
-            g.hud.ribbon(25, "Guided missile evaded");
+            g.hud.ribbon(25, "Missile evaded");
             g.player.score += 25;
             const st = stats();
             if (st) st.dfFlareSaves++;
@@ -477,11 +477,11 @@
             g.lastKills = g.lastKills.filter(t => g.time - t < 5).concat(g.time);
             if (g.lastKills.length >= 2) {
                 g.player.score += 50 * (g.lastKills.length - 1);
-                g.hud.ribbon(50 * (g.lastKills.length - 1), g.lastKills.length === 2 ? "Double takedown" : g.lastKills.length === 3 ? "Triple takedown" : "Multi takedown", true);
+                g.hud.ribbon(50 * (g.lastKills.length - 1), g.lastKills.length === 2 ? "Double elimination" : g.lastKills.length === 3 ? "Triple elimination" : "Multi elimination", true);
             }
             if (how === "missile") {
                 g.player.score += 20;
-                g.hud.ribbon(20, "Guided missile takedown");
+                g.hud.ribbon(20, "Missile elimination");
             }
         }
         if (plane === g.player) {
@@ -585,7 +585,7 @@
         if (!p.alive || p.missiles <= 0) return;
         const locked = g.lock.target && g.lock.progress >= 1 ? g.lock.target : null;
         launch(p, locked);
-        if (!locked) g.hud.ribbon(0, "No lock: guided missile fired straight");
+        if (!locked) g.hud.ribbon(0, "No lock: missile fired straight");
         const st = stats();
         if (st) st.missiles++;
     }
@@ -664,13 +664,13 @@
             ${m.teams ? `<p class="df-final"><span class="df-blue-t">Blue ${m.blue}</span> · <span class="df-red-t">${m.red} Red</span></p>` : ""}
             <div class="df-res-grid">
                 <div><b>${p.score}</b><small>Score</small></div>
-                <div><b>${p.kills}</b><small>Points</small></div>
+                <div><b>${p.kills}</b><small>Eliminations</small></div>
                 <div><b>${p.deaths}</b><small>Deaths</small></div>
                 <div><b>+${xp.toLocaleString()}</b><small>XP</small></div>
                 <div><b>+${(g.coins + coins).toLocaleString()}</b><small>Credits</small></div>
             </div>
-            <p class="df-mvp">MVP: <b>${esc(mvp === p ? "You" : mvp.name)}</b> (${esc(mvp.label)}) · ${mvp.kills} points · ${mvp.score} score</p>
-            <table class="df-res-table"><tr><th>#</th><th>Pilot</th><th>Plane</th><th>P</th><th>D</th><th>Score</th></tr>
+            <p class="df-mvp">MVP: <b>${esc(mvp === p ? "You" : mvp.name)}</b> (${esc(mvp.label)}) · ${mvp.kills} eliminations · ${mvp.score} score</p>
+            <table class="df-res-table"><tr><th>#</th><th>Pilot</th><th>Plane</th><th>E</th><th>D</th><th>Score</th></tr>
                 ${ranked.slice(0, 8).map((x, i) => `<tr class="${x === p ? "me" : ""} ${x.team || ""}"><td>${i + 1}</td><td>${esc(x === p ? "You" : x.name)}</td><td>${esc(x.label)}</td><td>${x.kills}</td><td>${x.deaths}</td><td>${x.score}</td></tr>`).join("")}
             </table>
             <div class="df-res-buttons"><button type="button" class="btn df-again">Play again</button><button type="button" class="btn df-out">Back to the lobby</button></div>
@@ -772,7 +772,7 @@
             if (incoming.length) {
                 threat = "missile";
                 const near = incoming.reduce((a, b) => (a.mesh.position.distanceTo(p.pos) < b.mesh.position.distanceTo(p.pos) ? a : b));
-                warning = `<span class="df-warn-missile">GUIDED MISSILE · ${Math.round(near.mesh.position.distanceTo(p.pos))} m${p.flares > 0 ? ` · ${keyName("flare")} countermeasures` : " · break hard!"}</span>`;
+                warning = `<span class="df-warn-missile">MISSILE · ${Math.round(near.mesh.position.distanceTo(p.pos))} m${p.flares > 0 ? ` · ${keyName("flare")} countermeasures` : " · break hard!"}</span>`;
             } else if (p.lockedAt && g.time - p.lockedAt < 0.3) {
                 threat = "lock";
                 warning = `<span class="df-warn-lock">${p.lockedBy ? p.lockedBy.name + " is locking on" : "Locked on"}</span>`;

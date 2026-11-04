@@ -126,10 +126,10 @@
             },
         },
         match: {
-            args: "[skip]", help: "Multiplayer match phase and time (skip: next phase, host only)",
+            args: "[skip]", help: "Online Mode match phase and time (skip: next phase, host only)",
             run(a) {
                 const M = window.BitOnline && window.BitOnline.match, st = M && M.state;
-                if (!st || !st.phase) throw new Error("Not in a Multiplayer match.");
+                if (!st || !st.phase) throw new Error("Not in an Online Mode match.");
                 if (String(a[0] || "").toLowerCase() === "skip") {
                     if (!M.skip()) throw new Error("Only the host can skip.");
                     return print("Skipping to the next phase.", "ok");
@@ -142,7 +142,7 @@
             run() {
                 const s = window.BitStats.get();
                 if (!s) throw new Error("Stats aren't ready yet.");
-                print(`Points ${s.killed} · Deaths ${s.deaths} · Best streak ${s.bestStreak} · Hits ${s.hits}/${s.bullets} shots · Sessions ${s.matches}`, "dim");
+                print(`Eliminations ${s.killed} · Deaths ${s.deaths} · Best streak ${s.bestStreak} · Hits ${s.hits}/${s.bullets} projectiles · Sessions ${s.matches}`, "dim");
             },
         },
         daily: {
@@ -167,8 +167,8 @@
                 const S = window.BitSkins, q = String(a[0] || "").toLowerCase().replace(/[^a-z]/g, "");
                 const list = S.list.map(s => `${s.id}${S.state().owned.includes(s.id) ? " ✓" : ""}`).join(", ");
                 const s = S.list.find(x => x.id === q || x.name.toLowerCase().replace(/[^a-z]/g, "") === q);
-                if (!s) throw new Error("Skins: " + list);
-                if (!S.equip(s.id)) throw new Error(`You don't own ${s.name} yet (${s.price.toLocaleString()} credits in the Skins tab).`);
+                if (!s) throw new Error("Customization: " + list);
+                if (!S.equip(s.id)) throw new Error(`You don't own ${s.name} yet (${s.price.toLocaleString()} credits in the Customization tab).`);
                 print(`Wearing ${s.name}.`, "ok");
             },
         },
@@ -182,7 +182,7 @@
             },
         },
         refill: {
-            help: "Full ammo, guided missiles and countermeasures (single player)",
+            help: "Full ammo, missiles and countermeasures (single player)",
             run() {
                 const plane = needSinglePlayer();
                 plane.ammo = plane.maxAmmo;
@@ -193,7 +193,7 @@
             },
         },
         god: {
-            help: "Toggle: bullets can't shoot you down (single player)",
+            help: "Toggle: projectiles can't shoot you down (single player)",
             run() {
                 const plane = needSinglePlayer();
                 plane.godMode = !plane.godMode;
@@ -318,7 +318,7 @@
         fpsBox.className = "fps-counter";
         fpsBox.hidden = true;
         document.body.appendChild(fpsBox);
-        print('Bit Planes console. Type "help". Ctrl+Shift+K or ` to close.', "dim");
+        print('BitPlanes console. Type "help". Ctrl+Shift+K or ` to close.', "dim");
 
         window.addEventListener("keydown", ev => {
             const toggle = (ev.code === "KeyK" && ev.ctrlKey && ev.shiftKey) || (ev.code === "Backquote" && !ev.ctrlKey && !ev.altKey);
