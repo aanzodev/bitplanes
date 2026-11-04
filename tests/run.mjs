@@ -400,6 +400,21 @@ async function run() {
         check(!r.wrong && !r.repeats && r.all >= 11 && r.maps === r.all && r.skies === 6, JSON.stringify(r));
     });
 
+    await test("airbattle", "PLAY goes straight into a session (no menu)", async open => {
+        const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
+        await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));
+        await p.evaluate(() => (document.querySelector('input[value="airbattle"]').checked = true));
+        await p.click(".play-btn");
+        await p.waitForTimeout(300);
+        const menu = await p.evaluate(() => !!document.querySelector(".df-deploy"));
+        await p.waitForFunction(() => BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+        const r = await p.evaluate(() => {
+            const g = BitAirBattle.state();
+            return {menu: false, teams: g.match.teams, planes: g.planes.length, map: g.setup.map};
+        });
+        check(!menu && r.teams && r.planes === 12, JSON.stringify(Object.assign(r, {menu})));
+    });
+
     await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));

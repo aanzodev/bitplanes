@@ -296,8 +296,8 @@ a **special plane** (the black or gold bordered ones in Aircraft Selection: the 
 and the B-2). Until then the mode card says 🔒 Locked and shows how far you
 are.
 
-Pick **Flight Sessions** on the mode card and press **PLAY**, then **Enter
-Session**. Every session is **Team Flight, 6 v 6** (blue vs red, first team to
+Pick **Flight Sessions** on the mode card and press **PLAY**: you go straight
+into a session, no menu. Every session is **Team Flight, 6 v 6** (blue vs red, first team to
 the score goal or the most takedowns in 10 minutes) in a **random
 environment** (never the same one twice in a row) with **random lighting**.
 You fly your selected aircraft with its paint, speed, armor, real gun sound
@@ -571,7 +571,7 @@ js/
     ai.js               Computer pilots
     audio.js            3D synthesized sound
     hud.js              The on-screen display, scoreboard and results
-    deploy.js           The session screen (random environment and lighting), and the parachuting pilot
+    deploy.js           Picks each session's random environment and lighting, and the parachuting pilot
     mode.js             The session itself: teams, scoring, cameras, input
   vendor/peerjs.min.js, three.min.js
 assets/
