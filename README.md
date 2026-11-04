@@ -370,9 +370,33 @@ number.
 **Flying:** planes turn best near their corner speed, hard turns bleed speed,
 climbing costs speed and diving gains it, and too slow stalls. Click the
 screen to fly with the **mouse** (it pitches and rolls, like Battlefield), or
-use keys. **V** switches between the chase camera and the **cockpit**, with a
-live instrument panel (airspeed, altitude, artificial horizon, heading, G,
-throttle, health).
+use keys. **V** switches between the chase camera and the **cockpit**.
+
+**Cockpits** (`cockpit.js`, with GLSL shaders for the glass and displays):
+
+- **Jets:**
+  - A **head-up display** whose pitch ladder, horizon, heading tape,
+    flight-path marker and target box line up with the real world.
+  - Two **multifunction displays**: radar with the other planes and your lock,
+    and engine, stores and airframe health. Each has 20 push buttons.
+  - A green data display, warning lights (CAUTION, FIRE, STALL, LOCK, MSL,
+    LOW ALT, AB) and standby gauges.
+  - Side consoles with switches and knobs, a side stick and throttle that move
+    with your inputs, and rear-view mirrors.
+- **WWII fighters:**
+  - Six real-style gauges (two-needle altimeter, turn and slip with its ball),
+    plus oil and fuel.
+  - A reflector gunsight with a glowing reticle.
+  - A spade-grip control column, throttle quadrant, trim wheel, ribbed
+    cockpit-green walls and a rear-view mirror.
+- **Biplanes:** a wooden dashboard with brass gauges (and a pulsing oil
+  bubble), a padded leather rim, a small windscreen and the twin machine-gun
+  breeches in front of you.
+- **All of them:**
+  - Your legs and gloved hands in your skin's colours.
+  - Rudder pedals and a cockpit tub.
+  - Canopy glass with reflections, fine scratches, dust and sun glare.
+  - Instrument glass that catches the light.
 
 **Flight model (C++):** speed comes from real physics, written in C++ and
 compiled to WebAssembly (`native/flight.cpp`, with a matching JavaScript
@@ -566,7 +590,8 @@ js/
     flight.wasm         Built from native/flight.cpp
     post.js             Bloom, filmic tone mapping and color grading (High/Ultra)
     models.js           Realistic plane models (each real plane its own shape, moving controls)
-    aircraft.js         Cockpits with instruments, controls
+    aircraft.js         Planes in flight: controls, effects
+    cockpit.js          Detailed cockpits: HUD, displays, gauges, controls (GLSL glass, HUD glow, LCD)
     combat.js           Guns, guided missiles, countermeasures, GLSL particle effects, debris
     ai.js               Computer pilots
     audio.js            3D synthesized sound

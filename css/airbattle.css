@@ -1001,3 +1001,8 @@
 .df-fps[hidden] {
     display: none;
 }
+
+.in-cockpit .df-nums,
+.in-cockpit .df-row {
+    display: none;
+}
