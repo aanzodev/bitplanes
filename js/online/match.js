@@ -13,7 +13,7 @@
     function connect() {
         const url = O.serverUrl();
         return new Promise((resolve, reject) => {
-            if (!url) return reject(new Error("Multiplayer needs the online server (see js/online/config.js)."));
+            if (!url) return reject(new Error("Online Mode needs the online server (see js/online/config.js)."));
             let ws, v = 0, opened = false;
             try {
                 ws = new WebSocket(url);
@@ -37,7 +37,7 @@
                 if (!msg) return;
                 if (msg.op === "hello") {
                     v = msg.v || 0;
-                    if (v < 3) return fail("The online server needs its update for Multiplayer. Render installs it a few minutes after the change is merged.");
+                    if (v < 3) return fail("The online server needs its update for Online Mode. Render installs it a few minutes after the change is merged.");
                     if (v < 4) return done(null);
                     ws.send(JSON.stringify({op: "ping", t: performance.now()}));
                 } else if (msg.op === "pong") done(Math.round(performance.now() - msg.t));
@@ -189,8 +189,8 @@
         browser = document.createElement("div");
         browser.className = "servers panel-backdrop";
         browser.hidden = true;
-        browser.innerHTML = `<div class="panel" role="dialog" aria-label="Multiplayer servers">
-            <div class="shop-header"><h2>Multiplayer servers</h2><button type="button" class="close-shop srv-close" aria-label="Close">×</button></div>
+        browser.innerHTML = `<div class="panel" role="dialog" aria-label="Online Mode servers">
+            <div class="shop-header"><h2>Online Mode servers</h2><button type="button" class="close-shop srv-close" aria-label="Close">×</button></div>
             <p class="shop-note">Up to 10 real players per server; bots fill the empty spots. Ping is an estimate.</p>
             <div class="srv-tools">
                 <input type="text" class="srv-search" placeholder="Find a friend or server…" autocomplete="off" spellcheck="false">
@@ -455,7 +455,7 @@
                         ? `<img src="${window.bitPlaneImage(color, true, skin || undefined, pattern || "")}" alt="">` : "";
                     return `<tr class="${i === 0 ? "first" : ""}"><td class="rank">${["🥇", "🥈", "🥉", "4", "5"][i]}</td>
                         <td>${img}</td><td class="who">${nameHtml(r.name)}<small>${esc(r.plane || "")}</small></td>
-                        <td class="score"><b>${Number(r.kills) || 0}</b> points<small>${Number(r.deaths) || 0} deaths</small></td></tr>`;
+                        <td class="score"><b>${Number(r.kills) || 0}</b> eliminations<small>${Number(r.deaths) || 0} deaths</small></td></tr>`;
                 }).join("")}</table>
                 <p class="match-sub">Next lobby in ${Math.ceil(left / 1000)}</p>`;
         }

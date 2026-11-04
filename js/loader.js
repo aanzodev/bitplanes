@@ -51,7 +51,7 @@
             (radio.closest("div") || radio).remove();
         }
         const note = document.querySelector(".online-status");
-        if (note) note.textContent = "Flight Sessions (3D) couldn't load here. Bit Planes works as usual.";
+        if (note) note.textContent = "Flight Sessions (3D) couldn't load here. BitPlanes works as usual.";
     }
 
     function bodyReady() {
@@ -64,7 +64,7 @@
         const p = document.createElement("p");
         p.style.cssText = "font: bold 16px sans-serif; padding: 20px; color: #b3261e";
         const msg = err && err.name === "AbortError" ? "the download took too long" : (err && err.message) || String(err);
-        p.textContent = "Bit Planes could not load: " + msg;
+        p.textContent = "BitPlanes could not load: " + msg;
         const box = document.querySelector(".bit-load-box");
         if (box) {
             p.style.padding = "12px 0 0";
@@ -74,13 +74,13 @@
     }
 
     const TIPS = [
-        "Press <b>Space</b> to fire and <b>X</b> for a guided missile.",
-        "Press <b>Q</b> to drop countermeasures when a guided missile is on your tail.",
+        "Press <b>Space</b> to fire and <b>X</b> for a missile.",
+        "Press <b>Q</b> to drop countermeasures when a missile is on your tail.",
         "Press <b>C</b> to eject. Land at the barn to get a new plane.",
-        "Every takedown earns <b>50 credits</b> to spend in Aircraft Selection.",
+        "Every elimination earns <b>50 credits</b> to spend in Aircraft Selection.",
         "Claim your <b>daily reward</b> every day: day 7 pays 1,000 credits.",
         "Reach <b>level 10</b> or own a special jet to unlock Flight Sessions (3D).",
-        "Change any key in <b>⚙ Settings</b>, for both Bit Planes and Flight Sessions.",
+        "Change any key in <b>⚙ Settings</b>, for both BitPlanes and Flight Sessions.",
         "Quests reset every day and every week. Check them for extra credits and XP.",
         "In Flight Sessions, press <b>V</b> for the cockpit view.",
     ];
@@ -149,14 +149,14 @@
         el.className = "bit-load";
         const clouds = [[12, 38, 0], [30, 52, -20], [62, 44, -9], [80, 60, -33]]
             .map(([top, secs, delay]) => `<div class="bit-load-cloud" style="top: ${top}%; animation-duration: ${secs}s; animation-delay: ${delay}s"></div>`).join("");
-        el.innerHTML = `${clouds}<div class="bit-load-box" role="progressbar" aria-label="Loading Bit Planes" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        el.innerHTML = `${clouds}<div class="bit-load-box" role="progressbar" aria-label="Loading BitPlanes" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="bit-load-head"><div class="bit-load-logo">${PLANE_SVG}</div>
-                <div><h1>Loading Bit Planes</h1><p class="bit-load-step" aria-live="polite">Starting…</p></div></div>
+                <div><h1>Loading BitPlanes</h1><p class="bit-load-step" aria-live="polite">Starting…</p></div></div>
             <div class="bit-load-track"><div class="bit-load-fill"></div><div class="bit-load-plane">${PLANE_SVG}</div></div>
             <div class="bit-load-row"><span class="bit-load-file"></span><span class="bit-load-pct">0%</span></div>
             <ul class="bit-load-stages">
                 <li data-stage="page">Page and styles<small></small></li>
-                <li data-stage="core">Bit Planes<small></small></li>
+                <li data-stage="core">BitPlanes<small></small></li>
                 <li data-stage="air">Flight Sessions (3D)<small></small></li>
             </ul>
             <p class="bit-load-slow" hidden></p>
@@ -278,7 +278,7 @@
             const part = OPTIONAL.test(src) ? "air" : "core";
             if (part === "air" && missing.length) continue;
             stage(part, "active");
-            step(`${part === "air" ? "Flight Sessions (3D)" : "Bit Planes"}: file ${i + 1} of ${scripts.length}`,
+            step(`${part === "air" ? "Flight Sessions (3D)" : "BitPlanes"}: file ${i + 1} of ${scripts.length}`,
                 src.replace(/^.*\//, ""));
             try {
                 await loadScript(/^https?:/.test(src) ? src : base + src);

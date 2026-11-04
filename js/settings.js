@@ -7,7 +7,7 @@ window.BitSettings = (function () {
         {id: "pitchUp", name: "Turn ⟲ (nose up when flying right)", keys: ["ArrowLeft", "KeyA"]},
         {id: "pitchDown", name: "Turn ⟳ (nose down when flying right)", keys: ["ArrowRight", "KeyD"]},
         {id: "fire", name: "Fire the gun", keys: ["Space", ""]},
-        {id: "missile", name: "Fire a guided missile", keys: ["KeyX", ""]},
+        {id: "missile", name: "Fire a missile", keys: ["KeyX", ""]},
         {id: "flare", name: "Drop countermeasures", keys: ["KeyQ", ""]},
         {id: "eject", name: "Eject / parachute", keys: ["KeyC", ""]},
     ];
@@ -22,7 +22,7 @@ window.BitSettings = (function () {
         {id: "throttleDown", name: "Throttle down", keys: ["KeyS", ""]},
         {id: "boost", name: "Afterburner / boost (hold)", keys: ["ShiftLeft", "ShiftRight"]},
         {id: "fire", name: "Guns", keys: ["Space", "Mouse0"]},
-        {id: "missile", name: "Guided missile", keys: ["KeyX", "Mouse2"]},
+        {id: "missile", name: "Missile", keys: ["KeyX", "Mouse2"]},
         {id: "flare", name: "Countermeasures", keys: ["KeyQ", ""]},
         {id: "camera", name: "Switch camera (cockpit / chase)", keys: ["KeyV", ""]},
         {id: "look", name: "Free look (hold, then move the mouse)", keys: ["KeyC", ""]},
@@ -205,7 +205,7 @@ window.BitSettings = (function () {
             body.innerHTML = `
                 <p class="shop-note">Click a key, then press the new key${set === "keysDf" ? " or mouse button" : ""}. <kbd>Esc</kbd> cancels, <kbd>Backspace</kbd> clears.</p>
                 <table class="key-table"><tr><th>Action</th><th>Key</th><th>Second key</th></tr>${list.map(a => row(set, a)).join("")}</table>
-                <button type="button" class="pill set-reset" data-set="${set}">Reset ${set === "keys2d" ? "Bit Planes" : "Flight Sessions"} keys</button>`;
+                <button type="button" class="pill set-reset" data-set="${set}">Reset ${set === "keys2d" ? "BitPlanes" : "Flight Sessions"} keys</button>`;
         }
     }
 
@@ -264,7 +264,7 @@ window.BitSettings = (function () {
             <div class="shop-header"><h2>Settings</h2><button type="button" class="close-shop set-close" aria-label="Close">×</button></div>
             <div class="set-tabs">
                 <button type="button" class="set-tab" data-tab="general">General</button>
-                <button type="button" class="set-tab" data-tab="keys2d">Bit Planes keys</button>
+                <button type="button" class="set-tab" data-tab="keys2d">BitPlanes keys</button>
                 <button type="button" class="set-tab" data-tab="keysDf">Flight Sessions keys</button>
             </div>
             <div class="settings-body"></div>

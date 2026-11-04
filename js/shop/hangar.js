@@ -56,11 +56,11 @@
                     <span>Turn</span>${statBar(p.turn / 1.4)}
                     <span>Armor</span>${statBar((3 + p.life) / 7)}
                     <span>Ammo</span>${statBar((15 + p.ammo) / 35)}
-                    <span>Guided Missiles</span>${statBar((2 + p.missiles) / 4)}
-                    <span>Bullets</span>${statBar((p.bulletSpeed || 1) / 1.6)}
+                    <span>Missiles</span>${statBar((2 + p.missiles) / 4)}
+                    <span>Projectiles</span>${statBar((p.bulletSpeed || 1) / 1.6)}
                 </div>
                 ${p.flares ? `<div class="plane-perk"><i class="flare"></i> ${p.flares} countermeasures <kbd>Q</kbd></div>` : ""}
-                ${p.smartMissiles ? `<div class="plane-perk">◎ Smart guided missiles</div>` : ""}
+                ${p.smartMissiles ? `<div class="plane-perk">◎ Smart missiles</div>` : ""}
                 ${action}
             </div>`;
     }

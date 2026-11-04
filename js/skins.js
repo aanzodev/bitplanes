@@ -222,11 +222,11 @@ window.BitSkins = (function () {
         el = document.createElement("div");
         el.className = "skins panel-backdrop";
         el.hidden = true;
-        el.innerHTML = `<div class="panel skins-panel" role="dialog" aria-label="Skins">
-            <div class="shop-header"><h2>Skins</h2>
+        el.innerHTML = `<div class="panel skins-panel" role="dialog" aria-label="Customization">
+            <div class="shop-header"><h2>Customization</h2>
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
                 <button type="button" class="close-shop skins-close" aria-label="Close">×</button></div>
-            <p class="shop-note">Your pilot in the lobby, and the pilot who bails out when you eject (in Bit Planes and Flight Sessions). Rarer skins cost more credits.</p>
+            <p class="shop-note">Your pilot in the lobby, and the pilot who bails out when you eject (in BitPlanes and Flight Sessions). Rarer skins cost more credits.</p>
             <div class="skin-grid"></div>
         </div>`;
         document.body.appendChild(el);

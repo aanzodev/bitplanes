@@ -49,7 +49,7 @@
                 <div class="df-row"><small>BOOST</small><div class="df-bar df-boost"><i></i></div></div>
                 <div class="df-weapons">
                     <div><small>GUNS</small><b class="df-ammo">0</b></div>
-                    <div><small>GUIDED MISSILES</small><b class="df-missiles">0</b></div>
+                    <div><small>MISSILES</small><b class="df-missiles">0</b></div>
                     <div><small>COUNTER&shy;MEASURES</small><b class="df-flares">0</b></div>
                 </div>
                 <div class="df-repair"></div>
@@ -158,7 +158,7 @@
                 b.hidden = !show;
                 if (!show) return;
                 const table = (list, cls, title) => `<div class="df-board-team ${cls}"><h3>${title}</h3><table>
-                    <tr><th>Pilot</th><th>Plane</th><th>P</th><th>D</th><th>Score</th></tr>
+                    <tr><th>Pilot</th><th>Plane</th><th>E</th><th>D</th><th>Score</th></tr>
                     ${list.sort((a, b) => b.score - a.score || b.kills - a.kills).map(p => `<tr class="${p.isPlayer ? "me" : ""}"><td>${esc(p.name)}</td><td>${esc(p.label)}</td><td>${p.kills}</td><td>${p.deaths}</td><td>${p.score}</td></tr>`).join("")}</table></div>`;
                 b.innerHTML = teams.length > 1 ? table(teams[0].list, "blue", teams[0].name) + table(teams[1].list, "red", teams[1].name) : table(teams[0].list, "ffa", teams[0].name);
             },
@@ -184,7 +184,7 @@
                     $(".df-red").textContent = m.red;
                     $(".df-blue-bar").style.width = Math.min(100, 100 * m.blue / m.goal) + "%";
                     $(".df-red-bar").style.width = Math.min(100, 100 * m.red / m.goal) + "%";
-                    $(".df-goal").textContent = `First to ${m.goal} points`;
+                    $(".df-goal").textContent = `First to ${m.goal} eliminations`;
                 } else {
                     $(".df-blue").textContent = p.kills;
                     $(".df-red").textContent = m.leader;
@@ -192,7 +192,7 @@
                     $(".df-red-bar").style.width = Math.min(100, 100 * m.leader / m.goal) + "%";
                     $(".df-goal").textContent = `You vs the leader · first to ${m.goal}`;
                 }
-                $(".df-score").innerHTML = `Score <b>${p.score}</b> · P <b>${p.kills}</b> · D <b>${p.deaths}</b> · <i class="coin"></i> +${s.coins}`;
+                $(".df-score").innerHTML = `Score <b>${p.score}</b> · E <b>${p.kills}</b> · D <b>${p.deaths}</b> · <i class="coin"></i> +${s.coins}`;
 
                 const hp = Math.max(0, p.health) / p.maxHealth;
                 $(".df-plane").textContent = p.label;

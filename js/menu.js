@@ -1,7 +1,7 @@
 (function () {
     const MODES = {
-        "death-match": {name: "Competitive Flight", desc: "Everyone against everyone"},
-        "multiplayer": {name: "Multiplayer", desc: "Real players online · 10 min sessions"},
+        "death-match": {name: "Combat Mode", desc: "Everyone against everyone"},
+        "multiplayer": {name: "Online Mode", desc: "Real players online · 10 min sessions"},
         "airbattle": {name: "Flight Sessions", desc: "BETA · 3D flights over real terrain", beta: true},
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
@@ -77,7 +77,7 @@
         if (!S || !table) return;
         const keys = (set, id) => S.keys(set)[id].filter(Boolean).map(k => `<kbd>${S.keyName(k)}</kbd>`).join(" ") || "–";
         const rows = (set, list) => list.map(a => `<tr><td>${keys(set, a.id)}</td><td>${a.name}</td></tr>`).join("");
-        table.innerHTML = `<tr><th colspan="2">Bit Planes</th></tr>${rows("keys2d", S.actions2d)}
+        table.innerHTML = `<tr><th colspan="2">BitPlanes</th></tr>${rows("keys2d", S.actions2d)}
             <tr><td><kbd>M</kbd></td><td>Sound on / off</td></tr>
             <tr><td><kbd>Esc</kbd></td><td>Menu: resume, change plane or paint, settings, leave</td></tr>
             <tr><th colspan="2">Flight Sessions (3D)</th></tr>${rows("keysDf", S.actionsDf)}
