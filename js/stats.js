@@ -138,7 +138,7 @@ window.BitStats = (function () {
         document.body.appendChild(el);
         el.addEventListener("click", ev => {
             if (ev.target === el || ev.target.closest(".stats-close")) el.hidden = true;
-            if (ev.target.closest(".stats-reset") && confirm("Reset all your stats? Credits, planes, level and milestones stay.")) {
+            if (ev.target.closest(".stats-reset") && confirm("Reset all your stats? Credits, planes and level stay.")) {
                 reset();
                 render();
             }

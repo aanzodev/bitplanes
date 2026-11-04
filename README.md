@@ -23,15 +23,14 @@ The start screen is a lobby, with the bots flying behind it:
 
 - **Top bar:** Play · **Stats** · **Aircraft Selection** (planes, paint, upgrades) ·
   **Skins** (pilot characters) · **Quests** (3 daily and 3 weekly quests with
-  credit and XP rewards; a yellow dot means one is ready to claim) ·
-  **Milestones** · **Rankings** (worldwide top 50).
+  credit and XP rewards; a yellow dot means one is ready to claim).
 - **Top right:** your level and XP bar, your credits (1.5K, 100K, 2.5M…) and
   your pilot's face.
 - **Middle:** your pilot on the pad. Click your name above them to change it.
   The chip under the pad shows your plane (click for Aircraft Selection).
 - **Bottom left:** the mode (Competitive Flight or Multiplayer; click to switch) and
   **PLAY**. "Play with friends" hosts or joins a private room with a code.
-- **Bottom right:** **👥 Friends**, **⚙ Settings**, **Controls** and
+- **Bottom right:** **⚙ Settings**, **Controls** and
   **Servers** (Multiplayer server browser).
 
 While flying, a timer sits in the bottom left: the session countdown in
@@ -60,27 +59,14 @@ The short form also works:
 `js/loader.js` reads `index.html` from the same place and loads its page,
 styles, scripts and images, with a loading screen that shows its progress.
 
-## Levels, milestones and quests
+## Levels and quests
 
 - **XP and levels (1 to 100):** you earn XP for takedowns (100), hits, sessions and
-  time in the air, in Bit Planes and in Flight Sessions, plus quests, milestones
-  and Flight Sessions scores. Every level pays credits (more every 5th level).
+  time in the air, in Bit Planes and in Flight Sessions, plus quests and
+  Flight Sessions scores. Every level pays credits (more every 5th level).
   Levels **10, 25 and 50** each add one more level to every upgrade
   (the gold pips).
-- **Milestones:** 36 of them in Combat, Flying, Flight Sessions and Career, from
-  "First Blood" to "Legend of the Skies" (1,000 takedowns). Each pays credits and XP
-  the moment you unlock it.
 - **Quests:** 3 daily and 3 weekly, including Flight Sessions quests.
-
-## Friends and the rankings
-
-**👥 Friends** shows your 6-letter friend code. Type a friend's code to send a
-request; once they accept, you see when they're online and where (lobby,
-Multiplayer session, private room, Flight Sessions). **Join** puts you in their room,
-and **Invite** (while you're in a room) pops up a Join button on their screen.
-The **Rankings** tab ranks every pilot worldwide by level, takedowns, Flight Sessions
-takedowns or best score streak, with you and your friends highlighted. Both use the
-online server (see `server/README.md`).
 
 ## Settings
 
@@ -501,7 +487,7 @@ lobby panels, Bit Planes (flying, shooting, ejecting in your skin, remapped
 keys, countermeasures), levels and the Flight Sessions lock, every plane's gun and engine
 sound, Flight Sessions (erosion, a session with guns, a guided missile lock, countermeasures,
 ejecting and the results, and computer pilots fighting on their own) and
-online play through the relay server (private rooms, Multiplayer, friends).
+online play through the relay server (private rooms, Multiplayer).
 They run on every pull request (GitHub Actions, `.github/workflows/test.yml`).
 To run them yourself:
 
@@ -518,7 +504,7 @@ index.html              Start screen, HUD and script tags
 css/
   base.css              Page, buttons, keys
   menu.css              Start screen
-  career.css            Settings, levels, milestones, friends, rankings
+  career.css            Settings, levels and pop-up notices
   airbattle.css         Flight Sessions
   hangar.css            Aircraft Selection
   online.css            Online play
@@ -531,9 +517,8 @@ js/
   daily.js              Daily reward
   stats.js              Lifetime stats and the Stats page
   quests.js             Daily and weekly quests
-  progress.js           XP, levels, milestones and pop-up notices
+  progress.js           XP, levels and pop-up notices
   settings.js           Settings: volume, key bindings, Flight Sessions options
-  social.js             Friends, invites and the global rankings
   skins.js              Pilot skins (drawn in code) and the Skins tab
   menu.js               The lobby: pilot, credits, mode card, pop-ups
   console.js            Built-in console (Ctrl+Shift+K)
@@ -585,7 +570,7 @@ assets/
 docs/screenshots/       Images for this README
 native/                 C and C++ code compiled to WebAssembly (build.sh rebuilds it; needs clang)
 tests/run.mjs           Automated tests (npm test), run on every pull request
-server/                 Relay server for online play, friends and the rankings (Node.js)
+server/                 Relay server for online play (Node.js)
 render.yaml             One-click deploy of the relay server on Render
 ```
 

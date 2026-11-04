@@ -84,7 +84,7 @@
                 <div class="df-lock-way"><b>⭐ Reach level ${a.need}</b>
                     <span>You're level ${a.level}${a.level < a.need ? ` · ${a.need - a.level} to go` : ""}</span>
                     <div class="df-lock-bar"><i style="width: ${Math.min(100, ((a.level - 1 + (info.frac || 0)) / (a.need - 1)) * 100)}%"></i></div>
-                    <small>XP comes from points, sessions, quests and milestones in Bit Planes.</small></div>
+                    <small>XP comes from points, sessions and quests in Bit Planes.</small></div>
                 <div class="df-lock-way"><b>✈ Own a special plane</b>
                     <span>The jets with a black border in the Aircraft Market${a.cheapest ? `, from the ${a.cheapest.name} (${a.cheapest.price.toLocaleString()} credits)` : ""}.</span>
                     <small>You have ${coins.toLocaleString()} credits.</small>

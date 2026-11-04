@@ -1,5 +1,4 @@
 const http = require("http");
-const social = require("./social");
 const {WebSocketServer} = require("ws");
 
 const PORT = Number(process.env.PORT) || 8787;
@@ -51,7 +50,6 @@ function onMessage(ws, text) {
     if (!msg || typeof msg !== "object") return;
 
     if (msg.op === "ping") return send(ws, {op: "pong", t: msg.t});
-    if (social.handle(ws, msg, send)) return;
 
     if (msg.op === "list") {
         const list = [];
@@ -131,7 +129,6 @@ function onMessage(ws, text) {
 }
 
 function onClose(ws) {
-    social.closed(ws);
     const room = ws.room && rooms.get(ws.room);
     if (!room) return;
     if (ws.isHost) {
@@ -147,7 +144,7 @@ function onClose(ws) {
 const server = http.createServer((req, res) => {
     res.writeHead(200, {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"});
     const pub = [...rooms.values()].filter(r => r.public).length;
-    res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size} (${pub} Multiplayer). ${social.summary()}\n`);
+    res.end(`Bit Planes relay server is running. Rooms open: ${rooms.size} (${pub} Multiplayer).\n`);
 });
 
 const wss = new WebSocketServer({server, maxPayload: 512 * 1024});
@@ -172,7 +169,6 @@ setInterval(() => {
 }, 25000);
 
 process.on("SIGTERM", () => {
-    social.saveNow();
     process.exit(0);
 });
 
