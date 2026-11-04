@@ -27,15 +27,6 @@ activity, so the server does very little work.
 It also runs **Multiplayer** matchmaking and the server list (public matches,
 up to 10 real players each).
 
-And it keeps **friends** (friend codes, requests, who is online and in which
-room, invites) and the **global leaderboard**. That data is saved to
-`server/data.json` (or the file in `$DATA_FILE`) every 30 seconds. On Render's
-free plan that file is wiped when the server restarts; browsers send their
-stats again every time they connect, so the leaderboard fills back up as
-players come back, and friend codes never change (they're made from each
-browser's secret id). To keep friend lists across restarts, add a Render disk
-(paid) and set `DATA_FILE` to a path on it.
-
 Players connect directly when their network allows it and only use the
 server when it doesn't, so the server is only busy for players who need it.
 

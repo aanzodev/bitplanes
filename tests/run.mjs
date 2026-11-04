@@ -111,8 +111,8 @@ async function run() {
 
     await test("lobby", "every panel opens and closes", async open => {
         const p = await open();
-        for (const sel of [".nav-tab.open-stats", ".nav-tab.open-shop", ".nav-tab.open-skins", ".open-quests", ".nav-tab.open-achievements",
-            ".lobby-corner .open-settings", ".lobby-corner .open-friends-list", ".open-controls"]) {
+        for (const sel of [".nav-tab.open-stats", ".nav-tab.open-shop", ".nav-tab.open-skins", ".open-quests",
+            ".lobby-corner .open-settings", ".open-controls"]) {
             await p.click(sel);
             await p.waitForTimeout(150);
             const shown = await p.evaluate(() => [...document.querySelectorAll(".panel-backdrop, .shop")].some(e => !e.hidden));
@@ -262,7 +262,7 @@ async function run() {
         check((await count()) >= 12, "flares still burning at 3.6 s: " + (await count()));
     });
 
-    await test("career", "XP levels you up, pays coins, unlocks achievements", async open => {
+    await test("career", "XP levels you up and pays coins", async open => {
         const p = await open();
         const r = await p.evaluate(() => {
             const c0 = BitShop.state().coins;
@@ -505,18 +505,6 @@ async function run() {
             return [ps.length, ps.filter(x => /^\[PLAYER\]/.test(x.name)).length];
         });
         check(r[0] === 10 && r[1] === 2, JSON.stringify(r));
-    });
-
-    await test("online", "friends: request, accept, see each other online", async open => {
-        const a = await open({query: q, storage: {nickname: "Ann"}}), b = await open({query: q, storage: {nickname: "Ben"}});
-        await a.waitForFunction(() => BitSocial.connected(), null, {timeout: 15000});
-        await b.waitForFunction(() => BitSocial.connected(), null, {timeout: 15000});
-        const code = await b.evaluate(() => BitSocial.code());
-        await a.evaluate(c => BitSocial._send({op: "fadd", code: c}), code);
-        await b.waitForTimeout(600);
-        await b.evaluate(() => BitSocial.openFriends());
-        await b.click(".friend-accept");
-        await a.waitForFunction(() => BitSocial.friends().some(f => f.name === "Ben"), null, {timeout: 10000});
     });
 }
 
