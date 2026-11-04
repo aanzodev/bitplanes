@@ -98,7 +98,7 @@ window.BitStats = (function () {
                 ${card("Daily streak", n(daily.streak), `best: ${n(daily.best)}`)}
                 ${card("Cows hit", n(s.cowKilled), "oops")}
             </div>
-            <h3>Flight Sessions (3D)</h3>
+            <h3>3D Flight Mode</h3>
             <div class="stat-grid">
                 ${card("Eliminations", n(s.dfKills), `${n(s.dfGunKills)} guns · ${n(s.dfMissileKills)} missiles`)}
                 ${card("Deaths", n(s.dfDeaths))}
@@ -131,7 +131,7 @@ window.BitStats = (function () {
         el.className = "stats-page panel-backdrop";
         el.hidden = true;
         el.innerHTML = `<div class="panel" role="dialog" aria-label="Stats">
-            <div class="shop-header"><h2>Stats</h2><button type="button" class="close-shop stats-close" aria-label="Close">×</button></div>
+            <div class="shop-header"><h2>Flight Statistics</h2><button type="button" class="close-shop stats-close" aria-label="Close">×</button></div>
             <div class="stats-body"></div>
             <button type="button" class="stats-reset">Reset stats</button>
         </div>`;

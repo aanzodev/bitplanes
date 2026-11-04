@@ -189,7 +189,7 @@ window.BitSettings = (function () {
                 ${slider("engineVolume", "Engines", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
                 ${slider("gunVolume", "Guns", 0, 1, 0.05, v => Math.round(v * 100) + "%")}
                 <p class="shop-note"><kbd>M</kbd> turns the sound on and off at any time.</p>
-                <h3>Flight Sessions (3D)</h3>
+                <h3>3D Flight Mode</h3>
                 ${option("dfQuality", "Graphics", [["low", "Low (fastest)"], ["medium", "Medium"], ["high", "High (shadows, reflections, cinematic look)"], ["ultra", "Ultra (strong graphics card)"]])}
                 ${option("dfView", "Starting camera", [["chase", "Chase (third person)"], ["cockpit", "Cockpit (first person)"]])}
                 ${slider("dfFov", "Field of view", 55, 100, 1, v => v + "°")}
@@ -205,7 +205,7 @@ window.BitSettings = (function () {
             body.innerHTML = `
                 <p class="shop-note">Click a key, then press the new key${set === "keysDf" ? " or mouse button" : ""}. <kbd>Esc</kbd> cancels, <kbd>Backspace</kbd> clears.</p>
                 <table class="key-table"><tr><th>Action</th><th>Key</th><th>Second key</th></tr>${list.map(a => row(set, a)).join("")}</table>
-                <button type="button" class="pill set-reset" data-set="${set}">Reset ${set === "keys2d" ? "BitPlanes" : "Flight Sessions"} keys</button>`;
+                <button type="button" class="pill set-reset" data-set="${set}">Reset ${set === "keys2d" ? "BitPlanes" : "3D Flight Mode"} keys</button>`;
         }
     }
 
@@ -265,7 +265,7 @@ window.BitSettings = (function () {
             <div class="set-tabs">
                 <button type="button" class="set-tab" data-tab="general">General</button>
                 <button type="button" class="set-tab" data-tab="keys2d">BitPlanes keys</button>
-                <button type="button" class="set-tab" data-tab="keysDf">Flight Sessions keys</button>
+                <button type="button" class="set-tab" data-tab="keysDf">3D Flight Mode keys</button>
             </div>
             <div class="settings-body"></div>
         </div>`;

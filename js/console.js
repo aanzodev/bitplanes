@@ -126,10 +126,10 @@
             },
         },
         match: {
-            args: "[skip]", help: "Online Mode match phase and time (skip: next phase, host only)",
+            args: "[skip]", help: "Online Multiplayer match phase and time (skip: next phase, host only)",
             run(a) {
                 const M = window.BitOnline && window.BitOnline.match, st = M && M.state;
-                if (!st || !st.phase) throw new Error("Not in an Online Mode match.");
+                if (!st || !st.phase) throw new Error("Not in an Online Multiplayer match.");
                 if (String(a[0] || "").toLowerCase() === "skip") {
                     if (!M.skip()) throw new Error("Only the host can skip.");
                     return print("Skipping to the next phase.", "ok");

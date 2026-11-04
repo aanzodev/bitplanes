@@ -26,16 +26,16 @@
         <nav class="lobby-nav">
             <span class="lobby-logo"><i class="logo"></i> BitPlanes</span>
             <button type="button" class="nav-tab active">Play</button>
-            <button type="button" class="nav-tab open-stats">Stats</button>
+            <button type="button" class="nav-tab open-stats">Flight Statistics</button>
             <button type="button" class="nav-tab open-shop">Aircraft Selection</button>
-            <button type="button" class="nav-tab open-skins">Customization</button>
-            <button type="button" class="nav-tab open-quests"><i class="nav-dot" hidden></i>Quests</button>
+            <button type="button" class="nav-tab open-skins">Aircraft Customization</button>
+            <button type="button" class="nav-tab open-quests"><i class="nav-dot" hidden></i>Flight Challenges</button>
         </nav>
 
         <div class="lobby-profile">
-            <button type="button" class="lobby-level" title="Level"><small>LV</small><b>1</b><span class="level-track"><span class="level-fill"></span></span></button>
+            <button type="button" class="lobby-level" title="Pilot Level"><small>LV</small><b>1</b><span class="level-track"><span class="level-fill"></span></span></button>
             <span class="lobby-coins" title="Credits"><i class="coin"></i> <span class="coin-short">0</span></span>
-            <button type="button" class="lobby-avatar open-skins" title="Your pilot (Customization)"><img alt="Your pilot"></button>
+            <button type="button" class="lobby-avatar open-skins" title="Your pilot (Aircraft Customization)"><img alt="Your pilot"></button>
         </div>
 
         <form id="activity">
@@ -48,30 +48,30 @@
                     </span>
                     <i class="name-edit" aria-hidden="true">✎</i>
                 </label>
-                <button type="button" class="lobby-hero open-skins" title="Change your skin"><img alt="Your pilot"></button>
+                <button type="button" class="lobby-hero open-skins" title="Change your appearance"><img alt="Your pilot"></button>
                 <div class="lobby-pad"></div>
                 <div class="lobby-hero-name"></div>
-                <button type="button" class="lobby-plane-chip open-shop" title="Change your plane in Aircraft Selection"><img alt=""><span></span></button>
+                <button type="button" class="lobby-plane-chip open-shop" title="Change your selected aircraft"><img alt=""><span></span></button>
             </div>
 
             <div class="lobby-mode">
                 <h2 class="mode-title">Combat Mode</h2>
                 <button type="button" class="mode-switch" title="Change mode">
                     <b>Mode: <span class="mode-name">Combat Mode</span> ▸</b>
-                    <small class="mode-desc">Everyone against everyone</small>
+                    <small class="mode-desc">Free-for-all combat</small>
                 </button>
                 <button class="btn play-btn">Play</button>
-                <button type="button" class="lobby-link open-friends">Play with friends (room code)</button>
+                <button type="button" class="lobby-link open-friends">Private Multiplayer Rooms</button>
                 <p class="online-status"></p>
                 <div class="activity-modes" hidden>
                     <div>
-                        <label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked> Combat Mode</label>
+                        <label title="Free-for-all combat."><input type="radio" name="mode" value="death-match" checked> Combat Mode</label>
                     </div>
                     <div>
-                        <label title="Play with real people online: 10 minute sessions, top 5 rankings."><input type="radio" name="mode" value="multiplayer"> Online Mode</label>
+                        <label title="Play with real people online: 10 minute sessions, top 5 rankings."><input type="radio" name="mode" value="multiplayer"> Online Multiplayer</label>
                     </div>
                     <div>
-                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="airbattle"> Flight Sessions (Beta)</label>
+                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="airbattle"> 3D Flight Mode (Beta)</label>
                     </div>
                 </div>
             </div>
@@ -79,20 +79,20 @@
             <div class="lobby-corner">
                 <button type="button" class="pill open-settings" title="Settings">⚙</button>
                 <button type="button" class="pill open-controls">Controls</button>
-                <button type="button" class="pill open-servers" title="Online Mode servers: pick by ping or find your friends">Servers</button>
+                <button type="button" class="pill open-servers" title="Multiplayer server browser: choose a server by ping or find friends">Multiplayer Servers</button>
             </div>
 
             <div class="friends panel-backdrop" hidden>
-                <div class="panel" role="dialog" aria-label="Play with friends">
-                    <div class="shop-header"><h2>Play with friends</h2><button type="button" class="close-shop close-panel" aria-label="Close">×</button></div>
+                <div class="panel" role="dialog" aria-label="Play with Friends">
+                    <div class="shop-header"><h2>Play with Friends</h2><button type="button" class="close-shop close-panel" aria-label="Close">×</button></div>
                     <p class="shop-note">Host a private room and share its code, or type a friend's code. No [PLAYER] tags or timer here.</p>
                     <div class="online-row">
-                        <button type="button" class="btn host-activity">Host a room</button>
+                        <button type="button" class="btn host-activity">Create Private Room</button>
                         <span class="online-or">or</span>
                         <label>
-                            <input type="text" class="room-code" placeholder="Room code" maxlength="5" autocomplete="off" spellcheck="false">
+                            <input type="text" class="room-code" placeholder="Room Code" maxlength="5" autocomplete="off" spellcheck="false">
                         </label>
-                        <button type="button" class="btn join-activity">Join</button>
+                        <button type="button" class="btn join-activity">Join Room</button>
                     </div>
                 </div>
             </div>
@@ -117,12 +117,12 @@
                 <span class="wallet"><i class="coin"></i> <span class="coin-count">0</span></span>
                 <button type="button" class="close-shop" aria-label="Close">×</button>
             </div>
-            <h3>Planes</h3>
+            <h3>Aircraft</h3>
             <div class="shop-planes"></div>
-            <h3>Paint</h3>
+            <h3>Paint &amp; Appearance</h3>
             <div class="shop-paint"></div>
-            <h3>Upgrades</h3>
-            <p class="shop-note">Upgrades apply to whichever plane you fly. Player levels 10, 25 and 50 each unlock one more level of every upgrade (gold pips).</p>
+            <h3>Aircraft Upgrades</h3>
+            <p class="shop-note">Upgrades apply to whichever aircraft you fly. Player levels 10, 25 and 50 each unlock one more level of every upgrade (gold pips).</p>
             <div class="shop-upgrades"></div>
         </div>
     </div>
@@ -170,15 +170,15 @@
         <p class="pause-note"></p>
         <div class="pause-actions">
             <button type="button" class="btn resume-activity">▶ Resume</button>
-            <button type="button" class="btn leave-activity">Leave to home</button>
+            <button type="button" class="btn leave-activity">Return to Lobby</button>
             <button type="button" class="btn open-settings">⚙ Settings</button>
         </div>
         <h3>Selected Aircraft</h3>
         <p class="pause-hint"></p>
         <div class="pause-planes"></div>
-        <h3>Paint</h3>
+        <h3>Paint &amp; Appearance</h3>
         <div class="pause-paint"></div>
-        <p class="pause-keys"><kbd>Esc</kbd> resume</p>
+        <p class="pause-keys"><kbd>Esc</kbd> to resume</p>
     </div>
 </div>
 

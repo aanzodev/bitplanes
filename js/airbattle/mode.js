@@ -78,8 +78,8 @@
         const P = window.BitProgress, info = P ? P.levelInfo() : {frac: 0};
         const coins = window.BitShop ? window.BitShop.state().coins : 0;
         el.innerHTML = `<div class="df-deploy-box df-lock-box">
-            <div class="df-deploy-head"><h2>🔒 Flight Sessions <span class="beta-tag">Beta</span></h2><button type="button" class="df-x" aria-label="Close">×</button></div>
-            <p class="df-lock-lead">Flight Sessions is for experienced pilots. Unlock it either way:</p>
+            <div class="df-deploy-head"><h2>🔒 3D Flight Mode <span class="beta-tag">Beta</span></h2><button type="button" class="df-x" aria-label="Close">×</button></div>
+            <p class="df-lock-lead">3D Flight Mode is for experienced pilots. Unlock it either way:</p>
             <div class="df-lock-ways">
                 <div class="df-lock-way"><b>⭐ Reach level ${a.need}</b>
                     <span>You're level ${a.level}${a.level < a.need ? ` · ${a.need - a.level} to go` : ""}</span>
@@ -123,7 +123,7 @@
     async function start(setup) {
         if (fight) return;
         setup = Object.assign({map: "alpine", sky: "", mode: "team", size: 6, difficulty: "normal"}, setup || {});
-        status("Loading 3D Flight Sessions…");
+        status("Loading 3D Flight Mode…");
         let THREE;
         try {
             [THREE] = await Promise.all([loadThree(), D.loadErosion ? D.loadErosion() : null, D.loadFlight ? D.loadFlight() : null]);

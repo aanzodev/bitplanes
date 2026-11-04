@@ -1,8 +1,8 @@
 (function () {
     const MODES = {
-        "death-match": {name: "Combat Mode", desc: "Everyone against everyone"},
-        "multiplayer": {name: "Online Mode", desc: "Real players online · 10 min sessions"},
-        "airbattle": {name: "Flight Sessions", desc: "BETA · 3D flights over real terrain", beta: true},
+        "death-match": {name: "Combat Mode", desc: "Free-for-all combat"},
+        "multiplayer": {name: "Online Multiplayer", desc: "Real players online · 10 min sessions"},
+        "airbattle": {name: "3D Flight Mode", desc: "BETA · 3D flights over real terrain", beta: true},
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
 
@@ -80,7 +80,7 @@
         table.innerHTML = `<tr><th colspan="2">BitPlanes</th></tr>${rows("keys2d", S.actions2d)}
             <tr><td><kbd>M</kbd></td><td>Sound on / off</td></tr>
             <tr><td><kbd>Esc</kbd></td><td>Menu: resume, change plane or paint, settings, leave</td></tr>
-            <tr><th colspan="2">Flight Sessions (3D)</th></tr>${rows("keysDf", S.actionsDf)}
+            <tr><th colspan="2">3D Flight Mode</th></tr>${rows("keysDf", S.actionsDf)}
             <tr><td>Mouse</td><td>${S.get("dfMouse") ? "Pitch and roll (click the screen first)" : "Mouse flying is off (Settings)"}</td></tr>`;
     }
 

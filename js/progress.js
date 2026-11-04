@@ -118,7 +118,7 @@ window.BitProgress = (function () {
         document.querySelectorAll(".lobby-level").forEach(el => {
             el.querySelector("b").textContent = info.level;
             el.querySelector(".level-fill").style.width = Math.round(info.frac * 100) + "%";
-            el.title = info.need ? `Level ${info.level} · ${info.into.toLocaleString()} / ${info.need.toLocaleString()} XP to level ${info.level + 1}` : `Level ${info.level} (max)`;
+            el.title = info.need ? `Pilot Level ${info.level} · ${info.into.toLocaleString()} / ${info.need.toLocaleString()} XP to level ${info.level + 1}` : `Pilot Level ${info.level} (max)`;
         });
     }
 

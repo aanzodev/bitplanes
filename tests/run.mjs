@@ -187,12 +187,12 @@ async function run() {
         }
     });
 
-    await test("one-line", "a blocked Flight Sessions file doesn't stop BitPlanes", async () => {
+    await test("one-line", "a blocked 3D Flight Mode file doesn't stop BitPlanes", async () => {
         const p = await oneLine(true);
         try {
             const r = await p.evaluate(() => ({failed: document.body.textContent.includes("could not load"), shop: !!window.BitShop,
                 modes: [...document.querySelectorAll('input[name="mode"]')].map(x => x.value), note: document.querySelector(".online-status").textContent}));
-            check(!r.failed && r.shop && !r.modes.includes("airbattle") && /Flight Sessions/.test(r.note), JSON.stringify(r));
+            check(!r.failed && r.shop && !r.modes.includes("airbattle") && /3D Flight Mode/.test(r.note), JSON.stringify(r));
             await p.click(".play-btn");
             await p.waitForTimeout(800);
             check(await p.evaluate(() => document.querySelector(".ui").style.display === "block"), "BitPlanes didn't start");
@@ -272,7 +272,7 @@ async function run() {
         check(r.level >= 6 && r.coins > 0, JSON.stringify(r));
     });
 
-    await test("career", "Flight Sessions unlocks at level 10 or with a special plane (either one)", async open => {
+    await test("career", "3D Flight Mode unlocks at level 10 or with a special plane (either one)", async open => {
         const a = await open();
         check(!(await a.evaluate(() => BitAirBattle.access().ok)), "new player can play Air Battle");
         const b = await open({storage: {shop: {coins: 0, owned: ["classic", "mig21"], selected: "classic", upgrades: {}, paint: {}, pattern: {}}}});

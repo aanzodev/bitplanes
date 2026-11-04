@@ -131,7 +131,7 @@
         e.loop(camera, ctx, world, (cam, alpha) => e.follow(cam, world, me, alpha), g => e.scoreboard(g, world.participants));
         e.minimap(world);
         bindGuestKeys();
-        banner(O.mode === "multiplayer" ? "🌐 Online Mode" : "Room " + guest.code);
+        banner(O.mode === "multiplayer" ? "🌐 Online Multiplayer" : "Room " + guest.code);
         window.BitWeather && window.BitWeather.force(w.weather);
         window.BitMaps && window.BitMaps.announce(world.map);
         setInterval(() => {
