@@ -420,6 +420,30 @@ async function run() {
         check(!menu && r.teams && r.planes === 12, JSON.stringify(Object.assign(r, {menu})));
     });
 
+    await test("airbattle", "cockpits: jet, WWII and biplane build and update", async open => {
+        const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
+        const out = [];
+        for (const id of ["f16", "spitfire", "camel"]) {
+            await p.evaluate(id => (BitShop.give(id), BitShop.selectPlane(id)), id);
+            await p.evaluate(() => BitAirBattle.start({map: "farmlands", sky: "day", mode: "team", size: 2, difficulty: "normal"}));
+            await p.waitForFunction(() => BitAirBattle.state() && !document.querySelector(".df-loading"), null, {timeout: 120000});
+            out.push(await p.evaluate(() => {
+                const g = BitAirBattle.state(), pl = g.player;
+                pl.setCockpit(true);
+                pl.input.pitch = 1;
+                pl.input.roll = -1;
+                for (let i = 0; i < 12; i++) pl.updateInstruments({dt: 0.05, time: i, sky: g.world.sky, lock: g.lock, planes: g.planes, timeLeft: 300});
+                const cp = pl.cockpit();
+                let meshes = 0;
+                cp.group.traverse(o => o.isMesh && meshes++);
+                const stick = cp.group.children.find(o => o.isGroup && Math.abs(o.rotation.x) > 0.05);
+                return {kind: cp.kind, meshes, stickMoved: !!stick};
+            }));
+            await p.evaluate(() => BitAirBattle.stop());
+        }
+        check(out.map(o => o.kind).join() === "jet,prop,bi" && out.every(o => o.meshes > 60 && o.stickMoved) && !p.errors.length, JSON.stringify(out) + p.errors);
+    });
+
     await test("airbattle", "a match: guns, missile lock, flares, eject, results", async open => {
         const p = await open({viewport: {width: 480, height: 270}, storage: {settings: {dfQuality: "low"}}});
         await p.evaluate(() => (BitShop.give("f16"), BitShop.selectPlane("f16")));

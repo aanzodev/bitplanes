@@ -67,161 +67,6 @@
     }
 
 
-    function buildCockpit(shape, color, eye) {
-        const T = D.THREE, g = new T.Group();
-        const [ex, ey, ez] = eye;
-        const frame = lambert(0x2b2f33), body = lambert(color), metal = lambert(0x1e2124);
-        const canvas = document.createElement("canvas");
-        canvas.width = 512;
-        canvas.height = 200;
-        const tex = new T.CanvasTexture(canvas);
-        tex.encoding = T.sRGBEncoding;
-        const panelW = shape === "" ? 1.5 : 2.2, panelH = 0.62;
-        const panel = new T.Mesh(new T.PlaneGeometry(panelW, panelH), new T.MeshBasicMaterial({map: tex, color: 0xdddddd}));
-        panel.position.set(ex, ey - (shape === "jet" || shape === "bomber" ? 0.5 : 0.62), ez - 1.0);
-        panel.rotation.x = -0.25;
-        g.add(panel);
-        g.add(box(panelW + 0.2, 0.08, 0.45, frame, ex, ey - 0.16, ez - 1.22));
-        g.add(box(panelW + 0.3, 0.5, 0.1, metal, ex, ey - 0.88, ez - 0.98));
-        if (shape === "jet" || shape === "bomber") {
-            const hud = new T.Mesh(new T.PlaneGeometry(0.62, 0.5), new T.MeshBasicMaterial({color: 0x7dffa0, transparent: true, opacity: 0.08, depthWrite: false}));
-            hud.position.set(ex, ey - 0.02, ez - 1.25);
-            g.add(hud);
-            g.add(box(0.05, 0.6, 0.05, frame, ex - 0.32, ey - 0.08, ez - 1.27));
-            g.add(box(0.05, 0.6, 0.05, frame, ex + 0.32, ey - 0.08, ez - 1.27));
-            [-1, 1].forEach(s => {
-                const rail = box(0.08, 0.08, 4.5, frame, ex + s * 0.85, ey - 0.25, ez + 0.6);
-                g.add(rail);
-            });
-            const bow = new T.Mesh(new T.TorusGeometry(0.95, 0.045, 4, 16, Math.PI), frame);
-            bow.position.set(ex, ey - 0.3, ez - 1.5);
-            g.add(bow);
-            const bow2 = bow.clone();
-            bow2.position.z = ez + 0.9;
-            g.add(bow2);
-        } else if (shape === "prop") {
-            [-1, 1].forEach(s => g.add(box(0.06, 0.06, 2.2, frame, ex + s * 0.7, ey - 0.3, ez + 0.2)));
-            const bow = new T.Mesh(new T.TorusGeometry(0.75, 0.05, 4, 14, Math.PI), frame);
-            bow.position.set(ex, ey - 0.35, ez - 0.9);
-            g.add(bow);
-            [-0.38, 0.38].forEach(x => {
-                const ws = box(0.04, 0.55, 0.04, frame, ex + x, ey - 0.12, ez - 1.0);
-                ws.rotation.x = -0.4;
-                ws.rotation.z = x > 0 ? -0.35 : 0.35;
-                g.add(ws);
-            });
-            g.add(box(0.07, 0.06, 0.1, metal, ex, ey - 0.3, ez - 1.05));
-            const glass = new T.Mesh(new T.PlaneGeometry(0.12, 0.1), new T.MeshBasicMaterial({color: 0xffc040, transparent: true, opacity: 0.2, depthWrite: false}));
-            glass.position.set(ex, ey - 0.22, ez - 1.05);
-            g.add(glass);
-            const cowl = new T.Mesh(new T.CylinderGeometry(1.2, 1.4, 4.6, 12, 1, true, -Math.PI / 2, Math.PI), new T.MeshLambertMaterial({color, side: T.DoubleSide}));
-            cowl.rotation.x = Math.PI / 2;
-            cowl.position.set(ex, ey - 1.85, ez - 3.6);
-            g.add(cowl);
-        } else {
-            const ws = new T.Mesh(new T.PlaneGeometry(0.9, 0.35), new T.MeshBasicMaterial({color: 0xbfe8ff, transparent: true, opacity: 0.25, depthWrite: false, side: T.DoubleSide}));
-            ws.position.set(ex, ey - 0.32, ez - 1.0);
-            ws.rotation.x = -0.35;
-            g.add(ws);
-            g.add(box(1.6, 0.08, 1.0, body, ex, ey - 0.5, ez - 1.25));
-        }
-        return {group: g, canvas, tex, ctx: canvas.getContext("2d")};
-    }
-
-    function drawInstruments(cp, plane) {
-        const c = cp.ctx, W = 512, H = 200;
-        c.fillStyle = "#1b1e21";
-        c.fillRect(0, 0, W, H);
-        const dial = (x, y, r, label, value, max, text) => {
-            c.fillStyle = "#0b0c0d";
-            c.beginPath();
-            c.arc(x, y, r, 0, Math.PI * 2);
-            c.fill();
-            c.strokeStyle = "#9aa1a8";
-            c.lineWidth = 3;
-            c.stroke();
-            c.strokeStyle = "#e8e8e8";
-            c.lineWidth = 2;
-            for (let i = 0; i <= 10; i++) {
-                const a = Math.PI * 0.75 + i / 10 * Math.PI * 1.5;
-                c.beginPath();
-                c.moveTo(x + Math.cos(a) * r * 0.78, y + Math.sin(a) * r * 0.78);
-                c.lineTo(x + Math.cos(a) * r * 0.92, y + Math.sin(a) * r * 0.92);
-                c.stroke();
-            }
-            const a = Math.PI * 0.75 + Math.min(1, Math.max(0, value / max)) * Math.PI * 1.5;
-            c.strokeStyle = "#ffcf3a";
-            c.lineWidth = 4;
-            c.beginPath();
-            c.moveTo(x, y);
-            c.lineTo(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8);
-            c.stroke();
-            c.fillStyle = "#cfd5da";
-            c.font = "bold 15px sans-serif";
-            c.textAlign = "center";
-            c.fillText(label, x, y + r * 0.45);
-            c.fillStyle = "#7dffa0";
-            c.font = "bold 17px monospace";
-            c.fillText(text, x, y - r * 0.25);
-        };
-        dial(70, 100, 62, "KM/H", plane.speed, plane.topSpeed * 1.4, String(Math.round(plane.speed * 3.6)));
-        dial(442, 100, 62, "ALT M", plane.pos.y, 5000, String(Math.round(plane.pos.y)));
-        const f = plane.forward, r = plane.right;
-        const pitch = Math.asin(Math.max(-1, Math.min(1, f.y))), roll = Math.atan2(r.y, plane.up.y);
-        c.save();
-        c.beginPath();
-        c.arc(256, 92, 70, 0, Math.PI * 2);
-        c.clip();
-        c.translate(256, 92);
-        c.rotate(roll);
-        const off = pitch * 120;
-        c.fillStyle = "#3a7bd5";
-        c.fillRect(-120, -200 + off, 240, 200);
-        c.fillStyle = "#8a5a2b";
-        c.fillRect(-120, off, 240, 200);
-        c.strokeStyle = "#fff";
-        c.lineWidth = 2;
-        for (let k = -3; k <= 3; k++) {
-            if (!k) continue;
-            c.beginPath();
-            c.moveTo(-18, off - k * 21);
-            c.lineTo(18, off - k * 21);
-            c.stroke();
-        }
-        c.beginPath();
-        c.moveTo(-120, off);
-        c.lineTo(120, off);
-        c.stroke();
-        c.restore();
-        c.strokeStyle = "#ffcf3a";
-        c.lineWidth = 4;
-        c.beginPath();
-        c.moveTo(220, 92);
-        c.lineTo(246, 92);
-        c.lineTo(256, 100);
-        c.lineTo(266, 92);
-        c.lineTo(292, 92);
-        c.stroke();
-        c.strokeStyle = "#9aa1a8";
-        c.lineWidth = 3;
-        c.beginPath();
-        c.arc(256, 92, 70, 0, Math.PI * 2);
-        c.stroke();
-        const heading = (Math.atan2(f.x, -f.z) * 180 / Math.PI + 360) % 360;
-        c.fillStyle = "#cfd5da";
-        c.font = "bold 16px monospace";
-        c.textAlign = "center";
-        c.fillText(`HDG ${String(Math.round(heading)).padStart(3, "0")}°   G ${plane.g.toFixed(1)}`, 256, 186);
-        c.fillStyle = "#333";
-        c.fillRect(150, 172, 8, -150);
-        c.fillStyle = plane.boosting ? "#ff7a2a" : "#7dffa0";
-        c.fillRect(150, 172, 8, -150 * plane.throttle);
-        c.fillStyle = "#333";
-        c.fillRect(354, 172, 8, -150);
-        c.fillStyle = plane.health / plane.maxHealth > 0.35 ? "#7dffa0" : "#ff4d4d";
-        c.fillRect(354, 172, 8, -150 * Math.max(0, plane.health / plane.maxHealth));
-        cp.tex.needsUpdate = true;
-    }
 
 
     class Aircraft {
@@ -277,7 +122,7 @@
 
         cockpit() {
             if (!this._cockpit) {
-                this._cockpit = buildCockpit(this.shape, this.color, this.eyeLocal);
+                this._cockpit = D.buildCockpit(this.shape, this.color, this.eyeLocal, {skin: this.skin});
                 this.mesh.add(this._cockpit.group);
             }
             return this._cockpit;
@@ -286,6 +131,7 @@
         setPilot(skin) {
             this.skin = skin;
             if (this.helmet && skin && skin.capColor) this.helmet.material.color.set(skin.capColor);
+            if (this._cockpit) this._cockpit.setSkin(skin);
         }
 
         setCockpit(on) {
@@ -296,8 +142,8 @@
             this.inCockpit = on;
         }
 
-        updateInstruments() {
-            if (this._cockpit && this.inCockpit) drawInstruments(this._cockpit, this);
+        updateInstruments(info) {
+            if (this._cockpit && this.inCockpit) this._cockpit.update(this, info);
         }
 
         spawn(pos, lookAt) {

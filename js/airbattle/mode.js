@@ -911,7 +911,7 @@
         g.shake *= Math.exp(-dt * 8);
         cam.updateProjectionMatrix();
         g.world.update(dt, cam, p.alive ? p.pos : cam.position);
-        if (p.alive && g.view === "cockpit" && (g.frame++ % 3 === 0)) p.updateInstruments();
+        if (p.alive && g.view === "cockpit") p.updateInstruments({dt, time: g.time, sky: g.world.sky, lock: g.lock, threat: g.threat, planes: g.planes, timeLeft: g.match.timeLeft});
         if (g.post) g.post.render(g.scene, cam, dt);
         else g.renderer.render(g.scene, cam);
 
@@ -929,7 +929,7 @@
         const m = g.match;
         g.hud.update(dt, {
             player: p, planes: g.planes, camera: cam, width: window.innerWidth, height: window.innerHeight,
-            lock: p.alive ? g.lock : null, time: g.time, coins: g.coins, warning: g.warning, repair: g.repairText, lead, deadView,
+            lock: p.alive ? g.lock : null, time: g.time, cockpit: g.view === "cockpit" && p.alive, coins: g.coins, warning: g.warning, repair: g.repairText, lead, deadView,
             match: {teams: m.teams, blue: m.blue, red: m.red, goal: m.goal, timeLeft: m.timeLeft, leader: m.leader || 0},
             radarRange: 4000 * (1 + 0.2 * (p.stats.radar || 0)), area: g.area, missiles: g.combat.missiles(), blackout: g.blackout,
         });

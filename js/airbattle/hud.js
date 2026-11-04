@@ -175,6 +175,7 @@
             update(dt, s) {
                 const {player: p, planes, camera, width: W, height: H, lock, time} = s;
                 if (performance.now() > msgUntil) $(".df-msg").innerHTML = "";
+                hud.classList.toggle("in-cockpit", !!s.cockpit);
                 const m = s.match;
                 const clock = Math.max(0, Math.ceil(m.timeLeft));
                 $(".df-clock").textContent = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, "0")}`;
