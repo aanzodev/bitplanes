@@ -136,7 +136,7 @@ BitModules[9] = function (M, j, t) {
             window.bitOnLog && window.bitOnLog(L.innerHTML),
             (j.team && j.team == M.team) || M == j
                 ? M.kills--
-                : (M.kills++, window.BitShop && window.BitShop.onKill(M)),
+                : (M.kills++, window.BitMarket && window.BitMarket.onKill(M)),
             j.deaths++,
             M.isHuman && M !== j && !(j.team && j.team == M.team) && i.c.killed++,
             j.isHuman && i.c.deaths++);

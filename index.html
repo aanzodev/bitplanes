@@ -8,13 +8,13 @@
     <title>BitPlanes</title>
     <link href="css/base.css" rel="stylesheet">
     <link href="css/menu.css" rel="stylesheet">
-    <link href="css/hangar.css" rel="stylesheet">
+    <link href="css/aircraft.css" rel="stylesheet">
     <link href="css/online.css" rel="stylesheet">
     <link href="css/activity.css" rel="stylesheet">
     <link href="css/pause.css" rel="stylesheet">
     <link href="css/console.css" rel="stylesheet">
     <link href="css/panels.css" rel="stylesheet">
-    <link href="css/airbattle.css" rel="stylesheet">
+    <link href="css/flightmode.css" rel="stylesheet">
     <link href="css/career.css" rel="stylesheet">
 </head>
 <body>
@@ -26,16 +26,16 @@
         <nav class="lobby-nav">
             <span class="lobby-logo"><i class="logo"></i> BitPlanes</span>
             <button type="button" class="nav-tab active">Play</button>
-            <button type="button" class="nav-tab open-stats">Flight Statistics</button>
-            <button type="button" class="nav-tab open-shop">Aircraft Selection</button>
-            <button type="button" class="nav-tab open-skins">Aircraft Customization</button>
-            <button type="button" class="nav-tab open-quests"><i class="nav-dot" hidden></i>Flight Challenges</button>
+            <button type="button" class="nav-tab open-statistics">Flight Statistics</button>
+            <button type="button" class="nav-tab open-market">Aircraft Selection</button>
+            <button type="button" class="nav-tab open-customization">Aircraft Customization</button>
+            <button type="button" class="nav-tab open-challenges"><i class="nav-dot" hidden></i>Flight Challenges</button>
         </nav>
 
         <div class="lobby-profile">
             <button type="button" class="lobby-level" title="Pilot Level"><small>LV</small><b>1</b><span class="level-track"><span class="level-fill"></span></span></button>
             <span class="lobby-coins" title="Credits"><i class="coin"></i> <span class="coin-short">0</span></span>
-            <button type="button" class="lobby-avatar open-skins" title="Your pilot (Aircraft Customization)"><img alt="Your pilot"></button>
+            <button type="button" class="lobby-avatar open-customization" title="Your pilot (Aircraft Customization)"><img alt="Your pilot"></button>
         </div>
 
         <form id="activity">
@@ -48,10 +48,10 @@
                     </span>
                     <i class="name-edit" aria-hidden="true">✎</i>
                 </label>
-                <button type="button" class="lobby-hero open-skins" title="Change your appearance"><img alt="Your pilot"></button>
+                <button type="button" class="lobby-hero open-customization" title="Change your appearance"><img alt="Your pilot"></button>
                 <div class="lobby-pad"></div>
                 <div class="lobby-hero-name"></div>
-                <button type="button" class="lobby-plane-chip open-shop" title="Change your selected aircraft"><img alt=""><span></span></button>
+                <button type="button" class="lobby-plane-chip open-market" title="Change your selected aircraft"><img alt=""><span></span></button>
             </div>
 
             <div class="lobby-mode">
@@ -65,13 +65,13 @@
                 <p class="online-status"></p>
                 <div class="activity-modes" hidden>
                     <div>
-                        <label title="Free-for-all combat."><input type="radio" name="mode" value="death-match" checked> Combat Mode</label>
+                        <label title="Free-for-all combat."><input type="radio" name="mode" value="combat" checked> Combat Mode</label>
                     </div>
                     <div>
                         <label title="Play with real people online: 10 minute sessions, top 5 rankings."><input type="radio" name="mode" value="multiplayer"> Online Multiplayer</label>
                     </div>
                     <div>
-                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="airbattle"> 3D Flight Mode (Beta)</label>
+                        <label title="3D flights over real terrain (beta)."><input type="radio" name="mode" value="flightmode"> 3D Flight Mode (Beta)</label>
                     </div>
                 </div>
             </div>
@@ -190,14 +190,14 @@
 <script src="js/audio/engines.js"></script>
 <script src="js/audio/sound.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/shop/catalog.js"></script>
-<script src="js/shop/shop.js"></script>
-<script src="js/shop/hangar.js"></script>
-<script src="js/stats.js"></script>
+<script src="js/aircraft/catalog.js"></script>
+<script src="js/aircraft/market.js"></script>
+<script src="js/aircraft/selection.js"></script>
+<script src="js/statistics.js"></script>
 <script src="js/daily.js"></script>
-<script src="js/quests.js"></script>
+<script src="js/challenges.js"></script>
 <script src="js/progress.js"></script>
-<script src="js/skins.js"></script>
+<script src="js/customization.js"></script>
 <script src="js/console.js"></script>
 <script src="js/pause.js"></script>
 <script src="js/health.js"></script>
@@ -211,20 +211,20 @@
 <script src="js/online/match.js"></script>
 <script src="js/online/lobby.js"></script>
 <script src="js/menu.js"></script>
-<script src="js/airbattle/maps.js"></script>
-<script src="js/airbattle/erosion.js"></script>
-<script src="js/airbattle/world.js"></script>
-<script src="js/airbattle/post.js"></script>
-<script src="js/airbattle/models.js"></script>
-<script src="js/airbattle/flight.js"></script>
-<script src="js/airbattle/cockpit.js"></script>
-<script src="js/airbattle/aircraft.js"></script>
-<script src="js/airbattle/combat.js"></script>
-<script src="js/airbattle/ai.js"></script>
-<script src="js/airbattle/audio.js"></script>
-<script src="js/airbattle/hud.js"></script>
-<script src="js/airbattle/deploy.js"></script>
-<script src="js/airbattle/mode.js"></script>
+<script src="js/flightmode/maps.js"></script>
+<script src="js/flightmode/erosion.js"></script>
+<script src="js/flightmode/world.js"></script>
+<script src="js/flightmode/post.js"></script>
+<script src="js/flightmode/models.js"></script>
+<script src="js/flightmode/flight.js"></script>
+<script src="js/flightmode/cockpit.js"></script>
+<script src="js/flightmode/aircraft.js"></script>
+<script src="js/flightmode/combat.js"></script>
+<script src="js/flightmode/ai.js"></script>
+<script src="js/flightmode/audio.js"></script>
+<script src="js/flightmode/hud.js"></script>
+<script src="js/flightmode/deploy.js"></script>
+<script src="js/flightmode/mode.js"></script>
 <script src="js/engine/registry.js"></script>
 <script src="js/engine/00-vector.js"></script>
 <script src="js/engine/01-constants.js"></script>

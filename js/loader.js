@@ -38,11 +38,11 @@
         }
     }
 
-    const OPTIONAL = /js\/airbattle\//;
+    const OPTIONAL = /js\/flightmode\//;
 
-    function dropAirBattle(missing) {
+    function dropFlightMode(missing) {
         console.warn("3D Flight Mode is off: these files didn't load:", missing);
-        const radio = document.querySelector('input[name="mode"][value="airbattle"]');
+        const radio = document.querySelector('input[name="mode"][value="flightmode"]');
         if (radio) {
             if (radio.checked) {
                 const first = document.querySelector('input[name="mode"]');
@@ -300,8 +300,8 @@
         step("Ready!");
         progress(100);
         if (missing.length) {
-            window.BitAirBattle = null;
-            dropAirBattle(missing);
+            window.BitFlightMode = null;
+            dropFlightMode(missing);
         }
         done();
     }

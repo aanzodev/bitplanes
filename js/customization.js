@@ -1,4 +1,4 @@
-window.BitSkins = (function () {
+window.BitCustomization = (function () {
     const KEY = "skins";
     const RARITY = {
         common: {name: "Common", color: "#8f969c"},
@@ -178,7 +178,7 @@ window.BitSkins = (function () {
 
     function buy(id) {
         const s = SKINS.find(x => x.id === id);
-        if (!s || state.owned.includes(id) || !window.BitShop || !window.BitShop.spend(s.price)) return false;
+        if (!s || state.owned.includes(id) || !window.BitMarket || !window.BitMarket.spend(s.price)) return false;
         state.owned.push(id);
         state.selected = id;
         save();
@@ -196,7 +196,7 @@ window.BitSkins = (function () {
 
     function render() {
         if (!el || el.hidden) return;
-        const coins = window.BitShop ? window.BitShop.state().coins : 0;
+        const coins = window.BitMarket ? window.BitMarket.state().coins : 0;
         el.querySelector(".skin-grid").innerHTML = SKINS.slice().sort((a, b) => a.price - b.price).map(s => {
             const r = RARITY[s.rarity], owned = state.owned.includes(s.id), on = state.selected === s.id;
             const action = on ? `<button type="button" class="shop-btn equipped" disabled>Equipped</button>`
@@ -238,9 +238,9 @@ window.BitSkins = (function () {
             if (b && b.dataset.equip) equip(b.dataset.equip);
         });
         document.addEventListener("keydown", ev => ev.key === "Escape" && (el.hidden = true));
-        document.querySelectorAll(".open-skins").forEach(b => b.addEventListener("click", open));
+        document.querySelectorAll(".open-customization").forEach(b => b.addEventListener("click", open));
         listeners.push(render);
-        if (window.BitShop) window.BitShop.onChange(render);
+        if (window.BitMarket) window.BitMarket.onChange(render);
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

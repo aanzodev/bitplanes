@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
 
     D.makePilot = function (THREE, plane, skill = 0.7) {
         plane.pilotBonus = 1 + 0.12 * skill;

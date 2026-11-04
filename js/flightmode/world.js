@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
 
 
     const SKY_VERT = `

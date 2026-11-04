@@ -62,8 +62,8 @@ window.BitProgress = (function () {
             for (let l = Math.max(before, state.rewardedLevel) + 1; l <= after; l++) coins += levelReward(l);
             state.rewardedLevel = Math.max(state.rewardedLevel, after);
             if (coins) {
-                window.BitShop && window.BitShop.addCoins(coins);
-                window.BitStats && window.BitStats.addEarned(coins);
+                window.BitMarket && window.BitMarket.addCoins(coins);
+                window.BitStatistics && window.BitStatistics.addEarned(coins);
             }
             const tier = UPGRADE_TIERS.includes(after) ? "<br><small>New upgrade levels unlocked in the Aircraft Market!</small>" : "";
             toast(`<span class="toast-big">LEVEL UP!</span> Level ${after}${coins ? ` · +${coins.toLocaleString()} <i class="coin"></i>` : ""}${tier}`, "level", 4200);
@@ -73,7 +73,7 @@ window.BitProgress = (function () {
     }
 
     function tick() {
-        const s = window.BitStats && window.BitStats.get();
+        const s = window.BitStatistics && window.BitStatistics.get();
         if (!s) return;
         const now = {};
         for (const k of Object.keys(XP_FOR)) now[k] = s[k] || 0;

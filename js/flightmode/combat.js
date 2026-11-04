@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
     const MAX_BULLETS = 1400;
 
     const PART_VERT = `

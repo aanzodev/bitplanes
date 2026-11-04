@@ -357,7 +357,7 @@
         const plane = p.hasPlane() || p.lastPlane;
         if (plane) p.lastPlane = plane;
         const key = plane && plane.sprite && plane.sprite.planeKey;
-        const info = window.BitShop && plane && window.BitShop.planes.find(x => x.id === plane.planeId);
+        const info = window.BitMarket && plane && window.BitMarket.planes.find(x => x.id === plane.planeId);
         return {look: key ? [key[0], key[2], key[3]] : [p.color, "", ""], plane: info ? info.name : "Biplane"};
     }
 

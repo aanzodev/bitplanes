@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
 
     function esc(s) {
         return String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));

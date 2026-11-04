@@ -1,5 +1,5 @@
 (function () {
-    const D = window.BitAirBattle = window.BitAirBattle || {};
+    const D = window.BitFlightMode = window.BitFlightMode || {};
 
     const SHAPES = {
         "": {top: 80, min: 32, radius: 9, roll: 2.2, pitch: 1.0, eye: [0, 1.95, 1.6], boost: 1.18},

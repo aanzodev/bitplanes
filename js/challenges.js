@@ -1,4 +1,4 @@
-window.BitQuests = (function () {
+window.BitChallenges = (function () {
     const KEY = "quests";
     const DAILY = [
         {id: "kills5", text: "Shoot down 5 planes", stat: "killed", goal: 5, coins: 250},
@@ -58,7 +58,7 @@ window.BitQuests = (function () {
     }
 
     function stats() {
-        return window.BitStats && window.BitStats.get();
+        return window.BitStatistics && window.BitStatistics.get();
     }
 
     function fresh(pool, key, s) {
@@ -117,8 +117,8 @@ window.BitQuests = (function () {
         const entry = state.list.concat(state.weekly).find(x => x.id === id);
         entry.claimed = true;
         save();
-        window.BitShop && window.BitShop.addCoins(q.coins);
-        window.BitStats && window.BitStats.addEarned(q.coins);
+        window.BitMarket && window.BitMarket.addCoins(q.coins);
+        window.BitStatistics && window.BitStatistics.addEarned(q.coins);
         window.BitProgress && window.BitProgress.addXp(q.xp, "quest complete");
         render();
     }
@@ -130,7 +130,7 @@ window.BitQuests = (function () {
 
     function render() {
         const all = list("all");
-        const dot = document.querySelector(".open-quests .nav-dot");
+        const dot = document.querySelector(".open-challenges .nav-dot");
         if (dot) dot.hidden = !all.some(q => q.done && !q.claimed);
         if (!el || el.hidden) return;
         const quests = tab === "weekly" ? list("weekly") : list("daily");
@@ -187,7 +187,7 @@ window.BitQuests = (function () {
             if (b) claim(b.dataset.quest);
         });
         document.addEventListener("keydown", ev => ev.key === "Escape" && (el.hidden = true));
-        const btn = document.querySelector(".open-quests");
+        const btn = document.querySelector(".open-challenges");
         if (btn) btn.addEventListener("click", () => {
             el.hidden = false;
             render();

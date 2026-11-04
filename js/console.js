@@ -13,7 +13,7 @@
     }
 
     function shop() {
-        return window.BitShop;
+        return window.BitMarket;
     }
 
     function online() {
@@ -140,7 +140,7 @@
         stats: {
             help: "Your lifetime stats (or open the Stats page)",
             run() {
-                const s = window.BitStats.get();
+                const s = window.BitStatistics.get();
                 if (!s) throw new Error("Stats aren't ready yet.");
                 print(`Eliminations ${s.killed} · Deaths ${s.deaths} · Best streak ${s.bestStreak} · Hits ${s.hits}/${s.bullets} projectiles · Sessions ${s.matches}`, "dim");
             },
@@ -160,11 +160,11 @@
             },
         },
         unlockall: {help: "Own every plane and skin, max every upgrade",
-            run: () => (window.BitSkins && window.BitSkins.unlockAll(), print(shop().unlockAll() + " (and every skin)", "ok"))},
+            run: () => (window.BitCustomization && window.BitCustomization.unlockAll(), print(shop().unlockAll() + " (and every skin)", "ok"))},
         skin: {
             args: "<skin>", help: "Wear a skin you own (skins: list them)",
             run(a) {
-                const S = window.BitSkins, q = String(a[0] || "").toLowerCase().replace(/[^a-z]/g, "");
+                const S = window.BitCustomization, q = String(a[0] || "").toLowerCase().replace(/[^a-z]/g, "");
                 const list = S.list.map(s => `${s.id}${S.state().owned.includes(s.id) ? " ✓" : ""}`).join(", ");
                 const s = S.list.find(x => x.id === q || x.name.toLowerCase().replace(/[^a-z]/g, "") === q);
                 if (!s) throw new Error("Customization: " + list);

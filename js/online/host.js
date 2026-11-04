@@ -19,7 +19,7 @@
         peer.on("open", () => {
             host.code = code;
             status(O.mode === "multiplayer" ? "Online Multiplayer match ready." : "Room " + code + " is open.");
-            const dm = document.querySelector('input[name="mode"][value="death-match"]');
+            const dm = document.querySelector('input[name="mode"][value="combat"]');
             if (dm) dm.checked = true;
             document.getElementById("activity").requestSubmit();
         });

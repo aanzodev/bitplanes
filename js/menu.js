@@ -1,8 +1,8 @@
 (function () {
     const MODES = {
-        "death-match": {name: "Combat Mode", desc: "Free-for-all combat"},
+        "combat": {name: "Combat Mode", desc: "Free-for-all combat"},
         "multiplayer": {name: "Online Multiplayer", desc: "Real players online · 10 min sessions"},
-        "airbattle": {name: "3D Flight Mode", desc: "BETA · 3D flights over real terrain", beta: true},
+        "flightmode": {name: "3D Flight Mode", desc: "BETA · 3D flights over real terrain", beta: true},
         "swarm": {name: "Swarm", desc: "Two big teams"},
     };
 
@@ -19,12 +19,12 @@
     }
 
     function planeImage(p) {
-        const shop = window.BitShop;
+        const shop = window.BitMarket;
         return window.bitPlaneImage ? window.bitPlaneImage(shop.colorOf(p), true, p.skin, shop.patternOf(p)) : "";
     }
 
     function update() {
-        const shop = window.BitShop;
+        const shop = window.BitMarket;
         if (!shop) return;
         const st = shop.state(), p = shop.selected();
         document.querySelectorAll(".coin-short").forEach(el => {
@@ -37,7 +37,7 @@
             if (chip.querySelector("img").src !== img) chip.querySelector("img").src = img;
             chip.querySelector("span").textContent = p.name;
         }
-        const S = window.BitSkins;
+        const S = window.BitCustomization;
         if (S) {
             const skin = S.selected(), r = S.rarity[skin.rarity];
             const hero = document.querySelector(".lobby-hero img"), face = document.querySelector(".lobby-avatar img");
@@ -57,8 +57,8 @@
         const r = radios().find(x => x.checked) || radios()[0];
         if (!r) return;
         const m = MODES[r.value] || {name: r.value, desc: ""};
-        const D = window.BitAirBattle;
-        const locked = r.value === "airbattle" && D && D.access && !D.access().ok;
+        const D = window.BitFlightMode;
+        const locked = r.value === "flightmode" && D && D.access && !D.access().ok;
         document.querySelector(".mode-title").innerHTML = (locked ? "🔒 " : "") + m.name + (m.beta ? ' <span class="beta-tag">Beta</span>' : "");
         document.querySelector(".mode-name").textContent = m.name;
         document.querySelector(".mode-desc").textContent = locked ? "Unlocks at level 10, or with a special plane" : m.desc;
@@ -90,9 +90,9 @@
     }
 
     function init() {
-        const shop = window.BitShop;
+        const shop = window.BitMarket;
         if (shop) shop.onChange(update);
-        if (window.BitSkins) window.BitSkins.onChange(update);
+        if (window.BitCustomization) window.BitCustomization.onChange(update);
         update();
         showMode();
         setInterval(showMode, 500);

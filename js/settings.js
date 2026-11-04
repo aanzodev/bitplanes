@@ -128,7 +128,7 @@ window.BitSettings = (function () {
 
     function in2D() {
         const ui = document.querySelector(".ui");
-        return ui && ui.style.display === "block" && !(window.BitAirBattle && window.BitAirBattle.state && window.BitAirBattle.state());
+        return ui && ui.style.display === "block" && !(window.BitFlightMode && window.BitFlightMode.state && window.BitFlightMode.state());
     }
 
     function translate(ev) {
