@@ -36,9 +36,12 @@ The start screen is a lobby, with the bots flying behind it:
 While flying, a timer sits in the bottom left: the session countdown in
 Multiplayer, your time in the air otherwise.
 
-**Skins:** 11 pilots from Common to Legendary: Rookie (free), Ace, Red Baron,
-Night Owl, Arctic Fox, Desert Hawk, Moo Pilot, Top Gun, Neon Rider, Stealth
-and Golden Ace (25,000 credits).
+**Skins:** 21 pilots from Common to Legendary, sorted by price: Rookie (free),
+Cadet, Ace, Mechanic, Red Baron, Jungle Ranger (camo), Night Owl, Arctic Fox,
+Desert Hawk, Sky Racer (racing chevrons), Sea Wolf (bearded carrier veteran),
+Moo Pilot, Top Gun, Firebird (flames), Starfighter (stars), Neon Rider,
+Admiral (medals), Stealth, Phantom Ghost, Golden Ace and Diamond Ace
+(40,000 credits).
 
 ### One-line version (loads from jsDelivr)
 
