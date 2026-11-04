@@ -74,21 +74,21 @@
 
     function showLocked(a) {
         const el = document.createElement("div");
-        el.className = "df-deploy df-locked";
+        el.className = "fm-overlay fm-locked";
         const P = window.BitProgress, info = P ? P.levelInfo() : {frac: 0};
         const coins = window.BitMarket ? window.BitMarket.state().coins : 0;
-        el.innerHTML = `<div class="df-deploy-box df-lock-box">
-            <div class="df-deploy-head"><h2>🔒 3D Flight Mode <span class="beta-tag">Beta</span></h2><button type="button" class="df-x" aria-label="Close">×</button></div>
-            <p class="df-lock-lead">3D Flight Mode is for experienced pilots. Unlock it either way:</p>
-            <div class="df-lock-ways">
-                <div class="df-lock-way"><b>⭐ Reach level ${a.need}</b>
+        el.innerHTML = `<div class="fm-overlay-box fm-lock-box">
+            <div class="fm-overlay-head"><h2>🔒 3D Flight Mode <span class="beta-tag">Beta</span></h2><button type="button" class="fm-x" aria-label="Close">×</button></div>
+            <p class="fm-lock-lead">3D Flight Mode is for experienced pilots. Unlock it either way:</p>
+            <div class="fm-lock-ways">
+                <div class="fm-lock-way"><b>⭐ Reach level ${a.need}</b>
                     <span>You're level ${a.level}${a.level < a.need ? ` · ${a.need - a.level} to go` : ""}</span>
-                    <div class="df-lock-bar"><i style="width: ${Math.min(100, ((a.level - 1 + (info.frac || 0)) / (a.need - 1)) * 100)}%"></i></div>
+                    <div class="fm-lock-bar"><i style="width: ${Math.min(100, ((a.level - 1 + (info.frac || 0)) / (a.need - 1)) * 100)}%"></i></div>
                     <small>XP comes from eliminations, sessions and quests in BitPlanes.</small></div>
-                <div class="df-lock-way"><b>✈ Own a special plane</b>
+                <div class="fm-lock-way"><b>✈ Own a special plane</b>
                     <span>The jets with a black border in the Aircraft Market${a.cheapest ? `, from the ${a.cheapest.name} (${a.cheapest.price.toLocaleString()} credits)` : ""}.</span>
                     <small>You have ${coins.toLocaleString()} credits.</small>
-                    <button type="button" class="pill df-lock-hangar">Open the Aircraft Market</button></div>
+                    <button type="button" class="pill fm-lock-market">Open the Aircraft Market</button></div>
             </div>
         </div>`;
         document.body.appendChild(el);
@@ -104,8 +104,8 @@
         };
         document.addEventListener("keydown", onKey, true);
         el.addEventListener("click", ev => {
-            if (ev.target === el || ev.target.closest(".df-x")) close();
-            if (ev.target.closest(".df-lock-hangar")) {
+            if (ev.target === el || ev.target.closest(".fm-x")) close();
+            if (ev.target.closest(".fm-lock-market")) {
                 close();
                 const h = document.querySelector(".open-market");
                 if (h) h.click();
@@ -132,9 +132,9 @@
         }
         D.THREE = THREE;
         const root = document.createElement("div");
-        root.className = "df-root";
+        root.className = "fm-root";
         const loading = document.createElement("div");
-        loading.className = "df-loading";
+        loading.className = "fm-loading";
         const map = D.MAPS.find(m => m.id === setup.map) || D.MAPS[0];
         loading.innerHTML = `<div><span>${map.icon}</span><h2>${map.name}</h2><p>Building the world…</p></div>`;
         root.appendChild(loading);
@@ -243,7 +243,7 @@
         g.offSettings = window.BitSettings && window.BitSettings.onChange(applySettings);
         applySettings();
         loading.remove();
-        hud.message(`<b>${world.theme.name}</b><br>${teams ? `You fly for the <span class="df-blue-t">blue team</span>. First to ${g.match.goal} eliminations wins.` : `Open Flight: first to ${g.match.goal} eliminations.`}<br><small>Esc pauses · ${keyName("camera")} cockpit view · ${setting("dfMouse") ? "click to fly with the mouse" : "keys to fly"}</small>`, 6000);
+        hud.message(`<b>${world.theme.name}</b><br>${teams ? `You fly for the <span class="fm-blue-t">blue team</span>. First to ${g.match.goal} eliminations wins.` : `Open Flight: first to ${g.match.goal} eliminations.`}<br><small>Esc pauses · ${keyName("camera")} cockpit view · ${setting("dfMouse") ? "click to fly with the mouse" : "keys to fly"}</small>`, 6000);
         loop();
     }
 
@@ -441,13 +441,13 @@
         plane.deaths++;
         const st = stats();
         const killer = by && by !== plane && !(by.team && by.team === plane.team) ? by : null;
-        const name = p => `<span class="df-n ${p.team || (p.isPlayer ? "blue" : "red")}">${p === g.player ? "You" : p.name}</span>`;
+        const name = p => `<span class="fm-n ${p.team || (p.isPlayer ? "blue" : "red")}">${p === g.player ? "You" : p.name}</span>`;
         const icon = {gun: "▬▸", missile: "🚀", crash: "💥", collision: "💥", eject: "🪂"}[how] || "✈";
         if (killer) {
             killer.kills++;
             killer.score += 100;
             if (g.match.teams) g.match[killer.team]++;
-            g.hud.feed(`${name(killer)} <span class="df-feed-icon">${icon}</span> ${name(plane)}`);
+            g.hud.feed(`${name(killer)} <span class="fm-feed-icon">${icon}</span> ${name(plane)}`);
         } else if (collidedWith) g.hud.feed(`${name(plane)} 💥 ${name(collidedWith)}`);
         else g.hud.feed(`${name(plane)} ${how === "eject" ? "ejected 🪂" : "crashed 💥"}`);
         for (const [p, d] of plane.damageBy || []) {
@@ -493,8 +493,8 @@
             g.killcam = killer ? {target: killer, until: g.time + 3.5} : null;
             const dist = killer ? Math.round(killer.pos.distanceTo(plane.pos)) : 0;
             g.hud.killcam(killer
-                ? `<small>Shot down by</small><b class="df-n ${killer.team || "red"}">${killer.name}</b><span>${killer.label} · ${dist} m · ${Math.max(0, Math.ceil(100 * killer.health / killer.maxHealth))}% health left</span><em class="df-respawn"></em>`
-                : `<b>${how === "eject" ? "You ejected" : collidedWith ? `You collided with ${collidedWith.name}` : "You crashed"}</b><em class="df-respawn"></em>`);
+                ? `<small>Shot down by</small><b class="fm-n ${killer.team || "red"}">${killer.name}</b><span>${killer.label} · ${dist} m · ${Math.max(0, Math.ceil(100 * killer.health / killer.maxHealth))}% health left</span><em class="fm-respawn"></em>`
+                : `<b>${how === "eject" ? "You ejected" : collidedWith ? `You collided with ${collidedWith.name}` : "You crashed"}</b><em class="fm-respawn"></em>`);
         }
         g.respawnAt.set(plane, g.time + (plane === g.player ? PLAYER_RESPAWN : AI_RESPAWN));
         checkEnd();
@@ -659,21 +659,21 @@
         const ranked = g.planes.slice().sort((a, b) => b.score - a.score || b.kills - a.kills);
         const mvp = ranked[0];
         const esc = s => String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
-        g.hud.results(`<div class="df-results-box ${won ? "won" : "lost"}">
+        g.hud.results(`<div class="fm-results-box ${won ? "won" : "lost"}">
             <h1>${title}</h1>
-            ${m.teams ? `<p class="df-final"><span class="df-blue-t">Blue ${m.blue}</span> · <span class="df-red-t">${m.red} Red</span></p>` : ""}
-            <div class="df-res-grid">
+            ${m.teams ? `<p class="fm-final"><span class="fm-blue-t">Blue ${m.blue}</span> · <span class="fm-red-t">${m.red} Red</span></p>` : ""}
+            <div class="fm-res-grid">
                 <div><b>${p.score}</b><small>Score</small></div>
                 <div><b>${p.kills}</b><small>Eliminations</small></div>
                 <div><b>${p.deaths}</b><small>Deaths</small></div>
                 <div><b>+${xp.toLocaleString()}</b><small>XP</small></div>
                 <div><b>+${(g.coins + coins).toLocaleString()}</b><small>Credits</small></div>
             </div>
-            <p class="df-mvp">MVP: <b>${esc(mvp === p ? "You" : mvp.name)}</b> (${esc(mvp.label)}) · ${mvp.kills} eliminations · ${mvp.score} score</p>
-            <table class="df-res-table"><tr><th>#</th><th>Pilot</th><th>Plane</th><th>E</th><th>D</th><th>Score</th></tr>
+            <p class="fm-mvp">MVP: <b>${esc(mvp === p ? "You" : mvp.name)}</b> (${esc(mvp.label)}) · ${mvp.kills} eliminations · ${mvp.score} score</p>
+            <table class="fm-res-table"><tr><th>#</th><th>Pilot</th><th>Plane</th><th>E</th><th>D</th><th>Score</th></tr>
                 ${ranked.slice(0, 8).map((x, i) => `<tr class="${x === p ? "me" : ""} ${x.team || ""}"><td>${i + 1}</td><td>${esc(x === p ? "You" : x.name)}</td><td>${esc(x.label)}</td><td>${x.kills}</td><td>${x.deaths}</td><td>${x.score}</td></tr>`).join("")}
             </table>
-            <div class="df-res-buttons"><button type="button" class="btn df-again">Play again</button><button type="button" class="btn df-out">Back to the lobby</button></div>
+            <div class="fm-res-buttons"><button type="button" class="btn fm-again">Play again</button><button type="button" class="btn fm-out">Back to the lobby</button></div>
         </div>`, () => {
             const setup = g.setup;
             stop();
@@ -703,7 +703,7 @@
         if (f.time < 1) return;
         f.value = f.frames / f.time;
         f.frames = f.time = 0;
-        const el = g.root.querySelector(".df-fps");
+        const el = g.root.querySelector(".fm-fps");
         if (el) {
             el.hidden = !setting("dfShowFps");
             el.textContent = `${Math.round(f.value)} FPS · ${Math.round(100 * g.ratio / g.maxRatio)}% res`;
@@ -751,7 +751,7 @@
         if (p.alive && !m.over) {
             const out = Math.hypot(p.pos.x, p.pos.z);
             if (out > g.area) {
-                warning = `<span class="df-warn-area">Return to the battle area</span>`;
+                warning = `<span class="fm-warn-area">Return to the battle area</span>`;
                 if (out > g.area * 1.08) {
                     const to = new T.Vector3(-p.pos.x, 0, -p.pos.z).normalize();
                     p.input.roll = Math.max(-1, Math.min(1, p.right.dot(to) * 2));
@@ -761,21 +761,21 @@
             const ahead = p.pos.clone().addScaledVector(p.forward, p.speed * 3);
             const below = g.world.ground(p.pos.x, p.pos.z);
             if ((ahead.y < g.world.ground(ahead.x, ahead.z) + 40 || p.pos.y - below < 120) && p.forward.y < 0.1) {
-                warning = `<span class="df-warn-pull">PULL UP</span>`;
+                warning = `<span class="fm-warn-pull">PULL UP</span>`;
                 alarm = true;
             }
             if (p.stalling) {
-                warning = `<span class="df-warn-pull">STALL · nose down, throttle up</span>`;
+                warning = `<span class="fm-warn-pull">STALL · nose down, throttle up</span>`;
                 alarm = true;
             }
             const incoming = g.combat.missilesAt(p);
             if (incoming.length) {
                 threat = "missile";
                 const near = incoming.reduce((a, b) => (a.mesh.position.distanceTo(p.pos) < b.mesh.position.distanceTo(p.pos) ? a : b));
-                warning = `<span class="df-warn-missile">MISSILE · ${Math.round(near.mesh.position.distanceTo(p.pos))} m${p.flares > 0 ? ` · ${keyName("flare")} countermeasures` : " · break hard!"}</span>`;
+                warning = `<span class="fm-warn-missile">MISSILE · ${Math.round(near.mesh.position.distanceTo(p.pos))} m${p.flares > 0 ? ` · ${keyName("flare")} countermeasures` : " · break hard!"}</span>`;
             } else if (p.lockedAt && g.time - p.lockedAt < 0.3) {
                 threat = "lock";
-                warning = `<span class="df-warn-lock">${p.lockedBy ? p.lockedBy.name + " is locking on" : "Locked on"}</span>`;
+                warning = `<span class="fm-warn-lock">${p.lockedBy ? p.lockedBy.name + " is locking on" : "Locked on"}</span>`;
             }
         }
         g.warning = warning;
@@ -844,7 +844,7 @@
         for (const [plane, t] of g.respawnAt) {
             if (plane.isPlayer) {
                 const left = Math.max(0, Math.ceil(t - g.time));
-                const r = g.hud.el.querySelector(".df-respawn");
+                const r = g.hud.el.querySelector(".fm-respawn");
                 if (r) r.textContent = m.over ? "" : `Back in the air in ${left}…`;
             }
             if (g.time >= t && !m.over) {

@@ -102,7 +102,7 @@ BitModules[87] = function (M, j, t) {
                     (u.ammo = u.maxAmmo = I.maxAmmo = e.b),
                     u.move(Object(o.s)(M.width * Math.random(), M.ground * Math.random())),
                     M.add(u),
-                    (I.disableAI = Object(L.a)(M, I)));
+                    (I.disableBot = Object(L.a)(M, I)));
             }
             const t = document.querySelector(".demo"),
                 [D, g] = Object(u.b)(1.25, t);
@@ -117,7 +117,7 @@ BitModules[87] = function (M, j, t) {
             );
             return function () {
                 n();
-                for (let j of M.participants) j.disableAI();
+                for (let j of M.participants) j.disableBot();
             };
         })();
         window.BitEngine.stopDemo = r;
@@ -207,7 +207,7 @@ BitModules[87] = function (M, j, t) {
                                         (u.landed = !0),
                                         u.move(Object(o.s)((j * M.width) / e.j - 800, M.ground)),
                                         M.add(u),
-                                        (I.disableAI = Object(L.a)(M, I)));
+                                        (I.disableBot = Object(L.a)(M, I)));
                                 }
                                 (window.BitEngine.world = M), (window.BitEngine.player = z);
                                 window.BitMaps && window.BitMaps.announce(M.map);
@@ -281,7 +281,7 @@ BitModules[87] = function (M, j, t) {
                                             let M;
                                             for (; (M = w.shift());)
                                                 if (M.hasPlane()) {
-                                                    (M.disableAI(),
+                                                    (M.disableBot(),
                                                         x(M),
                                                         (M.isHuman = !0),
                                                         (g.leader = M),
@@ -319,7 +319,7 @@ BitModules[87] = function (M, j, t) {
                                             ),
                                         ),
                                         M.add(N),
-                                        (u.disableAI = Object(L.a)(M, u)),
+                                        (u.disableBot = Object(L.a)(M, u)),
                                         w.push(u));
                                 }
                                 for (let j = 0; j < t; j++) {
@@ -342,7 +342,7 @@ BitModules[87] = function (M, j, t) {
                                         ),
                                         (N.angle = 2 * Math.PI * Math.random()),
                                         M.add(N),
-                                        (u.disableAI = Object(L.a)(M, u)));
+                                        (u.disableBot = Object(L.a)(M, u)));
                                 }
                                 const O = document.querySelector("#canvas"),
                                     [C, E] = Object(u.b)(1.25, O);

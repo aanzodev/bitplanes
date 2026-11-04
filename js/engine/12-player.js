@@ -30,7 +30,7 @@ BitModules[12] = function (M, j, t) {
                 (this.maxMissiles = i.i),
                 (this.number = 0),
                 (this.isHuman = !1),
-                (this.disableAI = () => {}));
+                (this.disableBot = () => {}));
         }
         join(M) {
             ((this.team = M), M.members.push(this));
